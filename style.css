@@ -9,3 +9,38 @@ body {margin: 0; font-family: 'Arial', sans-serif; background: #f4f4f4;}
 .search-box input {width: 200px; padding: 8px; border: 2px solid white; border-radius: 4px;}
 .search-results {background: white; margin: 10px 20px; padding: 15px; border-radius: 8px; text-align: left;}
 .highlight {background-color: yellow !important; border-radius: 3px;}
+.contact-form {
+  max-width: 500px;
+  margin: 20px auto;
+  text-align: left;
+}
+.contact-form input, 
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 2px solid #0066cc;
+  border-radius: 5px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+.contact-form input:focus, 
+.contact-form textarea:focus {
+  border-color: #ffcc00;
+  outline: none;
+}
+.contact-form button {
+  width: 100%;
+  padding: 14px;
+  background: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.contact-form button:hover {
+  background: #004080;
+}
