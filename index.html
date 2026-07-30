@@ -45,7 +45,7 @@ body {margin: 0; font-family: 'Arial', sans-serif; background: #f4f4f4;}
   <a href="#about">About</a>
   <a href="#contact">Contact</a>
   <div class="search-box">
-  <input type="text" id="searchInput" placeholder="Zawng tur type rawh...">
+  <input type="text" id="searchInput" placeholder="Search">
   </div>
 </div>
 
@@ -60,30 +60,30 @@ body {margin: 0; font-family: 'Arial', sans-serif; background: #f4f4f4;}
   <p>Address: Saikhawthlir, Kolasib District, Mizoram</p>
 </div>
   
-  <script>
-function searchPage() {
-  let input = document.getElementById('searchInput');
-  let filter = input.value.toLowerCase();
-  
-  // h1, h2, h3, p, li chiah kan zawng ang
-  let elements = document.querySelectorAll('h1, h2, h3, p, li'); 
+<script>
+const searchInput = document.getElementById('searchInput');
+const searchableElements = document.querySelectorAll('h1, h2, h3, p, li');
 
-  // a hma a eng zawng zawng ti var phawt
-  elements.forEach(el => el.style.backgroundColor = "");
+searchInput.addEventListener('keyup', function() {
+  let filter = searchInput.value.toLowerCase();
 
-  if(filter !== ""){
-    elements.forEach(el => {
-      let txtValue = el.textContent || el.innerText;
-      if (txtValue.toLowerCase().indexOf(filter) > -1) {
-        el.style.backgroundColor = "yellow"; // hmuh ah chiah eng
-        el.scrollIntoView({behavior: "smooth", block: "center"}); // a awmna ah min kalpui
+  // a hma a eng zawng ti var phawt
+  searchableElements.forEach(el => {
+    el.style.backgroundColor = "";
+    el.style.transition = "background 0.3s";
+  });
+
+  if(filter.length > 0){
+    searchableElements.forEach(el => {
+      let txtValue = el.textContent.toLowerCase();
+      if (txtValue.includes(filter)) {
+        el.style.backgroundColor = "orange"; // i hmuh a awl nan orange kan ti
+        el.scrollIntoView({behavior: "smooth", block: "center"});
       }
     });
   }
-}
-
-document.getElementById('searchInput').addEventListener('keyup', searchPage);
-  </script>
+});
+</script>
 
 </body>
 </html>
