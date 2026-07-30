@@ -59,19 +59,26 @@ body {margin: 0; font-family: 'Arial', sans-serif; background: #f4f4f4;}
   <p>© 2026 Saikhawthlir Secondary School. All Rights Reserved.</p>
   <p>Address: Saikhawthlir, Kolasib District, Mizoram</p>
 </div>
+  
   <script>
 function searchPage() {
   let input = document.getElementById('searchInput');
   let filter = input.value.toLowerCase();
-  let elements = document.getElementsByTagName('*');
+  
+  // h1, h2, h3, p, li chiah kan zawng ang
+  let elements = document.querySelectorAll('h1, h2, h3, p, li'); 
 
-  for (let i = 0; i < elements.length; i++) {
-    let txtValue = elements[i].textContent || elements[i].innerText;
-    if (txtValue.toLowerCase().indexOf(filter) > -1 && filter!= "") {
-      elements[i].style.backgroundColor = "yellow"; // a hmuh ah a eng ang
-    } else {
-      elements[i].style.backgroundColor = "";
-    }
+  // a hma a eng zawng zawng ti var phawt
+  elements.forEach(el => el.style.backgroundColor = "");
+
+  if(filter !== ""){
+    elements.forEach(el => {
+      let txtValue = el.textContent || el.innerText;
+      if (txtValue.toLowerCase().indexOf(filter) > -1) {
+        el.style.backgroundColor = "yellow"; // hmuh ah chiah eng
+        el.scrollIntoView({behavior: "smooth", block: "center"}); // a awmna ah min kalpui
+      }
+    });
   }
 }
 
