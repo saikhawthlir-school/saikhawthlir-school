@@ -6,27 +6,24 @@
 <title>Saikhawthlir Secondary School (RMSA)</title>
 <style>
 body {margin: 0; font-family: 'Arial', sans-serif; background: #f4f4f4;}
-/* Header */
 .header {background: #004080; color: white; padding: 15px; text-align: center;}
 .header h1 {margin: 0; font-size: 24px;}
 .header p {margin: 5px 0 0 0; font-size: 14px;}
-/* Menu */
-.navbar {background: #0066cc; display: flex; justify-content: flex-start; flex-wrap: wrap; padding-left: 15px;}
-.navbar a {color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; margin-right: 10px;}
-.navbar a {color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; margin-right: 10px}
-.navbar a:hover {background: #ffcc00; color: black;}
-/* Content */
+.navbar {background: #0066cc; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; flex-wrap: wrap;}
+.nav-links a {color: white; padding: 14px 20px; text-decoration: none; font-weight: bold; display: inline-block;}
+.nav-links a:hover {background: #ffcc00; color: black;}
 .content {padding: 30px; text-align: center; background: white; margin: 20px; border-radius: 8px;}
 .footer {background: #00264d; color: white; text-align: center; padding: 15px; margin-top: 20px;}
-  .search-box {
-  text-align: center;
-  padding: 6px;
-}
+.search-box {padding: 10px;}
 .search-box input {
-  width: 60%;
+  width: 200px;
   padding: 8px;
-  border: 2px solid #0066cc;
+  border: 2px solid white;
   border-radius: 4px;
+}
+.highlight {
+  background-color: yellow !important;
+  border-radius: 3px;
 }
 </style>
 </head>
@@ -38,14 +35,16 @@ body {margin: 0; font-family: 'Arial', sans-serif; background: #f4f4f4;}
 </div>
 
 <div class="navbar">
-  <a href="index.html">Home</a>
-  <a href="gallery.html">Gallery</a>
-  <a href="download.html">Download</a>
-  <a href="notice.html">Notice</a>
-  <a href="#about">About</a>
-  <a href="#contact">Contact</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="download.html">Download</a>
+    <a href="notice.html">Notice</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </div>
   <div class="search-box">
-  <input type="text" id="searchInput" placeholder="Search">
+    <input type="text" id="searchInput" placeholder="Search...">
   </div>
 </div>
 
@@ -62,23 +61,21 @@ body {margin: 0; font-family: 'Arial', sans-serif; background: #f4f4f4;}
   
 <script>
 const searchInput = document.getElementById('searchInput');
-const searchableElements = document.querySelectorAll('h1, h2, h3, p, li');
+const searchableElements = document.querySelectorAll('.content h1, .content h2, .content h3, .content p, .content li');
 
 searchInput.addEventListener('keyup', function() {
   let filter = searchInput.value.toLowerCase();
 
-  // a hma a eng zawng ti var phawt
+  // a hma a eng zawng remove phawt
   searchableElements.forEach(el => {
-    el.style.backgroundColor = "";
-    el.style.transition = "background 0.3s";
+    el.classList.remove('highlight');
   });
 
-  if(filter.length > 0){
+  if(filter.length > 2){ // 2 character a pelh chuan chiah search
     searchableElements.forEach(el => {
       let txtValue = el.textContent.toLowerCase();
       if (txtValue.includes(filter)) {
-        el.style.backgroundColor = "orange"; // i hmuh a awl nan orange kan ti
-        el.scrollIntoView({behavior: "smooth", block: "center"});
+        el.classList.add('highlight'); // yellow class pe
       }
     });
   }
