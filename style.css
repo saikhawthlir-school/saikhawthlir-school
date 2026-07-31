@@ -115,15 +115,6 @@ body {margin: 0; font-family: 'Arial', sans-serif; background: #f4f4f4;}
     border-top: 1px solid #004080; /* a hrang hrang */
   }
 
-  /* Search box full width rawh se */
-  .search-box {
-    width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
-  }
-  .search-box input {
-    width: 100%; /* 200px atang full width */
-  }
 
   /* Content margin ti te deuh */
   .content {
