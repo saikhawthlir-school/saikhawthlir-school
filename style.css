@@ -44,3 +44,59 @@ body {margin: 0; font-family: 'Arial', sans-serif; background: #f4f4f4;}
 .contact-form button:hover {
   background: #004080;
 }
+
+/* ========== MOBILE VIEW ========== */
+@media (max-width: 768px) {
+
+  /* Header text te ti te deuh */
+  .header h1 {
+    font-size: 20px;
+  }
+
+  /* Navbar hi a in del thla vek rawh se */
+  .navbar {
+    flex-direction: column; /* a in del thla */
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .nav-links {
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* menu te a in del thla */
+    text-align: center;
+  }
+
+  .nav-links a {
+    width: 100%;
+    padding: 12px;
+    border-top: 1px solid #004080; /* a hrang hrang */
+  }
+
+  /* Search box full width rawh se */
+  .search-box {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  .search-box input {
+    width: 100%; /* 200px atang full width */
+  }
+
+  /* Content margin ti te deuh */
+  .content {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .contact-form {
+    margin: 10px;
+  }
+}
+
+/* ========== TABLET VIEW ========== */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .content {
+    margin: 15px;
+  }
+}
