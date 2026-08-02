@@ -1,20 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- HEI HI MOBILE TAN PAWIMAWH -->
+  <title>Saikhawthlir Secondary School (RMSA)</title>
+  <link rel="stylesheet" href="style.css"> <!-- CSS link -->
 </head>
 <body>
 
-<div class="navbar">
-  <!-- Mobile: Menu Button Vei lam -->
-  <button class="menu-toggle" id="menu-toggle">☰</button>
-  
-  <div class="logo">Saikhawthlir Secondary School (RMSA)</div>
+  <!-- HEADER -->
+  <header class="header">
+    <h1>Saikhawthlir Secondary School (RMSA)</h1>
+    <
+  </header>
 
-  <!-- PC Menu - Trung lai -->
-  <div class="nav-links pc-menu"> <!-- class thar pc-menu -->
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <button class="menu-toggle" id="menu-toggle">☰</button>
+    <div class="logo">SSS RMSA</div>
+
+    <!-- PC Menu -->
+    <div class="nav-links pc-menu">
+      <a href="index.html">Home</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="download.html">Download</a>
+      <a href="notice.html">Notice</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search...">
+      <button id="searchBtn">🔍</button>
+    </div>
+  </nav>
+
+  <!-- MOBILE SIDE MENU -->
+  <div class="side-menu" id="mobile-menu">
+    <button class="close-btn" id="close-btn">✕</button>
     <a href="index.html">Home</a>
     <a href="gallery.html">Gallery</a>
     <a href="download.html">Download</a>
@@ -23,41 +47,25 @@
     <a href="#contact">Contact</a>
   </div>
 
-  <!-- Search Dinglam -->
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Search...">
-    <button id="searchBtn">🔍</button>
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- CONTENT - SEARCH NA TUR -->
+  <div class="container" id="searchable">
+    <div class="content">
+      <h2>Welcome to SSS (RMSA)</h2>
+      <p>Kan school website ah hian lo kal la, lawmman i dawng ang. Notice thar, result leh school activity te kan dah thin. Heihi search test nan a ni. "Notice" tiin search chhin la.</p>
+    </div>
   </div>
-</div>
 
-<!-- Mobile Side Menu - ID thlak -->
-<div class="side-menu" id="mobile-menu"> <!-- id = mobile-menu -->
-    <button class="close-btn" id="close-btn">✕</button>
-  <a href="index.html">Home</a>
-  <a href="gallery.html">Gallery</a>
-  <a href="download.html">Download</a>
-  <a href="notice.html">Notice</a>
-  <a href="#about">About</a>
-  <a href="#contact">Contact</a>
-</div>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 Saikhawthlir Secondary School. All Rights Reserved.</p>
+    <p>Address: Saikhawthlir, Kolasib District, Mizoram</p>
+  </footer>
 
-<!-- Overlay -->
-<div class="overlay" id="overlay"></div>
+  <!-- SCRIPT - TAWP BER AH DAH TUR -->
+  <script src="script.js"></script> 
 
-<div class="container">
-  <div class="content" id="searchable">
-    <h2>Welcome to SSS (RMSA)</h2>
-    <p>Kan school website ah hian lo kal la, lawmman i dawng ang. 
-    Notice thar, result leh school activity te kan dah thin.</p>
-    <p>Heihi search test nan a ni. "Notice" tiin search chhin la.</p>
-  </div>
-</div>
-
-<div class="footer">
-  <p>© 2026 Saikhawthlir Secondary School. All Rights Reserved.</p>
-  <p>Address: Saikhawthlir, Kolasib District, Mizoram</p>
-</div>
-  
-<script src="script.js"></script>
 </body>
 </html>
