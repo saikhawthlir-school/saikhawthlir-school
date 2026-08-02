@@ -208,5 +208,35 @@ a { text-decoration: none; }
 
 /* ========== PC VIEW - 769px chunglam ========== */
 @media (min-width: 769px) {
-  .side-menu, .overlay, .menu-toggle { display: none !important; }
+  .side-menu, .overlay, .menu-toggle { 
+    display: none !important; 
   }
+  
+  /* PC ah chuan menu pangai kan dah let leh */
+  .navbar {
+    justify-content: space-between;
+  }
+  
+  .nav-links {
+    display: flex !important;
+    position: static;
+    flex-direction: row;
+    background: transparent;
+    width: auto;
+    padding: 0;
+  }
+  
+  .nav-links a {
+    border: none;
+    padding: 14px 20px;
+  }
+  
+  .nav-links a:hover {
+    background: #ffcc00;
+    color: black;
+  }
+  
+  .search-box.active input { 
+    width: 200px; 
+  }
+}
