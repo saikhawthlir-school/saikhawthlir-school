@@ -76,3 +76,15 @@ a { text-decoration: none; }
   .search-box.active input { width: 120px; }
   .container { padding: 10px; }
 }
+
+/* SIDE MENU TOP BAR */
+.side-menu .close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 28px;
+  color: white;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
