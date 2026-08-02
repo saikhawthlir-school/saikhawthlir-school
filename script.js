@@ -1,41 +1,28 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // ========== 1. SIDE MENU TOGGLE ==========
-  const menuToggle = document.getElementById('menu-toggle');
-  const mobileMenu = document.getElementById('mobile-menu');
-  const overlay = document.getElementById('overlay');
-  const closeBtn = document.getElementById('close-btn');
+// Menu toggle
+document.getElementById('menu-toggle').addEventListener('click', function(){
+  document.getElementById('mobile-menu').classList.toggle('show');
+  document.getElementById('overlay').classList.toggle('show');
+  this.innerHTML = document.getElementById('mobile-menu').classList.contains('show') ? '✕' : '☰';
+});
 
-  function closeMenu() {
-    mobileMenu.classList.remove('show');
-    overlay.classList.remove('show');
-    menuToggle.innerHTML = '☰';
+// X button
+document.getElementById('close-btn').addEventListener('click', function(){
+  document.getElementById('mobile-menu').classList.remove('show');
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('menu-toggle').innerHTML = '☰';
+});
+
+// Overlay click
+document.getElementById('overlay').addEventListener('click', function(){
+  document.getElementById('mobile-menu').classList.remove('show');
+  this.classList.remove('show');
+  document.getElementById('menu-toggle').innerHTML = '☰';
+});
+
+// Search toggle
+document.getElementById('searchBtn').addEventListener('click', function(){
+  document.querySelector('.search-box').classList.toggle('active');
+  if(document.querySelector('.search-box').classList.contains('active')){
+    document.getElementById('searchInput').focus();
   }
-
-  function openMenu() {
-    mobileMenu.classList.add('show');
-    overlay.classList.add('show');
-    menuToggle.innerHTML = '✕';
-  }
-
-  // ☰ Button hmet
-  menuToggle.addEventListener('click', () => {
-    if(mobileMenu.classList.contains('show')) {
-      closeMenu();
-    } else {
-      openMenu();
-    }
-  });
-
-  // X Button hmet
-  closeBtn.addEventListener('click', closeMenu); 
-
-  // Overlay dum hmet
-  overlay.addEventListener('click', closeMenu);
-  
-  // Menu link hmet
-  document.querySelectorAll('.side-menu a').forEach(link => {
-    link.addEventListener('click', closeMenu);
-  });
-
-
-  // =
+});
