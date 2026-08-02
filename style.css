@@ -1,46 +1,212 @@
-/* ========== BASIC ========== */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Arial', sans-serif; background: #f4f4f4; line-height: 1.6; }
+/* ========== BASIC RESET ========== */
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+body { 
+  font-family: 'Arial', sans-serif; 
+  background: #f4f4f4; 
+  line-height: 1.6; 
+}
+a { text-decoration: none; }
 
 /* ========== HEADER ========== */
-.header { background: #004080; color: white; padding: 20px 15px; text-align: center; }
-.header h1 { font-size: 28px; margin-bottom: 5px; }
-.header p { font-size: 16px; opacity: 0.9; }
+.header { 
+  background: #004080; 
+  color: white; 
+  padding: 20px 15px; 
+  text-align: center; 
+}
+.header h1 { 
+  font-size: 28px; 
+  margin-bottom: 5px; 
+}
+.header p { 
+  font-size: 16px; 
+  opacity: 0.9; 
+}
 
 /* ========== NAVBAR ========== */
-.navbar { background: #0066cc; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; }
-.logo { color: white; font-weight: bold; font-size: 18px; padding: 14px 0; }
-.nav-links { display: flex; }
-.nav-links a { color: white; padding: 14px 20px; font-weight: bold; display: block; transition: 0.3s; }
-.nav-links a:hover { background: #ffcc00; color: black; }
+.navbar { 
+  background: #0066cc; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 0 15px; 
+  position: sticky; 
+  top: 0; 
+  z-index: 100; 
+  height: 55px;
+}
+.logo { 
+  color: white; 
+  font-weight: bold; 
+  font-size: 18px; 
+}
 
 /* ========== MENU BUTTON ========== */
-.menu-toggle { display: none; background: none; border: none; color: white; font-size: 28px; cursor: pointer; padding: 10px; }
+.menu-toggle { 
+  background: none; 
+  border: none; 
+  color: white; 
+  font-size: 28px; 
+  cursor: pointer; 
+  padding: 10px; 
+}
+
+/* ========== SIDE MENU - Google Site ang ========== */
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: -260px; /* a tir ah a biru */
+  width: 250px;
+  height: 100%;
+  background: #004080;
+  z-index: 200;
+  transition: 0.3s;
+  padding-top: 60px;
+  display: flex;
+  flex-direction: column;
+}
+.side-menu.show { left: 0; }
+.side-menu a {
+  color: white;
+  padding: 15px 20px;
+  font-weight: bold;
+  text-decoration: none; /* underline awm lo */
+  border-bottom: 1px solid #003366;
+  transition: 0.2s;
+}
+.side-menu a:hover {
+  background: #ffcc00;
+  color: black;
+}
+
+/* ========== OVERLAY ========== */
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 150;
+  display: none;
+}
+.overlay.show { display: block; }
 
 /* ========== SEARCH BOX ========== */
-.search-box { display: flex; padding: 10px; align-items: center; }
-.search-box input { width: 0; padding: 0; border: none; border-radius: 20px; font-size: 16px; outline: none; transition: 0.4s; background: white; }
-.search-box.active input { width: 200px; padding: 10px 15px; }
-.search-box button { padding: 10px 14px; background: #333; color: white; border: none; border-radius: 50%; font-size: 18px; cursor: pointer; margin-left: 5px; }
+.search-box { 
+  display: flex; 
+  align-items: center; 
+}
+.search-box input { 
+  width: 0; 
+  padding: 0; 
+  border: none; 
+  border-radius: 20px; 
+  font-size: 16px; 
+  outline: none; 
+  transition: 0.4s; 
+  background: white; 
+}
+.search-box.active input { 
+  width: 150px; 
+  padding: 8px 12px; 
+}
+.search-box input::placeholder { color: #999; }
+.search-box button { 
+  padding: 8px 12px; 
+  background: #333; 
+  color: white; 
+  border: none; 
+  border-radius: 50%; 
+  font-size: 18px; 
+  cursor: pointer; 
+  margin-left: 5px;
+  transition: 0.3s;
+}
 .search-box button:hover { background: #000; }
 
 /* ========== CONTENT ========== */
-.container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-.content { padding: 30px; background: white; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.highlight { background-color: #ffcc00 !important; color: black; border-radius: 3px; padding: 2px 4px; }
+.container { 
+  max-width: 1100px; 
+  margin: 0 auto; 
+  padding: 20px; 
+}
+.content { 
+  padding: 30px; 
+  background: white; 
+  margin: 20px 0; 
+  border-radius: 8px; 
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+}
+.highlight { 
+  background-color: #ffcc00 !important; 
+  color: black; 
+  border-radius: 3px; 
+  padding: 2px 4px; 
+}
+
+/* ========== CONTACT FORM ========== */
+.contact-form {
+  max-width: 500px;
+  margin: 20px auto;
+  text-align: left;
+}
+.contact-form input, 
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 2px solid #0066cc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+.contact-form input:focus, 
+.contact-form textarea:focus {
+  border-color: #ffcc00;
+  outline: none;
+}
+.contact-form button {
+  width: 100%;
+  padding: 14px;
+  background: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.contact-form button:hover { background: #004080; }
 
 /* ========== FOOTER ========== */
-.footer { background: #00264d; color: white; text-align: center; padding: 20px 15px; margin-top: 30px; }
+.footer { 
+  background: #00264d; 
+  color: white; 
+  text-align: center; 
+  padding: 20px 15px; 
+  margin-top: 30px;
+}
 
-/* ========== MOBILE VIEW ========== */
+/* ========== MOBILE VIEW - 768px hnuai ========== */
 @media (max-width: 768px) {
   .header h1 { font-size: 22px; }
-  .menu-toggle { display: block; position: absolute; right: 15px; top: 10px; }
-  .navbar { padding: 0 15px; position: relative; }
-  .nav-links { display: none; flex-direction: column; width: 100%; background: #0055aa; position: absolute; top: 50px; left: 0; }
-  .nav-links.show { display: flex; }
-  .nav-links a { border-top: 1px solid #004080; text-align: left; padding: 15px 20px; }
-  .search-box.active input { width: 140px; }
+  .header p { font-size: 14px; }
+  .search-box.active input { width: 120px; }
   .container { padding: 10px; }
   .content { margin: 10px 0; padding: 20px 15px; }
+  .contact-form { margin: 10px; }
 }
+
+/* ========== TABLET VIEW - 769 to 1024px ========== */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .container { padding: 15px; }
+  .content { margin: 15px 0; }
+}
+
+/* ========== PC VIEW - 769px chunglam ========== */
+@media (min-width: 769px) {
+  .side-menu, .overlay, .menu-toggle { display: none !important; }
+  }
