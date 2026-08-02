@@ -88,3 +88,8 @@ a { text-decoration: none; }
   background: none;
   border: none;
 }
+
+.menu-toggle, #searchBtn, .close-btn { 
+  cursor: pointer; 
+  z-index: 999; 
+}
