@@ -14,7 +14,12 @@
 </div>
 
 <div class="navbar">
-  <div class="nav-links">
+  <div class="logo">SSS RMSA</div>
+  
+  <!-- Mobile menu button -->
+  <button class="menu-toggle" id="menu-toggle">☰</button>
+
+  <div class="nav-links" id="nav-links">
     <a href="index.html">Home</a>
     <a href="gallery.html">Gallery</a>
     <a href="download.html">Download</a>
@@ -22,16 +27,20 @@
     <a href="#about">About</a>
     <a href="#contact">Contact</a>
   </div>
+
   <div class="search-box">
-  <input type="text" placeholder="Search...">
-  <button type="submit">🔍</button>
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button id="searchBtn">🔍</button>
   </div>
 </div>
 
-<div class="content" id="home">
-  <h2>Welcome to SSS (RMSA)</h2>
-  <p>Kan school website ah hian lo kal la, lawmman i dawng ang. 
-  Notice thar, result leh school activity te kan dah thin.</p>
+<div class="container">
+  <div class="content" id="searchable">
+    <h2>Welcome to SSS (RMSA)</h2>
+    <p>Kan school website ah hian lo kal la, lawmman i dawng ang. 
+    Notice thar, result leh school activity te kan dah thin.</p>
+    <p>Heihi search test nan a ni. "Notice" tiin search chhin la.</p>
+  </div>
 </div>
 
 <div class="footer">
@@ -39,28 +48,6 @@
   <p>Address: Saikhawthlir, Kolasib District, Mizoram</p>
 </div>
   
-<script>
-const searchInput = document.getElementById('searchInput');
-const searchableElements = document.querySelectorAll('.content h1, .content h2, .content h3, .content p, .content li');
-
-searchInput.addEventListener('keyup', function() {
-  let filter = searchInput.value.toLowerCase();
-
-  // a hma a eng zawng remove phawt
-  searchableElements.forEach(el => {
-    el.classList.remove('highlight');
-  });
-
-  if(filter.length > 2){ // 2 character a pelh chuan chiah search
-    searchableElements.forEach(el => {
-      let txtValue = el.textContent.toLowerCase();
-      if (txtValue.includes(filter)) {
-        el.classList.add('highlight'); // yellow class pe
-      }
-    });
-  }
-});
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
