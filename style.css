@@ -12,29 +12,28 @@ a { text-decoration: none; }
 .navbar { 
   background: #0066cc; 
   display: flex; 
-  justify-content: flex-start; /* space-between atang heihi ah thlak */
+  justify-content: space-between; /* Mobile ah hian a tha zawk */
   align-items: center; 
-  padding: 0 20px; /* 15px atang 20px */
+  padding: 0 15px; 
   position: sticky; 
   top: 0; 
   z-index: 100; 
   height: 55px;
-  gap: 20px; /* Logo, Menu, Search inkar */
 }
 .logo { color: white; font-weight: bold; font-size: 18px; }
 
-/* PC MENU - INKAR HNEM NAN */
+/* PC MENU */
 .pc-menu { 
   display: flex; 
-  gap: 20px; /* 0 atang 20px. A inkar a hnaih */
-  margin-left: auto; /* Menu ho zawng hi dinglam ah a kal phei */
-  margin-right: 15px; /* Search nen a inkar */
+  gap: 20px; 
+  margin-left: 30px; /* Logo leh Menu inkar */
+  margin-right: auto; /* Heihi dah chuan Search a tawp thleng in a kal */
 }
 .pc-menu a { 
   color: white; 
-  padding: 18px 8px; /* 15px atang 8px. A inhnawh lut lo */
+  padding: 18px 8px; 
   font-weight: bold; 
-  white-space: nowrap; /* a tlak thla loh nan */
+  white-space: nowrap; 
 }
 .pc-menu a:hover { background: #ffcc00; color: black; }
 
@@ -81,12 +80,15 @@ a { text-decoration: none; }
 
 /* ========== MOBILE VIEW ========== */
 @media (max-width: 768px) {
-  .pc-menu { display: none !important; } /* PC menu hide */
+  .pc-menu { display: none !important; } 
   .menu-toggle { display: block; }
   .header h1 { font-size: 22px; }
   .search-box.active input { width: 120px; }
   .container { padding: 10px; }
-  .navbar { padding: 0 15px; gap: 10px; }
+  
+  /* HEI HI BELH THAR - MOBILE TAN */
+  .navbar { justify-content: flex-start; gap: 10px; } /* ☰ SSS RMSA 🔍 tiang in a inhnaih */
+  .logo { margin-right: auto; } /* Logo hnuai ah search a awm theih nan */
 }
 
 /* SIDE MENU TOP BAR */
