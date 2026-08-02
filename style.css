@@ -25,9 +25,9 @@ a { text-decoration: none; }
 /* PC MENU */
 .pc-menu { 
   display: flex; 
-  gap: 15px; /* Inkar hnaih nan */
+  gap: 8px; /* Inkar hnaih nan */
   position: absolute; /* HEI HI BELH */
-  left: 20%; /* Lai tak ah dah */
+  left: 280%; /* Lai tak ah dah */
   transform: translateX(-50%); /* A lai tak chiah ah dah */
 }
 .pc-menu a { 
