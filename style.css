@@ -19,7 +19,7 @@ a { text-decoration: none; }
   top: 0; 
   z-index: 100; 
   height: 55px;
-  transition: 0.3s;
+  flex-wrap: wrap;
 }
 .logo { color: white; font-weight: bold; font-size: 18px; }
 
@@ -30,7 +30,6 @@ a { text-decoration: none; }
   position: absolute; /* HEI HI BELH */
   left: 70%; /* Lai tak ah dah */
   transform: translateX(-50%); /* A lai tak chiah ah dah */
-  transition: 0.3s;
 }
 .pc-menu a { 
   color: white; 
@@ -111,8 +110,3 @@ a { text-decoration: none; }
   z-index: 999; 
 }
 
-
-/* HEI HI BELH THAR */
-.search-box.active ~ .pc-menu {
-  transform: translateX(200px); /* Search a lan chuan menu hi 200px in a tawlh phei */
-}
