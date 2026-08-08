@@ -1,53 +1,89 @@
 <!DOCTYPE html>
-<html>
-<head><title>SKT Feed</title>
-<style>
-  body{background:#F5F5F5;font-family:Arial}
-  .header{background:#1E88E5;color:white;padding:15px}
-  .postbox{background:white;padding:15px;margin:10px;border-radius:8px}
-  textarea{width:95%;padding:10px}
-</style>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKT School Feed</title>
+  <style>
+    body { font-family: Arial; background: #f0f2f5; margin: 0; }
+    .header { background: white; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; font-weight: bold; }
+    .post-box { background: white; margin: 20px auto; padding: 15px; border-radius: 10px; width: 90%; max-width: 600px; }
+    .post-box input { width: 95%; padding: 10px; border: 1px solid #ddd; border-radius: 20px; }
+    .post { background: white; margin: 20px auto; padding: 15px; border-radius: 10px; width: 90%; max-width: 600px; }
+    .post img { width: 100%; border-radius: 8px; margin-top: 10px; }
+    .post button { margin-right: 10px; padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; }
+  </style>
 </head>
 <body>
-  <div class="header"><h2>SKT Connect</h2></div>
-  
-  <div class="postbox">
-    <textarea id="postText" placeholder="Eng nge i ngaihtuah?"></textarea>
-    <button onclick="post()">Post</button>
+  <div class="header">SKT School Feed</div>
+
+  <div class="post-box">
+    <input type="text" id="postText" placeholder="What's on your mind?">
+    <button onclick="addPost()">Post</button>
   </div>
-  
-  <div id="feed"></div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <div id="posts"></div>
 
-const app = initializeApp( /* I firebaseConfig */ );
-const auth = getAuth(app);
-const db = getFirestore(app);
+  <script type="module">
+    // 1. Firebase Import
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-onAuthStateChanged(auth, user => { if(!user) window.location='login.html' });
+    // 2. I Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6-eVUiLVdPcd3KrJ7_lVJZxqRR",
+      authDomain: "school-project-dab29.firebaseapp.com",
+      projectId: "school-project-dab29",
+      storageBucket: "school-project-dab29.appspot.com",
+      messagingSenderId: "213425473234",
+      appId: "1:213425473234:web:b3f9088a476ef8Be3ce79"
+    };
 
-window.post = async () => {
-  await addDoc(collection(db, "posts"), {
-    text: postText.value,
-    date: new Date()
-  });
-  postText.value = '';
-  loadFeed();
-}
+    // 3. Initialize
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-async function loadFeed(){
-  const q = query(collection(db, "posts"), orderBy("date","desc"));
-  const snap = await getDocs(q);
-  let html = '';
-  snap.forEach(doc => {
-    html += `<div class="postbox"><p>${doc.data().text}</p></div>`;
-  });
-  feed.innerHTML = html;
-}
-loadFeed();
-</script>
+    // 4. Login check
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html"; // Login loh chuan login page ah
+      } else {
+        loadPosts();
+      }
+    });
+
+    // 5. Post thar dah
+    window.addPost = async () => {
+      const text = document.getElementById('postText').value;
+      if(text === "") return;
+      await addDoc(collection(db, "posts"), {
+        text: text,
+        time: serverTimestamp(),
+        likes: 0
+      });
+      document.getElementById('postText').value = "";
+      loadPosts();
+    }
+
+    // 6. Post load
+    async function loadPosts() {
+      const q = query(collection(db, "posts"), orderBy("time", "desc"));
+      const querySnapshot = await getDocs(q);
+      let postsHTML = "";
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        postsHTML += `
+          <div class="post">
+            <p>${data.text}</p>
+            <small>${data.time ? new Date(data.time.seconds * 1000).toLocaleString() : "Just now"}</small><br><br>
+            <button>❤️ Like ${data.likes || 0}</button>
+          </div>
+        `;
+      });
+      document.getElementById('posts').innerHTML = postsHTML;
+    }
+  </script>
 </body>
 </html>
