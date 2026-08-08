@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head><title>SKT Feed</title>
+<style>
+  body{background:#F5F5F5;font-family:Arial}
+  .header{background:#1E88E5;color:white;padding:15px}
+  .postbox{background:white;padding:15px;margin:10px;border-radius:8px}
+  textarea{width:95%;padding:10px}
+</style>
+</head>
+<body>
+  <div class="header"><h2>SKT Connect</h2></div>
+  
+  <div class="postbox">
+    <textarea id="postText" placeholder="Eng nge i ngaihtuah?"></textarea>
+    <button onclick="post()">Post</button>
+  </div>
+  
+  <div id="feed"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app = initializeApp( /* I firebaseConfig */ );
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, user => { if(!user) window.location='login.html' });
+
+window.post = async () => {
+  await addDoc(collection(db, "posts"), {
+    text: postText.value,
+    date: new Date()
+  });
+  postText.value = '';
+  loadFeed();
+}
+
+async function loadFeed(){
+  const q = query(collection(db, "posts"), orderBy("date","desc"));
+  const snap = await getDocs(q);
+  let html = '';
+  snap.forEach(doc => {
+    html += `<div class="postbox"><p>${doc.data().text}</p></div>`;
+  });
+  feed.innerHTML = html;
+}
+loadFeed();
+</script>
+</body>
+</html>
