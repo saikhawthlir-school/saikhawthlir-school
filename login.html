@@ -7,11 +7,12 @@
   <style>
     body { font-family: Arial; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
     .box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; }
-    input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+    input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
     button { background: #1877f2; color: white; border: none; font-weight: bold; cursor: pointer; }
     button:disabled { background: #aaa; cursor: not-allowed; }
     #otp-box { display: none; }
     #error { color: red; font-size: 14px; margin-top: 10px; }
+    h2 { text-align: center; margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -20,7 +21,7 @@
     
     <div id="phone-box">
       <input type="text" id="phone" placeholder="+917005697815">
-      <div id="recaptcha-container"></div>
+      <div id="recaptcha-container"></div> 
       <button id="send-otp">Send OTP</button>
     </div>
 
@@ -50,9 +51,9 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // 4. Recaptcha
+    // 4. Invisible reCAPTCHA - a lang tawh lo
     window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 
-      'size': 'normal',
+      'size': 'invisible',
       'callback': () => {}
     });
 
@@ -63,6 +64,7 @@
     // 5. Send OTP
     sendBtn.onclick = () => {
       const phone = document.getElementById('phone').value;
+      document.getElementById('error').innerText = "";
       sendBtn.disabled = true;
       sendBtn.innerText = "Sending...";
       
@@ -76,7 +78,6 @@
           document.getElementById('error').innerText = error.message;
           sendBtn.disabled = false;
           sendBtn.innerText = "Send OTP";
-          window.recaptchaVerifier.render();
         });
     };
 
@@ -87,10 +88,9 @@
       verifyBtn.innerText = "Verifying...";
       
       confirmationResult.confirm(code).then((result) => {
-        // Login hlawhtlin chuan feed ah kal
         window.location.href = "feed.html";
       }).catch((error) => {
-        document.getElementById('error').innerText = "Wrong OTP: " + error.message;
+        document.getElementById('error').innerText = "Wrong OTP";
         verifyBtn.disabled = false;
         verifyBtn.innerText = "Verify & Login";
       });
