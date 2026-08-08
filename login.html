@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SKT Connect Login</title>
+  <style>
+    body{background:#1E88E5;display:flex;justify-content:center;align-items:center;height:100vh}
+    .box{background:white;padding:30px;border-radius:10px;width:320px;text-align:center}
+    input,button{width:90%;padding:12px;margin:8px 0;border-radius:5px;border:1px solid #ccc}
+    button{background:#1E88E5;color:white;border:none;font-weight:bold}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🔵 SKT Connect</h2>
+    
+    <div id="phone-div">
+      <input id="phone" placeholder="+91 98623xxxxx">
+      <div id="recaptcha-container"></div>
+      <button onclick="sendOTP()">OTP Send</button>
+    </div>
+
+    <div id="otp-div" style="display:none">
+      <input id="otp" placeholder="OTP 6 digits dah rawh">
+      <button onclick="verifyOTP()">Login</button>
+    </div>
+  </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  // I firebaseConfig kha he tah dah rawh
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {}, auth);
+let confirmationResult;
+
+window.sendOTP = () => {
+  const phoneNumber = phone.value;
+  signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+  .then(result => {
+    confirmationResult = result;
+    phone-div.style.display = 'none';
+    otp-div.style.display = 'block';
+    alert("OTP a kal tawh");
+  }).catch(e => alert(e.message));
+}
+
+window.verifyOTP = () => {
+  confirmationResult.confirm(otp.value)
+  .then(() => window.location = 'feed.html')
+  .catch(e => alert("OTP a dik lo"));
+}
+</script>
+</body>
+</html>
