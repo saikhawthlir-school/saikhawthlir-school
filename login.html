@@ -9,10 +9,9 @@
     .box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; }
     input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
     button { background: #1877f2; color: white; border: none; font-weight: bold; cursor: pointer; }
-    button:disabled { background: #aaa; cursor: not-allowed; }
+    button:disabled { background: #aaa; }
     #otp-box { display: none; }
     #error { color: red; font-size: 14px; margin-top: 10px; }
-    h2 { text-align: center; margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -20,7 +19,7 @@
     <h2>SKT School Login</h2>
     
     <div id="phone-box">
-      <input type="text" id="phone" placeholder="+917005697815">
+      <input type="text" id="phone" value="+917005697815">
       <div id="recaptcha-container"></div> 
       <button id="send-otp">Send OTP</button>
     </div>
@@ -33,13 +32,11 @@
   </div>
 
   <script type="module">
-    // 1. Firebase Import
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
     import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-    // 2. I Firebase Config
     const firebaseConfig = {
-      apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
+      apiKey: "AIzaSyD6-eVUiLVdPcd3KrJ7_lVJZxqRR",
       authDomain: "school-project-dab29.firebaseapp.com",
       projectId: "school-project-dab29",
       storageBucket: "school-project-dab29.appspot.com",
@@ -47,52 +44,36 @@
       appId: "1:213425473234:web:b3f9088a476ef8Be3ce79"
     };
 
-    // 3. Initialize
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // 4. Invisible reCAPTCHA - a lang tawh lo
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 
-      'size': 'invisible',
-      'callback': () => {}
-    });
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
 
     let confirmationResult;
-    const sendBtn = document.getElementById('send-otp');
-    const verifyBtn = document.getElementById('verify-otp');
-
-    // 5. Send OTP
-    sendBtn.onclick = () => {
+    document.getElementById('send-otp').onclick = () => {
       const phone = document.getElementById('phone').value;
       document.getElementById('error').innerText = "";
-      sendBtn.disabled = true;
-      sendBtn.innerText = "Sending...";
+      document.getElementById('send-otp').disabled = true;
+      document.getElementById('send-otp').innerText = "Sending...";
       
       signInWithPhoneNumber(auth, phone, window.recaptchaVerifier)
         .then((result) => {
           confirmationResult = result;
           document.getElementById('phone-box').style.display = 'none';
-          document.getElementById('otp-box').style.display = 'block'; // OTP box a rawn lang
-          alert("OTP sent! Test OTP: 123456");
+          document.getElementById('otp-box').style.display = 'block'; 
         }).catch((error) => {
           document.getElementById('error').innerText = error.message;
-          sendBtn.disabled = false;
-          sendBtn.innerText = "Send OTP";
+          document.getElementById('send-otp').disabled = false;
+          document.getElementById('send-otp').innerText = "Send OTP";
         });
     };
 
-    // 6. Verify OTP
-    verifyBtn.onclick = () => {
+    document.getElementById('verify-otp').onclick = () => {
       const code = document.getElementById('otp').value;
-      verifyBtn.disabled = true;
-      verifyBtn.innerText = "Verifying...";
-      
-      confirmationResult.confirm(code).then((result) => {
+      confirmationResult.confirm(code).then(() => {
         window.location.href = "feed.html";
-      }).catch((error) => {
+      }).catch(() => {
         document.getElementById('error').innerText = "Wrong OTP";
-        verifyBtn.disabled = false;
-        verifyBtn.innerText = "Verify & Login";
       });
     };
   </script>
