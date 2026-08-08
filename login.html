@@ -36,7 +36,7 @@
     import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
+      apiKey: "AIzaSyD6-eVUiLVdPcd3KrJ7_lVJZxqRR",
       authDomain: "school-project-dab29.firebaseapp.com",
       projectId: "school-project-dab29",
       storageBucket: "school-project-dab29.appspot.com",
@@ -60,7 +60,7 @@
         .then((result) => {
           confirmationResult = result;
           document.getElementById('phone-box').style.display = 'none';
-          document.getElementById('otp-box').style.display = 'block'; 
+          document.getElementById('otp-box').style.display = 'block'; // Test number vangin a lang nghal ang
         }).catch((error) => {
           document.getElementById('error').innerText = error.message;
           document.getElementById('send-otp').disabled = false;
@@ -73,7 +73,7 @@
       confirmationResult.confirm(code).then(() => {
         window.location.href = "feed.html";
       }).catch(() => {
-        document.getElementById('error').innerText = "Wrong OTP";
+        document.getElementById('error').innerText = "Wrong OTP: 123456 try rawh";
       });
     };
   </script>
