@@ -1,77 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SKT School Login</title>
   <style>
-    body { font-family: Arial; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-    .box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; text-align: center;}
-    h2 { color: #1877f2; }
-    input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
-    button { background: #1877f2; color: white; border: none; font-weight: bold; cursor: pointer; }
-    button:disabled { background: #aaa; }
-    #otp-box { display: none; }
-    #error { color: red; font-size: 14px; margin-top: 10px; }
-    #recaptcha-container { margin: 10px 0; display: flex; justify-content: center; }
+    body { font-family: Arial; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin:0; }
+    .box { background: white; padding: 30px; border-radius: 12px; width: 350px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+    h2 { color:#1877f2 }
+    input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-size:16px; }
+    button { background: #1877f2; color: white; border: none; font-weight: bold; cursor:pointer; }
   </style>
 </head>
 <body>
   <div class="box">
     <h2>SKT School Login</h2>
-    <div id="phone-box">
-      <input type="text" id="phone" value="+917005697815" readonly>
-      <div id="recaptcha-container"></div> 
-      <button id="send-otp">Send OTP</button>
-    </div>
-    <div id="otp-box">
-      <p>Test OTP: <b>123456</b></p>
-      <input type="text" id="otp" placeholder="Enter OTP">
-      <button id="verify-otp">Verify & Login</button>
-    </div>
-    <p id="error"></p>
+    <input type="email" id="email" placeholder="Email" value="test@test.com">
+    <input type="password" id="pass" placeholder="Password" value="123456">
+    <button id="login">Login</button>
+    <p id="error" style="color:red"></p>
   </div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  
+  const app = initializeApp({
+    apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
+    authDomain: "school-project-dab29.firebaseapp.com",
+    projectId: "school-project-dab29"
+  });
+  const auth = getAuth(app);
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
-      authDomain: "school-project-dab29.firebaseapp.com",
-      projectId: "school-project-dab29",
-      storageBucket: "school-project-dab29.appspot.com",
-      messagingSenderId: "213425473234",
-      appId: "1:213425473234:web:b3f9088a476ef8Be3ce79"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'normal' });
-
-    let confirmationResult;
-    document.getElementById('send-otp').onclick = () => {
-      const phone = document.getElementById('phone').value;
-      document.getElementById('error').innerText = "";
-      signInWithPhoneNumber(auth, phone, window.recaptchaVerifier)
-        .then((result) => {
-          confirmationResult = result;
-          document.getElementById('phone-box').style.display = 'none';
-          document.getElementById('otp-box').style.display = 'block';
-        }).catch((error) => {
-          document.getElementById('error').innerText = error.message;
-        });
-    };
-
-    document.getElementById('verify-otp').onclick = () => {
-      const code = document.getElementById('otp').value;
-      confirmationResult.confirm(code).then(() => {
-        window.location.href = "feed.html";
-      }).catch(() => {
-        document.getElementById('error').innerText = "Wrong OTP. 123456 try rawh";
-      });
-    };
-  </script>
+  document.getElementById('login').onclick = () => {
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('pass').value;
+    signInWithEmailAndPassword(auth, email, pass)
+    .then(() => window.location.href = "feed.html")
+    .catch((e) => document.getElementById('error').innerText = "Login failed: " + e.message);
+  }
+</script>
 </body>
 </html>
