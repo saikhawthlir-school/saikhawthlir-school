@@ -5,19 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SKT School Login</title>
   <style>
-    body { font-family: Arial; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    body { font-family: Arial; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
     .box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; }
-    input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; }
+    input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
     button { background: #1877f2; color: white; border: none; font-weight: bold; cursor: pointer; }
-    button:disabled { background: #aaa; }
+    button:disabled { background: #aaa; cursor: not-allowed; }
     #otp-box { display: none; }
+    #error { color: red; font-size: 14px; margin-top: 10px; }
   </style>
 </head>
 <body>
   <div class="box">
     <h2>SKT School Login</h2>
+    
     <div id="phone-box">
-      <input type="text" id="phone" placeholder="+91 70056 97815">
+      <input type="text" id="phone" placeholder="+917005697815">
       <div id="recaptcha-container"></div>
       <button id="send-otp">Send OTP</button>
     </div>
@@ -26,7 +28,7 @@
       <input type="text" id="otp" placeholder="Enter OTP: 123456">
       <button id="verify-otp">Verify & Login</button>
     </div>
-    <p id="error" style="color:red;"></p>
+    <p id="error"></p>
   </div>
 
   <script type="module">
@@ -36,7 +38,7 @@
 
     // 2. I Firebase Config
     const firebaseConfig = {
-      apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
+      apiKey: "AIzaSyD6-eVUiLVdPcd3KrJ7_lVJZxqRR",
       authDomain: "school-project-dab29.firebaseapp.com",
       projectId: "school-project-dab29",
       storageBucket: "school-project-dab29.appspot.com",
@@ -49,34 +51,48 @@
     const auth = getAuth(app);
 
     // 4. Recaptcha
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'normal' });
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 
+      'size': 'normal',
+      'callback': () => {}
+    });
 
     let confirmationResult;
     const sendBtn = document.getElementById('send-otp');
     const verifyBtn = document.getElementById('verify-otp');
 
-    // 5. Send OTP - TEST MODE: 123456
+    // 5. Send OTP
     sendBtn.onclick = () => {
       const phone = document.getElementById('phone').value;
+      sendBtn.disabled = true;
+      sendBtn.innerText = "Sending...";
+      
       signInWithPhoneNumber(auth, phone, window.recaptchaVerifier)
         .then((result) => {
           confirmationResult = result;
           document.getElementById('phone-box').style.display = 'none';
-          document.getElementById('otp-box').style.display = 'block';
+          document.getElementById('otp-box').style.display = 'block'; // OTP box a rawn lang
           alert("OTP sent! Test OTP: 123456");
         }).catch((error) => {
           document.getElementById('error').innerText = error.message;
+          sendBtn.disabled = false;
+          sendBtn.innerText = "Send OTP";
+          window.recaptchaVerifier.render();
         });
     };
 
     // 6. Verify OTP
     verifyBtn.onclick = () => {
       const code = document.getElementById('otp').value;
+      verifyBtn.disabled = true;
+      verifyBtn.innerText = "Verifying...";
+      
       confirmationResult.confirm(code).then((result) => {
         // Login hlawhtlin chuan feed ah kal
         window.location.href = "feed.html";
       }).catch((error) => {
-        document.getElementById('error').innerText = "Wrong OTP";
+        document.getElementById('error').innerText = "Wrong OTP: " + error.message;
+        verifyBtn.disabled = false;
+        verifyBtn.innerText = "Verify & Login";
       });
     };
   </script>
