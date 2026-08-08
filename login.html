@@ -5,41 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SKT School Login</title>
   <style>
-    body { 
-      font-family: Arial; 
-      background: #f0f2f5; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      height: 100vh; 
-      margin: 0; 
-    }
-    .box { 
-      background: white; 
-      padding: 30px; 
-      border-radius: 12px; 
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-      width: 350px; 
-      text-align: center;
-    }
-    h2 { color: #1877f2; margin-bottom: 20px; }
-    input, button { 
-      width: 100%; 
-      padding: 12px; 
-      margin: 8px 0; 
-      border-radius: 8px; 
-      border: 1px solid #ccc; 
-      box-sizing: border-box; 
-      font-size: 16px; 
-    }
-    button { 
-      background: #1877f2; 
-      color: white; 
-      border: none; 
-      font-weight: bold; 
-      cursor: pointer; 
-    }
-    button:disabled { background: #aaa; cursor: not-allowed; }
+    body { font-family: Arial; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; text-align: center;}
+    h2 { color: #1877f2; }
+    input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
+    button { background: #1877f2; color: white; border: none; font-weight: bold; cursor: pointer; }
+    button:disabled { background: #aaa; }
     #otp-box { display: none; }
     #error { color: red; font-size: 14px; margin-top: 10px; }
     #recaptcha-container { margin: 10px 0; display: flex; justify-content: center; }
@@ -48,15 +19,13 @@
 <body>
   <div class="box">
     <h2>SKT School Login</h2>
-    
     <div id="phone-box">
       <input type="text" id="phone" value="+917005697815" readonly>
       <div id="recaptcha-container"></div> 
       <button id="send-otp">Send OTP</button>
     </div>
-
     <div id="otp-box">
-      <p>OTP: <b>123456</b></p>
+      <p>Test OTP: <b>123456</b></p>
       <input type="text" id="otp" placeholder="Enter OTP">
       <button id="verify-otp">Verify & Login</button>
     </div>
@@ -79,40 +48,30 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // HE MI HI A PAWIMAWH BER - Test mode on na
+    // HE MI HI A PAWIMAWH BER
     auth.settings.appVerificationDisabledForTesting = true;
 
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 
-      'size': 'normal',
-      'callback': () => {}
-    });
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'normal' });
 
     let confirmationResult;
     document.getElementById('send-otp').onclick = () => {
       const phone = document.getElementById('phone').value;
       document.getElementById('error').innerText = "";
-      document.getElementById('send-otp').disabled = true;
-      document.getElementById('send-otp').innerText = "Sending...";
-      
       signInWithPhoneNumber(auth, phone, window.recaptchaVerifier)
         .then((result) => {
           confirmationResult = result;
           document.getElementById('phone-box').style.display = 'none';
-          document.getElementById('otp-box').style.display = 'block'; // OTP box a rawn lang
+          document.getElementById('otp-box').style.display = 'block';
         }).catch((error) => {
           document.getElementById('error').innerText = error.message;
-          console.log(error);
-          document.getElementById('send-otp').disabled = false;
-          document.getElementById('send-otp').innerText = "Send OTP";
         });
     };
 
     document.getElementById('verify-otp').onclick = () => {
       const code = document.getElementById('otp').value;
-      confirmationResult.confirm(code).then((result) => {
-        // Login hlawhtlin
+      confirmationResult.confirm(code).then(() => {
         window.location.href = "feed.html";
-      }).catch((error) => {
+      }).catch(() => {
         document.getElementById('error').innerText = "Wrong OTP. 123456 try rawh";
       });
     };
