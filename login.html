@@ -47,7 +47,11 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+    // HEI HI LANG CHI KAN HMANG
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 
+      'size': 'normal', // invisible a tangin normal ah kan thlak
+      'callback': () => {}
+    });
 
     let confirmationResult;
     document.getElementById('send-otp').onclick = () => {
@@ -60,11 +64,12 @@
         .then((result) => {
           confirmationResult = result;
           document.getElementById('phone-box').style.display = 'none';
-          document.getElementById('otp-box').style.display = 'block'; // Test number vangin a lang nghal ang
+          document.getElementById('otp-box').style.display = 'block'; // OTP box a rawn lang
         }).catch((error) => {
           document.getElementById('error').innerText = error.message;
           document.getElementById('send-otp').disabled = false;
           document.getElementById('send-otp').innerText = "Send OTP";
+          window.recaptchaVerifier.render(); // fail chuan captcha a in refresh
         });
     };
 
