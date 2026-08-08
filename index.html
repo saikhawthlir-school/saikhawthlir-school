@@ -1,64 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- HEI HI MOBILE TAN PAWIMAWH -->
-  <link rel="stylesheet" href="style.css"> <!-- CSS link -->
+  <title>SKT Connect Login</title>
+  <style>
+    body{background:#1E88E5;display:flex;justify-content:center;align-items:center;height:100vh}
+    .box{background:white;padding:30px;border-radius:10px;width:300px}
+    input,button{width:100%;padding:10px;margin:10px 0;border-radius:5px;border:1px solid #ccc}
+    button{background:#1E88E5;color:white;border:none}
+  </style>
 </head>
 <body>
-
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <button class="menu-toggle" id="menu-toggle">☰</button>
-    <div class="logo">Saikhawthlir Secondary School (RMSA)</div>
-
-    <!-- PC Menu -->
-    <div class="nav-links pc-menu">
-      <a href="index.html">Home</a>
-      <a href="gallery.html">Gallery</a>
-      <a href="download.html">Download</a>
-      <a href="notice.html">Notice</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-    </div>
-
-    <!-- Search -->
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search...">
-      <button id="searchBtn">🔍</button>
-    </div>
-  </nav>
-
-  <!-- MOBILE SIDE MENU -->
-  <div class="side-menu" id="mobile-menu">
-    <button class="close-btn" id="close-btn">✕</button>
-    <a href="index.html">Home</a>
-    <a href="gallery.html">Gallery</a>
-    <a href="download.html">Download</a>
-    <a href="notice.html">Notice</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
+  <div class="box">
+    <h2>🔵 SKT Connect</h2>
+    <input id="email" placeholder="Email">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="signup()">Sign Up</button>
+    <button onclick="login()">Login</button>
   </div>
 
-  <!-- OVERLAY -->
-  <div class="overlay" id="overlay"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  <!-- CONTENT - SEARCH NA TUR -->
-  <div class="container" id="searchable">
-    <div class="content">
-      <h2>Welcome to SSS (RMSA)</h2>
-      <p>Kan school website ah hian lo kal la, lawmman i dawng ang. Notice thar, result leh school activity te kan dah thin. Heihi search test nan a ni. "Notice" tiin search chhin la.</p>
-    </div>
-  </div>
+const firebaseConfig = {
+  // I firebaseConfig kha he tah dah rawh
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <p>© 2026 Saikhawthlir Secondary School. All Rights Reserved.</p>
-    <p>Address: Saikhawthlir, Kolasib District, Mizoram</p>
-  </footer>
+window.signup = () => {
+  createUserWithEmailAndPassword(auth, email.value, pass.value)
+  .then(() => window.location = 'feed.html')
+  .catch(e => alert(e.message));
+}
 
-  <!-- SCRIPT - TAWP BER AH DAH TUR -->
-  <script src="script.js"></script> 
-
+window.login = () => {
+  signInWithEmailAndPassword(auth, email.value, pass.value)
+  .then(() => window.location = 'feed.html')
+  .catch(e => alert(e.message));
+}
+</script>
 </body>
 </html>
