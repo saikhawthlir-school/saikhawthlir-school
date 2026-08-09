@@ -51,20 +51,18 @@
     if(!name || !email || !password) return alert("Khawngaihin fill kim rawh");
 
     try {
-      // 1. Auth ah user siam
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2. DisplayName set
       await updateProfile(user, { displayName: name });
 
-      // 3. FIRESTORE AH USERS COLLECTION AH DAH - HEI HI A PAWIMAWH
+      // HEI HI A PAWIMAWH BER - USERS COLLECTION AH DAH
       await setDoc(doc(db, "users", user.uid), {
         name: name,
         email: email,
         uid: user.uid,
-        friends: [],     // thiante list ruak
-        requests: []     // friend request dawn list ruak
+        friends: [],     
+        requests: []     
       });
 
       alert("Account i siam hlawhtling e");
