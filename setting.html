@@ -1,73 +1,59 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Setting</title>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Setting</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;font-size:45px;}
-.header{background:#202c33;padding:28px 24px;display:flex;gap:20px;align-items:center;font-size:46px;font-weight:600;position:sticky;top:0;}
-.header button{background:none;border:none;color:white;font-size:50px;cursor:pointer;}
-.section{margin-top:20px;background:#111b21;}
-.item{display:flex;flex-direction:column;padding:30px 25px;border-bottom:1px solid #202c33;}
-.item-title{font-size:38px;margin-bottom:10px;}
-.item-sub{font-size:30px;color:#8696a0;margin-bottom:15px;}
-.slider{width:100%;height:10px;background:#2a3942;border-radius:5px;outline:none;-webkit-appearance:none;}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;width:40px;height:40px;border-radius:50%;background:#00a884;cursor:pointer;}
-.slider-value{font-size:34px;color:#00a884;text-align:right;margin-top:10px;}
+:root{--bg:#0b141a;--bg2:#111b21;--header:#202c33;--text:#e9edef;--sub:#8696a0;--green:#00a884;}
+body.light{--bg:#f0f2f5;--bg2:#ffffff;--header:#ffffff;--text:#111b21;--sub:#667781;}
+*{margin:0;padding:0;box-sizing:border-box} body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;}
+.header{background:var(--header);padding:28px 24px;display:flex;gap:20px;align-items:center;font-weight:600;position:sticky;top:0;}
+.header button{background:none;border:none;color:var(--text);font-size:50px;cursor:pointer;}
+.section-title{padding:30px 25px 15px;color:var(--sub);font-weight:600;}
+.section{background:var(--bg2);margin-bottom:20px;}
+.item{display:flex;align-items:center;justify-content:space-between;padding:30px 25px;border-bottom:1px solid var(--header);cursor:pointer;}
+.item:active{background:var(--header);} .item-left{display:flex;flex-direction:column;flex:1;} .item-sub{color:var(--sub);margin-top:8px;}
+.toggle{width:90px;height:50px;background:#2a3942;border-radius:25px;position:relative;cursor:pointer;} .toggle.on{background:var(--green);}
+.toggle-circle{width:46px;height:46px;background:white;border-radius:50%;position:absolute;top:2px;left:2px;transition:0.2s;} .toggle.on .toggle-circle{left:42px;}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:300;}
+.modal-content{background:var(--header);padding:0;border-radius:20px;width:90%;max-width:500px;overflow:hidden;}
+.modal-title{font-weight:600;padding:35px 30px 20px;} .radio-item{display:flex;align-items:center;padding:25px 30px;cursor:pointer;} .radio-item:hover{background:var(--bg2);}
+.radio-circle{width:40px;height:40px;border:4px solid var(--sub);border-radius:50%;margin-right:25px;display:flex;align-items:center;justify-content:center;}
+.radio-circle.selected{border-color:var(--green);} .radio-dot{width:22px;height:22px;background:var(--green);border-radius:50%;display:none;} .radio-circle.selected .radio-dot{display:block;}
+.modal-buttons{display:flex;justify-content:flex-end;padding:20px 20px;gap:20px;} .modal-btn{background:none;border:none;color:var(--green);font-weight:600;padding:15px 25px;cursor:pointer;}
 </style>
-</head>
-<body>
-<div class="header">
-  <button onclick="location.href='users.html'">←</button>
-  <span>Settings</span>
-</div>
-
+<script>
+window.onload = function(){
+  let savedSize = localStorage.getItem("appFontSize") || "medium"; let px = savedSize == "small" ? 34 : savedSize == "medium" ? 45 : 55; document.body.style.fontSize = px + "px";
+  let dark = localStorage.getItem("darkMode") || "on"; if(dark == "off"){ document.body.classList.add("light"); document.getElementById("darkToggle").classList.remove("on"); }
+  document.getElementById("currentFont").innerText = savedSize.charAt(0).toUpperCase() + savedSize.slice(1); document.getElementById("radio-"+savedSize).classList.add("selected");
+}
+</script>
+</head><body>
+<div class="header"><button onclick="location.href='users.html'">←</button><span>Settings</span></div>
+<div class="section-title">App Settings</div>
 <div class="section">
-  <div class="item" onclick="location.href='profile.html'">
-    <div class="item-title">Profile</div>
-    <div class="item-sub">I hming leh info thlakna</div>
+  <div class="item" onclick="location.href='profile.html'"><div class="item-left"><div>Profile</div><div class="item-sub">I hming leh info thlakna</div></div><span>></span></div>
+  <div class="item" onclick="openFontModal()"><div class="item-left"><div>Font size</div></div><span id="currentFont">Medium</span></div>
+  <div class="item" onclick="toggleDark()">
+    <div class="item-left"><div>Dark Mode</div></div>
+    <div class="toggle on" id="darkToggle"><div class="toggle-circle"></div></div>
   </div>
-
-  <div class="item">
-    <div class="item-title">Font Size</div>
-    <div class="item-sub">App chhung zawng font lian te ber</div>
-    <input type="range" min="30" max="60" value="45" class="slider" id="fontSlider" oninput="changeFont(this.value)">
-    <div class="slider-value">Tunah: <span id="fontValue">45</span>px</div>
-  </div>
-
-  <div class="item" onclick="alert('Dark Mode ON tawh')">
-    <div class="item-title">Dark Mode</div>
-    <div class="item-sub">A awm reng</div>
-  </div>
-  <div class="item" onclick="logout()">
-    <div class="item-title" style="color:#ef4444;">Logout</div>
-  </div>
+  <div class="item" onclick="logout()"><div style="color:#ef4444;">Logout</div></div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<div class="modal" id="fontModal"><div class="modal-content">
+  <div class="modal-title">Font size</div>
+  <div class="radio-item" onclick="selectFont('small')"><div class="radio-circle" id="radio-small"><div class="radio-dot"></div></div><div>Small</div></div>
+  <div class="radio-item" onclick="selectFont('medium')"><div class="radio-circle" id="radio-medium"><div class="radio-dot"></div></div><div>Medium</div></div>
+  <div class="radio-item" onclick="selectFont('large')"><div class="radio-circle" id="radio-large"><div class="radio-dot"></div></div><div>Large</div></div>
+  <div class="modal-buttons"><button class="modal-btn" onclick="closeFontModal()">Cancel</button><button class="modal-btn" onclick="saveFont()">OK</button></div>
+</div></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script>
 const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
-firebase.initializeApp(firebaseConfig); const auth = firebase.auth();
-
-// Page load in font size lo save tawh kha la chhuak
-window.onload = function(){
-  let savedSize = localStorage.getItem("appFontSize") || 45;
-  document.getElementById("fontSlider").value = savedSize;
-  document.getElementById("fontValue").innerText = savedSize;
-  document.body.style.fontSize = savedSize + "px";
-}
-
-function changeFont(size){
-  document.getElementById("fontValue").innerText = size;
-  localStorage.setItem("appFontSize", size); // Save
-  document.body.style.fontSize = size + "px";
-  alert("Font size " + size + "px ah dah ani. Page dang ah pawh a inthlak nghal ang");
-}
-
+firebase.initializeApp(firebaseConfig); const auth = firebase.auth(); let tempFont = "medium";
+function openFontModal(){ tempFont = localStorage.getItem("appFontSize") || "medium"; document.querySelectorAll(".radio-circle").forEach(r=>r.classList.remove("selected")); document.getElementById("radio-"+tempFont).classList.add("selected"); document.getElementById("fontModal").style.display = "flex"; }
+function closeFontModal(){ document.getElementById("fontModal").style.display = "none"; }
+function selectFont(size){ tempFont = size; document.querySelectorAll(".radio-circle").forEach(r=>r.classList.remove("selected")); document.getElementById("radio-"+size).classList.add("selected"); }
+function saveFont(){ localStorage.setItem("appFontSize", tempFont); document.getElementById("currentFont").innerText = tempFont.charAt(0).toUpperCase() + tempFont.slice(1); let px = tempFont == "small" ? 34 : tempFont == "medium" ? 45 : 55; document.body.style.fontSize = px + "px"; closeFontModal(); }
+function toggleDark(){ let t = document.getElementById("darkToggle"); t.classList.toggle("on"); let mode = t.classList.contains("on") ? "on" : "off"; localStorage.setItem("darkMode", mode); if(mode=="off") document.body.classList.add("light"); else document.body.classList.remove("light"); }
 function logout(){ if(confirm("I logout duh takzet maw?")){ auth.signOut(); } }
-</script>
-</body>
-</html>
+</script></body></html>
