@@ -8,9 +8,9 @@
     body.dark { --bg: #18191a; --card: #242526; --text: #e4e6eb; --sub: #b0b3b8; --border: #3a3b3c }
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial; }
     body { background: var(--bg); color: var(--text) }
+
 .header { background: var(--card); padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      position: sticky; top:0; display:flex; justify-content:space-between; align-items:center; z-index:60
-        }
+      position: sticky; top:0; display:flex; justify-content:space-between; align-items:center; z-index:60 }
 .header h2 { color:#1877f2; font-size:24px }
 .header div { display:flex; gap:10px }
 .header button { background:#1877f2; padding:8px 16px; border-radius:8px; font-size:14px; border:none; color:white; font-weight:bold; cursor:pointer; position:relative }
@@ -22,7 +22,9 @@
 .create-box textarea { width:100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background:var(--bg); font-size:15px; outline:none; color: var(--text); margin-bottom:10px }
 .create-box button { background: #1877f2; color:white; border:none; padding: 10px 20px; border-radius: 8px; font-weight:bold; cursor:pointer; width:100% }
 
-.post { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; scroll-margin-top:80px }
+.post { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; scroll-margin-top:80px; transition: background 0.5s }
+.post.highlight { background: #e7f3ff } /* Notif atang a kal chuan a eng deuh */
+body.dark.post.highlight { background: #263951 }
 .post-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px }
 .post-user { display:flex; align-items:center; gap:10px }
 .avatar { width:40px; height:40px; border-radius:50%; background: linear-gradient(45deg, #1877f2, #42a5f5); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:18px }
@@ -36,7 +38,6 @@
 .actions button:hover { background:var(--bg) }
 .actions button.liked { color:#1877f2 }
 
-/* FIX 1: COMMENTS SECTION DAH BELH */
 .comments-section { margin-top:10px }
 .comment { background:var(--bg); padding:10px; border-radius:18px; margin-top:8px; font-size:14px }
 .comment b { color:var(--text) }
@@ -57,7 +58,7 @@
     <div>
       <button class="dark-btn" onclick="toggleDark()">🌙</button>
       <button onclick="window.location='users.html'">👥 Friends</button>
-      <button onclick="openNotif()">🔔 <span id="notifCount">0</span></button> <!-- FIX 2: onclick belh -->
+      <button onclick="openNotif()">🔔 <span id="notifCount">0</span></button>
       <button onclick="window.location='profile.html'">Profile</button>
       <button class="logout" id="logoutBtn">Logout</button>
     </div>
@@ -91,13 +92,13 @@
     setTimeout(()=> n.style.display='none', 3000);
   }
 
-  // FIX 2: NOTIF EN HNU AH READ AH KAN DAH THIAM ANG
+  // NOTIF ICON HMETA CHUAN READ AH DAH NGHAI
   window.openNotif = () => {
     window.location = 'notification.html';
     let notifs = JSON.parse(localStorage.getItem('notifications_'+currentUser.email) || "[]");
-    notifs = notifs.map(n => ({...n, read: true})); // Zawng zawng read ah dah
+    notifs = notifs.map(n => ({...n, read: true}));
     localStorage.setItem('notifications_'+currentUser.email, JSON.stringify(notifs));
-    updateNotifCount(); // Count 0 ah dah nghal
+    updateNotifCount();
   }
 
   function updateNotifCount() {
@@ -123,10 +124,21 @@
     if (!user) window.location.href = "login.html";
     else {
       currentUser = user;
+      localStorage.setItem('currentUserEmail', user.email); // notif tan
       loadPosts();
       updateNotifCount();
+
+      // NOTIF ATANG A KAL CHUAN POST AH SCROLL
       if(window.location.hash) {
-        setTimeout(()=> document.getElementById(window.location.hash.substring(1))?.scrollIntoView(), 500)
+        const postId = window.location.hash.substring(1);
+        setTimeout(()=> {
+          const el = document.getElementById(postId);
+          if(el) {
+            el.scrollIntoView({behavior: "smooth"});
+            el.classList.add('highlight'); // 3 sec chhung eng
+            setTimeout(()=> el.classList.remove('highlight'), 3000)
+          }
+        }, 800)
       }
     }
   });
@@ -134,7 +146,7 @@
   document.getElementById('postBtn').onclick = async () => {
     const text = document.getElementById('postText').value;
     if(text.trim() === "") return alert("Engmah i ziak lo");
-    await addDoc(collection(db, "posts"), {
+    const docRef = await addDoc(collection(db, "posts"), {
       text: text,
       name: currentUser.displayName || currentUser.email.split('@')[0],
       email: currentUser.email,
@@ -209,7 +221,6 @@
       const isMine = data.uid === currentUser.uid;
       const firstLetter = data.name? data.name.charAt(0).toUpperCase() : "?";
 
-      // FIX 3: COMMENTS TE TILANG NGEI TUR IN DIV KAN BELH
       html += `
         <div class="post" id="${docSnap.id}">
           <div class="post-header">
@@ -227,7 +238,7 @@
             <button class="${liked? 'liked' : ''}" onclick="likePost('${docSnap.id}', ${liked}, '${data.email}')">👍 Like (${likes.length})</button>
             <button>💬 Comment (${comments.length})</button>
           </div>
-          
+
           <div class="comments-section">
             ${comments.map(c => { const parts = c.split(': '); return `<div class="comment"><b>${parts[0]}</b> ${parts[1] || ""}</div>` }).join('')}
           </div>
