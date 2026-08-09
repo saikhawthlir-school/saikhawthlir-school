@@ -8,7 +8,6 @@
     body.dark { --bg: #18191a; --card: #242526; --text: #e4e6eb; --sub: #b0b3b8; --border: #3a3b3c }
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial; }
     body { background: var(--bg); color: var(--text) }
-
 .header { background: var(--card); padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       position: sticky; top:0; display:flex; justify-content:space-between; align-items:center; z-index:100 }
 .header h2 { color:#1877f2; font-size:24px }
@@ -16,12 +15,10 @@
 .header button { background:#1877f2; padding:8px 16px; border-radius:8px; font-size:14px; border:none; color:white; font-weight:bold; cursor:pointer; position:relative }
 .header button.logout { background:#f44336; }
 .header button.dark-btn { background: var(--sub); }
-
 .container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
 .create-box { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
 .create-box textarea { width:100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background:var(--bg); font-size:15px; outline:none; color: var(--text); margin-bottom:10px }
 .create-box button { background: #1877f2; color:white; border:none; padding: 10px 20px; border-radius: 8px; font-weight:bold; cursor:pointer; width:100% }
-
 .post { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; scroll-margin-top:80px }
 .post-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px }
 .post-user { display:flex; align-items:center; gap:10px }
@@ -30,20 +27,16 @@
 .post-time { font-size:12px; color: var(--sub) }
 .post-menu { cursor:pointer; color:var(--sub); font-size:20px }
 .post-text { margin: 10px 0; font-size:15px; line-height:1.4; word-wrap: break-word; }
-
 .actions { border-top:1px solid var(--border); padding-top:10px; display:flex; justify-content:space-around; margin-top:10px }
 .actions button { flex:1; background:transparent; color:var(--sub); border:none; border-radius:8px; font-weight:600; padding:8px; cursor:pointer }
 .actions button:hover { background:var(--bg) }
 .actions button.liked { color:#1877f2 }
-
 .comment-box { display:flex; gap:8px; margin-top:10px }
 .comment-box input { flex:1; padding:8px 12px; border-radius:18px; border:1px solid var(--border); background:var(--bg); color:var(--text) }
 .comment-box button { padding:8px 16px; border-radius:18px; border:none; background:#1877f2; color:white; font-weight:bold; cursor:pointer }
 .comment { background:var(--bg); padding:10px; border-radius:18px; margin-top:8px; font-size:14px }
 .comment b { color:var(--text) }
 .notification { position:fixed; top:70px; right:20px; background:#1877f2; color:white; padding:12px 20px; border-radius:8px; display:none; z-index:200 }
-
-/* NOTIF BADGE */
 #notifCount { position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; display:none }
   </style>
 </head>
@@ -72,16 +65,12 @@
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
   import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
-    authDomain: "school-project-dab29.firebaseapp.com",
-    projectId: "school-project-dab29"
-  };
-  
+  const firebaseConfig = { apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk", authDomain: "school-project-dab29.firebaseapp.com", projectId: "school-project-dab29" };
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
   let currentUser = null;
+  let allUsers = []; // user zawng zawng kan lo dah
 
   if(localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
   window.toggleDark = () => { document.body.classList.toggle('dark'); localStorage.setItem('dark', document.body.classList.contains('dark')) }
@@ -93,24 +82,34 @@
   }
 
   function updateNotifCount() {
-    const notifs = JSON.parse(localStorage.getItem('notifications') || "[]");
+    const notifs = JSON.parse(localStorage.getItem('notifications_'+currentUser.email) || "[]");
+    const unread = notifs.filter(n => n.read === false).length;
     const countSpan = document.getElementById('notifCount');
-    if(notifs.length > 0) {
-      countSpan.innerText = notifs.length;
+    if(unread > 0) {
+      countSpan.innerText = unread;
       countSpan.style.display = 'inline-block';
     } else {
       countSpan.style.display = 'none';
     }
   }
 
-  function saveNotification(action, postId) {
-    let notifs = JSON.parse(localStorage.getItem('notifications') || "[]");
-    notifs.push({user: currentUser.displayName || currentUser.email.split('@')[0], action: action, postId: postId, time: "tun lawk ah"});
-    localStorage.setItem('notifications', JSON.stringify(notifs));
-    updateNotifCount();
+  // MI ZAWNG ZAWH NOTIF DAH
+  function saveNotification(action, postId, targetEmail) {
+    if(targetEmail === currentUser.email) return; // mahni ah chuan dah lo
+    let notifs = JSON.parse(localStorage.getItem('notifications_'+targetEmail) || "[]");
+    const newNotif = {
+      id: Date.now(),
+      user: currentUser.displayName || currentUser.email.split('@')[0], 
+      action: action, 
+      postId: postId, 
+      time: "tun lawk ah",
+      read: false
+    };
+    notifs.push(newNotif);
+    localStorage.setItem('notifications_'+targetEmail, JSON.stringify(notifs));
   }
 
-  onAuthStateChanged(auth, (user) => {
+  onAuthStateChanged(auth, async (user) => {
     if (!user) window.location.href = "login.html";
     else { 
       currentUser = user; 
@@ -129,6 +128,15 @@
       text: text, name: currentUser.displayName || currentUser.email.split('@')[0],
       email: currentUser.email, likes: [], comments: [], time: serverTimestamp()
     });
+    
+    // POST SIAM VEK PAWH NOTIF DAH
+    const allPosts = await getDocs(collection(db, "posts"));
+    allPosts.forEach(p => {
+      if(p.data().email!== currentUser.email) {
+        saveNotification("post thar a siam 📝", docRef.id, p.data().email);
+      }
+    });
+    
     document.getElementById('postText').value = ""; loadPosts();
   }
 
@@ -148,9 +156,7 @@
       await updateDoc(postRef, { likes: arrayRemove(currentUser.email) });
     } else {
       await updateDoc(postRef, { likes: arrayUnion(currentUser.email) });
-      if(postOwnerEmail!== currentUser.email) {
-        saveNotification("i post a like 👍", id);
-      }
+      saveNotification("i post a like 👍", id, postOwnerEmail);
       showNotif("I like e 👍");
     }
     loadPosts();
@@ -161,9 +167,7 @@
     const comment = input.value;
     if(!comment) return;
     await updateDoc(doc(db, "posts", id), { comments: arrayUnion(currentUser.displayName || currentUser.email.split('@')[0] + ": " + comment) });
-    if(postOwnerEmail!== currentUser.email) {
-      saveNotification("i post ah comment a dah 💬", id);
-    }
+    saveNotification("i post ah comment a dah 💬", id, postOwnerEmail);
     input.value = "";
     showNotif("Comment i dah e 💬");
     loadPosts();
