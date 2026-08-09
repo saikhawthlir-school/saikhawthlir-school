@@ -8,24 +8,27 @@
 :root{--bg:#0b141a;--bg2:#202c33;--msg:#202c33;--msgme:#005c4b;--text:#e9edef;--sub:#aebac1;--green:#00a884;}
 body.light{--bg:#e5ddd5;--bg2:#ffffff;--msg:#ffffff;--msgme:#d9fdd3;--text:#111b21;--sub:#667781;}
 *{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Arial;height:100vh;display:flex;flex-direction:column;}
-.header{background:var(--bg2);padding:28px 24px;font-weight:600;position:sticky;top:0;display:flex;gap:20px;align-items:center;z-index:10;}
-.header button{background:none;border:none;color:var(--text);font-size:50px;cursor:pointer;}
-#chatBox{flex:1;overflow-y:auto;padding:20px;background-image:url('https://user-images.githubusercontent.com/15082520/120515973-9b1ff200-c3b8-11eb-8b1e-5c1c7d5a3b3e.png');background-size:contain;}
-.msg{background:var(--msg);padding:24px 28px;margin:12px 0;border-radius:12px;max-width:80%;word-wrap:break-word;line-height:1.4;}
+.header{background:var(--bg2);padding:1.7em 1.5em;font-weight:600;position:sticky;top:0;display:flex;gap:1.2em;align-items:center;z-index:10;font-size:1.2em;}
+.header button{background:none;border:none;color:var(--text);cursor:pointer;}
+#chatBox{flex:1;overflow-y:auto;padding:1.2em;background-image:url('https://user-images.githubusercontent.com/15082520/120515973-9b1ff200-c3b8-11eb-8b1e-5c1c7d5a3b3e.png');background-size:contain;}
+.msg{background:var(--msg);padding:1.5em 1.7em;margin:0.7em 0;border-radius:12px;max-width:80%;word-wrap:break-word;line-height:1.4;}
 .msg.me{background:var(--msgme);margin-left:auto;}
-.bottom{position:sticky;bottom:0;display:flex;background:var(--bg2);padding:18px;gap:14px;}
-input{flex:1;padding:28px 30px;border:none;border-radius:35px;background:#2a3942;color:var(--text);}
-button{padding:28px 30px;background:var(--green);color:var(--bg);border:none;border-radius:50%;font-size:40px;cursor:pointer;}
+.bottom{position:sticky;bottom:0;display:flex;background:var(--bg2);padding:1.1em;gap:0.8em;}
+input{flex:1;padding:1.7em 1.8em;border:none;border-radius:35px;background:#2a3942;color:var(--text);}
+button{padding:1.7em 1.8em;background:var(--green);color:var(--bg);border:none;border-radius:50%;cursor:pointer;}
 </style>
 <script>
-window.onload = function(){
+function applyTheme(){
   let savedSize = localStorage.getItem("appFontSize") || "medium";
-  let px = savedSize == "small" ? 34 : savedSize == "medium" ? 45 : 55;
-  document.body.style.fontSize = px + "px";
+  let px = savedSize == "small"? 14 : savedSize == "medium"? 16 : 18;
+  document.documentElement.style.fontSize = px + "px";
   let dark = localStorage.getItem("darkMode") || "on";
   if(dark == "off"){ document.body.classList.add("light"); }
+  else{ document.body.classList.remove("light"); }
 }
+window.onload = applyTheme;
 </script>
 </head>
 <body>
@@ -41,7 +44,7 @@ firebase.initializeApp(firebaseConfig); const auth = firebase.auth(); const db =
 let me=null; let chatWith=localStorage.getItem("chatWith"); let chatName=localStorage.getItem("chatName");
 document.getElementById("headerName").innerText = chatName;
 auth.onAuthStateChanged(u=>{ if(!u) location.href="index.html"; me=u; loadMessages(); });
-function loadMessages(){ let chatId = [me.uid, chatWith].sort().join("_"); db.collection("privateChats").doc(chatId).collection("messages").orderBy("time").onSnapshot(snap=>{ let html=""; snap.forEach(d=>{ let data=d.data(); let cls = data.uid==me.uid ? "msg me" : "msg"; html+=`<div class="${cls}">${data.text}</div>`; }); document.getElementById("chatBox").innerHTML = html; document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight; }); }
+function loadMessages(){ let chatId = [me.uid, chatWith].sort().join("_"); db.collection("privateChats").doc(chatId).collection("messages").orderBy("time").onSnapshot(snap=>{ let html=""; snap.forEach(d=>{ let data=d.data(); let cls = data.uid==me.uid? "msg me" : "msg"; html+=`<div class="${cls}">${data.text}</div>`; }); document.getElementById("chatBox").innerHTML = html; document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight; }); }
 function send(){ let txt=document.getElementById("msgInput").value.trim(); if(!txt) return; let chatId = [me.uid, chatWith].sort().join("_"); db.collection("privateChats").doc(chatId).collection("messages").add({text:txt,uid:me.uid,time:Date.now()}); document.getElementById("msgInput").value=""; }
 </script>
 </body>
