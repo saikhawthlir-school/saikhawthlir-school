@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Group</title>
+<style>
+body{background:#0b141a;color:white;font-family:Arial;margin:0;padding-bottom:70px;}
+.header{background:#202c33;padding:12px;font-weight:bold;position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;}
+.msg{background:#202c33;padding:10px;margin:6px;border-radius:8px;max-width:75%;}
+.msg.me{background:#005c4b;margin-left:auto;}
+.bottom{position:fixed;bottom:0;left:0;width:100%;display:flex;background:#202c33;padding:10px;gap:5px;}
+input{flex:1;padding:12px;border:none;border-radius:8px;background:#2a3942;color:white;}
+button{padding:12px;background:#00a884;color:white;border:none;border-radius:8px;}
+.menu-btn{background:none;border:none;color:white;font-size:22px;cursor:pointer;}
+.menu{position:absolute;top:50px;right:10px;background:#202c33;border-radius:8px;display:none;flex-direction:column;z-index:20;}
+.menu.show{display:flex;} .menu a{padding:12px 20px;color:white;text-decoration:none;cursor:pointer;} .menu a:hover{background:#2a3942;}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:30;}
+.modal-content{background:#202c33;padding:20px;border-radius:10px;width:90%;}
+</style></head>
+<body>
+<div class="header">
+  <div style="display:flex;gap:10px;align-items:center;">
+    <button onclick="location.href='users.html'" style="background:none;border:none;color:white;">←</button>
+    <span id="headerName"></span>
+  </div>
+  <div style="position:relative;">
+    <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+    <div class="menu" id="menu">
+      <a onclick="groupInfo()">Group Info</a>
+      <a onclick="addMember()">Member Add</a>
+      <a onclick="groupSetting()">Group Setting</a>
+      <a onclick="leaveGroup()">Group Leave</a>
+    </div>
+  </div>
+</div>
+
+<div id="chatBox"></div>
+<div class="bottom"><input id="msgInput" placeholder="Message..." onkeypress="if(event.key==='Enter') send()"><button onclick="send()">➤</button></div>
+
+<!-- GROUP INFO MODAL -->
+<div class="modal" id="infoModal">
+  <div class="modal-content">
+    <h3 id="groupTitle"></h3>
+    <div id="memberList"></div>
+    <button onclick="closeModal()" style="background:#ef4444;margin-top:10px;">Close</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
+firebase.initializeApp(firebaseConfig); const auth = firebase.auth(); const db = firebase.firestore();
+let me=null; let groupId=localStorage.getItem("chatWith"); let groupName=localStorage.getItem("chatName"); let isAdmin=false;
+document.getElementById("headerName").innerText = groupName;
+
+auth.onAuthStateChanged(u=>{ if(!u) location.href="index.html"; me=u; loadMessages(); checkAdmin(); });
+
+function toggleMenu(){ document.getElementById("menu").classList.toggle("show"); }
+function closeModal(){ document.getElementById("infoModal").style.display="none"; }
+
+function checkAdmin(){
+  db.collection("groups").doc(groupId).get().then(doc=>{
+    isAdmin = doc.data().admins.includes(me.uid);
+  });
+}
+
+// GROUP INFO
+function groupInfo(){
+  db.collection("groups").doc(groupId).get().then(doc=>{
+    let data = doc.data();
+    document.getElementById("groupTitle").innerText = data.name + " - Members: " + data.members.length;
+    let html="";
+    data.members.forEach(uid=>{
+      db.collection("users").doc(uid).get().then(u=>{
+        html += `<div>${u.data().name} ${data.admins.includes(uid)?'👑':''}</div>`;
+        document.getElementById("memberList").innerHTML = html;
+      });
+    });
+  });
+  document.getElementById("infoModal").style.display="flex";
+  toggleMenu();
+}
+
+// MEMBER ADD
+function addMember(){
+  if(!isAdmin) return alert("Admin chiah in member a add thei");
+  db.collection("users").get().then(snap=>{
+    let userList = "";
+    snap.forEach(d=>{ if(d.id != me.uid) userList += `${d.data().name} - ${d.id}\n` });
+    let add = prompt("Add duh te ID paste rawh:\n\n" + userList);
+    if(add){
+      db.collection("groups").doc(groupId).update({
+        members: firebase.firestore.FieldValue.arrayUnion(add.trim())
+      }).then(()=>alert("Member add zawh"));
+    }
+  });
+  toggleMenu();
+}
+
+// GROUP SETTING
+function groupSetting(){
+  if(!isAdmin) return alert("Admin chiah in a thlak thei");
+  let newName = prompt("Group hming thar:", groupName);
+  if(newName){
+    db.collection("groups").doc(groupId).update({name:newName});
+    document.getElementById("headerName").innerText = newName;
+    localStorage.setItem("chatName", newName);
+  }
+  toggleMenu();
+}
+
+// LEAVE GROUP
+function leaveGroup(){
+  if(confirm("I chhuah duh takzet maw?")){
+    db.collection("groups").doc(groupId).update({
+      members: firebase.firestore.FieldValue.arrayRemove(me.uid)
+    }).then(()=>location.href="users.html");
+  }
+  toggleMenu();
+}
+
+function loadMessages(){
+  db.collection("groupChats").doc(groupId).collection("messages").orderBy("time").onSnapshot(snap=>{
+    let html=""; snap.forEach(d=>{ let data=d.data(); let cls = data.uid==me.uid ? "msg me" : "msg"; html+=`<div class="${cls}"><b>${data.name}:</b> ${data.text}</div>`; });
+    document.getElementById("chatBox").innerHTML = html; window.scrollTo(0,document.body.scrollHeight);
+  });
+}
+
+function send(){
+  let txt=document.getElementById("msgInput").value.trim(); if(!txt) return;
+  db.collection("users").doc(me.uid).get().then(doc=>{
+    db.collection("groupChats").doc(groupId).collection("messages").add({text:txt,uid:me.uid,name:doc.data().name,time:Date.now()});
+    document.getElementById("msgInput").value="";
+  });
+}
+document.addEventListener('click', function(e){ if(!e.target.closest('.header')) document.getElementById("menu").classList.remove("show"); });
+</script></body></html>
