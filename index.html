@@ -3,17 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SKT Chat</title>
+<title>SKT Chat Pro</title>
 <style>
     * { box-sizing: border-box; }
   body { font-family: Arial; margin:0; background:#0f172a; color:white; padding-bottom:70px; }
-  .header { background:#22c55e; padding:12px; font-size:18px; font-weight:bold; position:sticky; top:0; }
+  .header { background:#22c55e; padding:12px; font-size:18px; font-weight:bold; position:sticky; top:0; display:flex; justify-content:space-between; }
   .tabs { display:flex; background:#16a34a; position:sticky; top:48px; }
   .tab { flex:1; text-align:center; padding:12px; cursor:pointer; font-weight:bold; }
   .tab.active { border-bottom:3px solid white; background:#15803d; }
   .page { display:none; padding:10px; }
   .page.active { display:block; }
   .msg { background:#1e293b; padding:10px; margin:6px 0; border-radius:10px; word-wrap:break-word; }
+  .msg.me { background:#22c55e; text-align:right; }
+  .user-item { background:#1e293b; padding:12px; margin:6px 0; border-radius:10px; cursor:pointer; }
+  .user-item:hover { background:#334155; }
   .bottom { 
     position:fixed; 
     bottom:0; 
@@ -27,22 +30,28 @@
   }
   input { flex:1; padding:12px; border-radius:8px; border:none; background:#334155; color:white; outline:none; }
   button { padding:12px 18px; background:#22c55e; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
-  #loginPage { text-align:center; margin-top:100px; }
+  #loginPage { text-align:center; margin-top:80px; padding:20px; }
+  #loginPage input { width:80%; margin-bottom:10px; }
+  .back-btn { background:#ef4444; padding:8px 12px; font-size:14px; }
 </style>
 </head>
 <body>
 
 <div id="loginPage">
   <h2>SKT Chat</h2>
-  <p>Anonymous a lut rawh</p>
+  <input id="nameInput" placeholder="I hming dah rawh">
+  <br>
   <button onclick="login()">Lut rawh</button>
 </div>
 
 <div id="app" style="display:none;">
-  <div class="header">SKT Chat</div>
+  <div class="header">
+    <span id="headerTitle">SKT Chat</span>
+    <button class="back-btn" id="backBtn" onclick="backToUsers()" style="display:none;">Back</button>
+  </div>
   
-  <div class="tabs">
-    <div class="tab active" onclick="showTab('chats', this)">CHATS</div>
+  <div class="tabs" id="mainTabs">
+    <div class="tab active" onclick="showTab('chats', this)">GROUP</div>
     <div class="tab" onclick="showTab('users', this)">USERS</div>
     <div class="tab" onclick="showTab('status', this)">STATUS</div>
   </div>
@@ -50,13 +59,21 @@
   <div id="chats" class="page active">
     <div id="chatList">Loading...</div>
     <div class="bottom">
-      <input id="msgInput" placeholder="Type message..." onkeypress="if(event.key==='Enter') sendMsg()">
+      <input id="msgInput" placeholder="Group ah type rawh..." onkeypress="if(event.key==='Enter') sendMsg()">
       <button onclick="sendMsg()">Send</button>
     </div>
   </div>
 
   <div id="users" class="page">
     <div id="userList">Loading...</div>
+  </div>
+
+  <div id="privateChat" class="page">
+    <div id="privateChatList">Loading...</div>
+    <div class="bottom">
+      <input id="privateMsgInput" placeholder="Message..." onkeypress="if(event.key==='Enter') sendPrivateMsg()">
+      <button onclick="sendPrivateMsg()">Send</button>
+    </div>
   </div>
 
   <div id="status" class="page">
@@ -73,7 +90,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script>
-// I FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
   authDomain: "school-project-dab29.firebaseapp.com",
@@ -88,72 +104,123 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// LOGIN
+let currentUser = null;
+let currentUserName = "";
+let chatWith = null;
+
 function login(){
+  let name = document.getElementById("nameInput").value.trim();
+  if(!name) return alert("Hming dah hmasa rawh");
+  currentUserName = name;
   firebase.auth().signInAnonymously().catch(e=>alert("Error: "+e.message));
 }
 
 firebase.auth().onAuthStateChanged(user => {
   if(user){
+    currentUser = user;
     document.getElementById("loginPage").style.display="none";
     document.getElementById("app").style.display="block";
-    saveUser(user.uid);
+    saveUser(user.uid, currentUserName);
     loadChats();
     loadUsers();
     loadStatus();
   }
 });
 
-// TAB
 function showTab(id, el){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  if(el) el.classList.add("active");
   document.getElementById(id).classList.add("active");
-  el.classList.add("active");
+  document.getElementById("mainTabs").style.display="flex";
+  document.getElementById("backBtn").style.display="none";
+  document.getElementById("headerTitle").innerText = "SKT Chat";
 }
 
-// SAVE USER
-function saveUser(uid){
-  db.collection("users").doc(uid).set({lastSeen: Date.now()});
+function saveUser(uid, name){
+  db.collection("users").doc(uid).set({name:name, lastSeen: Date.now()});
 }
 
-// CHAT
 function loadChats(){
-  db.collection("chats").orderBy("time").onSnapshot(snap=>{
+  db.collection("groupChats").orderBy("time").onSnapshot(snap=>{
     let html="";
-    snap.forEach(d=>{ html+=`<div class="msg">${d.data().text}</div>` });
+    snap.forEach(d=>{
+      let data = d.data();
+      let cls = data.uid == currentUser.uid ? "msg me" : "msg";
+      html+=`<div class="${cls}"><b>${data.name}:</b> ${data.text}</div>`;
+    });
     document.getElementById("chatList").innerHTML = html || "Message la awm lo";
   });
 }
 function sendMsg(){
   let txt = document.getElementById("msgInput").value.trim();
   if(txt){
-    db.collection("chats").add({text:txt, time:Date.now()});
+    db.collection("groupChats").add({text:txt, name:currentUserName, uid:currentUser.uid, time:Date.now()});
     document.getElementById("msgInput").value="";
   }
 }
 
-// USERS
 function loadUsers(){
   db.collection("users").onSnapshot(snap=>{
     let html="";
-    snap.forEach(d=>{ html+=`<div class="msg">User: ${d.id.substring(0,8)}</div>` });
-    document.getElementById("userList").innerHTML = html || "User la awm lo";
+    snap.forEach(d=>{
+      if(d.id != currentUser.uid){
+        html+=`<div class="user-item" onclick="openPrivateChat('${d.id}','${d.data().name}')">
+          ${d.data().name}
+        </div>`;
+      }
+    });
+    document.getElementById("userList").innerHTML = html || "User dang la awm lo";
   });
 }
 
-// STATUS
+function openPrivateChat(uid, name){
+  chatWith = uid;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("privateChat").classList.add("active");
+  document.getElementById("mainTabs").style.display="none";
+  document.getElementById("backBtn").style.display="block";
+  document.getElementById("headerTitle").innerText = name;
+  
+  let chatId = [currentUser.uid, chatWith].sort().join("_");
+  db.collection("privateChats").doc(chatId).collection("messages").orderBy("time")
+  .onSnapshot(snap=>{
+    let html="";
+    snap.forEach(d=>{
+      let data = d.data();
+      let cls = data.uid == currentUser.uid ? "msg me" : "msg";
+      html+=`<div class="${cls}">${data.text}</div>`;
+    });
+    document.getElementById("privateChatList").innerHTML = html || "Be rawh le";
+  });
+}
+
+function sendPrivateMsg(){
+  let txt = document.getElementById("privateMsgInput").value.trim();
+  if(txt && chatWith){
+    let chatId = [currentUser.uid, chatWith].sort().join("_");
+    db.collection("privateChats").doc(chatId).collection("messages").add({
+      text:txt, uid:currentUser.uid, time:Date.now()
+    });
+    document.getElementById("privateMsgInput").value="";
+  }
+}
+
+function backToUsers(){
+  showTab('users');
+}
+
 function loadStatus(){
   db.collection("status").orderBy("time","desc").onSnapshot(snap=>{
     let html="";
-    snap.forEach(d=>{ html+=`<div class="msg">${d.data().text}</div>` });
+    snap.forEach(d=>{ html+=`<div class="msg"><b>${d.data().name}:</b> ${d.data().text}</div>` });
     document.getElementById("statusList").innerHTML = html || "Status la awm lo";
   });
 }
 function updateStatus(){
   let txt = document.getElementById("statusInput").value.trim();
   if(txt){
-    db.collection("status").add({text:txt, time:Date.now()});
+    db.collection("status").add({text:txt, name:currentUserName, time:Date.now()});
     document.getElementById("statusInput").value="";
   }
 }
