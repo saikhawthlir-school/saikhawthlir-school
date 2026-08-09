@@ -6,41 +6,41 @@
 <title>MizoChat</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;padding-bottom:130px;font-size:38px;} /* 38px */
-.header{background:#202c33;padding:28px 22px;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:10;font-size:40px;}
-.tabs{display:flex;background:#202c33;position:sticky;top:96px;z-index:10;}
-.tab{flex:1;text-align:center;padding:28px;cursor:pointer;font-weight:600;font-size:28px;color:#8696a0;letter-spacing:1px;}
-.tab.active{color:#00a884;border-bottom:4px solid #00a884;}
+body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;padding-bottom:150px;font-size:45px;} /* 45px */
+.header{background:#202c33;padding:32px 24px;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100; /* z-index sang */font-size:46px;}
+.tabs{display:flex;background:#202c33;position:sticky;top:108px;z-index:50;} /* z-index hniam */
+.tab{flex:1;text-align:center;padding:32px;cursor:pointer;font-weight:600;font-size:32px;color:#8696a0;letter-spacing:1px;}
+.tab.active{color:#00a884;border-bottom:5px solid #00a884;}
 .page{display:none;}
 .page.active{display:block;}
-.item{display:flex;gap:28px;align-items:center;background:#111b21;padding:28px 30px;cursor:pointer;border-bottom:1px solid #1f2c33;min-height:140px;} /* lian hle */
+.item{display:flex;gap:32px;align-items:center;background:#111b21;padding:32px 34px;cursor:pointer;border-bottom:1px solid #1f2c33;min-height:160px;} /* lian tawp */
 .item:active{background:#2a3942;}
-.avatar{width:110px;height:110px;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:40px;flex-shrink:0;color:#e9edef;} /* 110px */
-.avatar.status{border:5px solid #00a884;}
+.avatar{width:130px;height:130px;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:46px;flex-shrink:0;color:#e9edef;} /* 130px */
+.avatar.status{border:6px solid #00a884;}
 .chat-info{flex:1;overflow:hidden;}
-.chat-name{font-size:32px;font-weight:500;margin-bottom:8px;color:#e9edef;}
-.last-msg{font-size:26px;color:#8696a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.bottom-btn{position:fixed;bottom:30px;right:24px;width:95px;height:95px;border-radius:50%;background:#00a884;color:#111b21;border:none;font-size:55px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.4);z-index:10;font-weight:300;}
-.bottom-status{display:flex;background:#202c33;padding:18px;gap:16px;position:fixed;bottom:0;left:0;width:100%;}
-.bottom-status input{flex:1;padding:24px 26px;border:none;border-radius:30px;background:#2a3942;color:white;font-size:30px;}
-.bottom-status button{padding:24px 28px;background:#00a884;color:#111b21;border:none;border-radius:30px;font-weight:600;font-size:28px;}
-.menu{position:absolute;top:100px;right:16px;background:#233138;border-radius:5px;display:none;flex-direction:column;z-index:20;box-shadow:0 4px 10px rgba(0,0,0,0.4);min-width:320px;}
+.chat-name{font-size:36px;font-weight:500;margin-bottom:10px;color:#e9edef;}
+.last-msg{font-size:30px;color:#8696a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bottom-btn{position:fixed;bottom:35px;right:28px;width:110px;height:110px;border-radius:50%;background:#00a884;color:#111b21;border:none;font-size:65px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;font-weight:300;}
+.bottom-status{display:flex;background:#202c33;padding:20px;gap:18px;position:fixed;bottom:0;left:0;width:100%;}
+.bottom-status input{flex:1;padding:28px 30px;border:none;border-radius:35px;background:#2a3942;color:white;font-size:34px;}
+.bottom-status button{padding:28px 32px;background:#00a884;color:#111b21;border:none;border-radius:35px;font-weight:600;font-size:32px;}
+.menu{position:absolute;top:115px;right:18px;background:#233138;border-radius:8px;display:none;flex-direction:column;z-index:200; /* z-index sang ber */box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:360px;}
 .menu.show{display:flex;}
-.menu a{padding:24px 30px;color:#d1d7db;text-decoration:none;cursor:pointer;font-size:28px;border-bottom:1px solid #2a3942;}
+.menu a{padding:28px 34px;color:#d1d7db;text-decoration:none;cursor:pointer;font-size:32px;border-bottom:1px solid #2a3942;}
 .menu a:hover{background:#182229;}
 .menu a:last-child{border-bottom:none;color:#ef4444;}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:40;}
-.modal-content{background:#233138;padding:30px;border-radius:5px;width:90%;max-width:550px;max-height:70vh;overflow-y:auto;color:#d1d7db;font-size:30px;}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:300;}
+.modal-content{background:#233138;padding:34px;border-radius:8px;width:90%;max-width:600px;max-height:70vh;overflow-y:auto;color:#d1d7db;font-size:34px;}
 </style>
 </head>
 <body>
 <div class="header">
   <span>MizoChat</span>
   <div style="position:relative;">
-    <button onclick="toggleMenu()" style="background:none;border:none;color:#aebac1;font-size:40px;">⋮</button>
+    <button onclick="toggleMenu()" style="background:none;border:none;color:#aebac1;font-size:46px;">⋮</button>
     <div class="menu" id="menu">
-      <a onclick="openProfile()">Profile</a>
-      <a onclick="newGroup()">Create Group</a> <!-- Group create na chu hetah chiah -->
+      <a onclick="openProfile()">Profile</a> <!-- HEI HI A AWM TAWH ANG -->
+      <a onclick="newGroup()">Create Group</a>
       <a onclick="openSetting()">Setting</a>
       <a onclick="logout()">Logout</a>
     </div>
@@ -54,21 +54,20 @@ body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;padding-bott
 
 <div id="chats" class="page active">
   <div id="chatList">Loading...</div>
-  <!-- CHATS AH + BUTTON KA DELETE TAWH -->
 </div>
 
 <div id="status" class="page">
   <div id="statusList">Loading...</div>
-  <button class="bottom-btn" onclick="postStatus()">+</button> <!-- STATUS AH + BUTTON KAN DAH TAWH -->
+  <button class="bottom-btn" onclick="postStatus()">+</button>
 </div>
 
 <div class="modal" id="memberModal">
   <div class="modal-content">
-    <h3 id="modalTitle" style="margin-bottom:15px;font-size:32px;">Select contacts</h3>
+    <h3 id="modalTitle" style="margin-bottom:15px;font-size:36px;">Select contacts</h3>
     <div id="userList"></div>
     <div style="display:flex;gap:10px;margin-top:15px;">
-      <button onclick="closeMemberModal()" style="flex:1;padding:20px;background:#2a3942;border:none;border-radius:5px;color:#d1d7db;font-size:26px;">Cancel</button>
-      <button onclick="confirmAdd()" style="flex:1;padding:20px;background:#00a884;border:none;border-radius:5px;color:#111b21;font-weight:bold;font-size:26px;">OK</button>
+      <button onclick="closeMemberModal()" style="flex:1;padding:22px;background:#2a3942;border:none;border-radius:8px;color:#d1d7db;font-size:30px;">Cancel</button>
+      <button onclick="confirmAdd()" style="flex:1;padding:22px;background:#00a884;border:none;border-radius:8px;color:#111b21;font-weight:bold;font-size:30px;">OK</button>
     </div>
   </div>
 </div>
@@ -111,10 +110,10 @@ function openMemberModal(title, callback, excludeIds=[]){
   db.collection("users").get().then(snap=>{
     snap.forEach(d=>{
       if(d.id != me.uid && !excludeIds.includes(d.id)){
-        html += `<label style="display:flex;align-items:center;gap:22px;padding:20px;cursor:pointer;">
-          <input type="checkbox" value="${d.id}" style="width:32px;height:32px;" onchange="toggleSelect(this)">
-          <div class="avatar" style="width:80px;height:80px;font-size:28px;">${getInitials(d.data().name)}</div>
-          <span style="font-size:30px;">${d.data().name}</span>
+        html += `<label style="display:flex;align-items:center;gap:24px;padding:22px;cursor:pointer;">
+          <input type="checkbox" value="${d.id}" style="width:36px;height:36px;" onchange="toggleSelect(this)">
+          <div class="avatar" style="width:90px;height:90px;font-size:32px;">${getInitials(d.data().name)}</div>
+          <span style="font-size:34px;">${d.data().name}</span>
         </label>`;
       }
     });
@@ -159,7 +158,7 @@ function loadChats(){
   });
 }
 
-function loadStatus(){ db.collection("status").orderBy("time","desc").onSnapshot(snap=>{ let html=""; snap.forEach(d=>{ let data = d.data(); html+=`<div class="item"><div class="avatar status">${getInitials(data.name)}</div><div class="chat-info" style="border:none;"><div class="chat-name">${data.name}</div><div class="last-msg">${data.text}</div></div></div>`; }); document.getElementById("statusList").innerHTML = html || '<div style="padding:30px;text-align:center;color:#8696a0;font-size:28px">No recent updates</div>'; }); }
+function loadStatus(){ db.collection("status").orderBy("time","desc").onSnapshot(snap=>{ let html=""; snap.forEach(d=>{ let data = d.data(); html+=`<div class="item"><div class="avatar status">${getInitials(data.name)}</div><div class="chat-info" style="border:none;"><div class="chat-name">${data.name}</div><div class="last-msg">${data.text}</div></div></div>`; }); document.getElementById("statusList").innerHTML = html || '<div style="padding:35px;text-align:center;color:#8696a0;font-size:32px">No recent updates</div>'; }); }
 function postStatus(){ 
   let txt = prompt("Eng nge i status ah i dah duh?");
   if(!txt) return; 
