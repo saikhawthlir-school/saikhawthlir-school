@@ -6,16 +6,20 @@
 <title>Chat</title>
 <style>
 body{background:#0f172a;color:white;font-family:Arial;margin:0;padding-bottom:70px;}
-.header{background:#22c55e;padding:12px;font-weight:bold;}
-.msg{background:#1e293b;padding:10px;margin:6px;border-radius:10px;max-width:80%;}
+.header{background:#22c55e;padding:12px;font-weight:bold;position:sticky;top:0;display:flex;gap:10px;align-items:center;}
+.header button{background:#ef4444;color:white;border:none;padding:6px 10px;border-radius:6px;}
+.msg{background:#1e293b;padding:10px;margin:6px;border-radius:10px;max-width:80%;word-wrap:break-word;}
 .msg.me{background:#22c55e;margin-left:auto;}
-.bottom{position:fixed;bottom:0;width:100%;display:flex;background:#1e293b;padding:10px;gap:5px;}
+.bottom{position:fixed;bottom:0;left:0;width:100%;display:flex;background:#1e293b;padding:10px;gap:5px;}
 input{flex:1;padding:12px;border:none;border-radius:8px;background:#334155;color:white;}
 button{padding:12px;background:#22c55e;color:white;border:none;border-radius:8px;}
 </style>
 </head>
 <body>
-<div class="header" id="header">Loading...</div>
+<div class="header">
+  <button onclick="location.href='users.html'">Back</button>
+  <span id="headerName">Loading...</span>
+</div>
 <div id="chatBox"></div>
 <div class="bottom">
   <input id="msgInput" placeholder="Message type rawh..." onkeypress="if(event.key==='Enter') send()">
@@ -30,8 +34,10 @@ const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDo
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth(); const db = firebase.firestore();
 
-let me=null; let chatWith=localStorage.getItem("chatWith"); let chatName=localStorage.getItem("chatName");
-document.getElementById("header").innerText = chatName;
+let me=null; 
+let chatWith=localStorage.getItem("chatWith"); 
+let chatName=localStorage.getItem("chatName");
+document.getElementById("headerName").innerText = chatName;
 
 auth.onAuthStateChanged(u=>{ 
   if(!u) location.href="index.html"; 
