@@ -5,25 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Profile</title>
 <style>
+:root{--bg:#0b141a;--bg2:#202c33;--bg3:#111b21;--text:#e9edef;--sub:#8696a0;}
+body.light{--bg:#f0f2f5;--bg2:#ffffff;--bg3:#ffffff;--text:#111b21;--sub:#667781;}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;font-size:45px;}
-.header{background:#202c33;padding:28px 24px;display:flex;gap:20px;align-items:center;font-size:46px;font-weight:600;position:sticky;top:0;}
-.header button{background:none;border:none;color:white;font-size:50px;cursor:pointer;}
-.profile-top{background:#202c33;padding:50px 30px;text-align:center;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;}
+.header{background:var(--bg2);padding:28px 24px;display:flex;gap:20px;align-items:center;font-weight:600;position:sticky;top:0;}
+.header button{background:none;border:none;color:var(--text);font-size:50px;cursor:pointer;}
+.profile-top{background:var(--bg2);padding:50px 30px;text-align:center;}
 .avatar-big{width:220px;height:220px;border-radius:50%;background:#2a3942;margin:0 auto 30px;display:flex;align-items:center;justify-content:center;font-size:90px;font-weight:500;}
 .name{font-size:40px;font-weight:600;margin-bottom:10px;}
-.section{margin-top:20px;background:#111b21;}
-.item{display:flex;align-items:center;padding:30px 25px;border-bottom:1px solid #202c33;cursor:pointer;}
-.item:hover{background:#202c33;}
-.item-label{color:#8696a0;font-size:32px;margin-bottom:8px;}
-.item-value{font-size:38px;}
+.section{margin-top:20px;background:var(--bg3);}
+.item{display:flex;align-items:center;padding:30px 25px;border-bottom:1px solid var(--bg2);cursor:pointer;}
+.item:hover{background:var(--bg2);}
+.item-label{color:var(--sub);margin-bottom:8px;}
 </style>
+<script>
+window.onload = function(){
+  let savedSize = localStorage.getItem("appFontSize") || "medium";
+  let px = savedSize == "small"? 34 : savedSize == "medium"? 45 : 55;
+  document.body.style.fontSize = px + "px";
+  let dark = localStorage.getItem("darkMode") || "on";
+  if(dark == "off"){ document.body.classList.add("light"); }
+}
+</script>
 </head>
 <body>
-<div class="header">
-  <button onclick="location.href='users.html'">←</button>
-  <span>Profile</span>
-</div>
+<div class="header"><button onclick="location.href='users.html'">←</button><span>Profile</span></div>
 
 <div class="profile-top">
   <div class="avatar-big" id="profileAvatar">P</div>
@@ -31,24 +38,9 @@ body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;font-size:45
 </div>
 
 <div class="section">
-  <div class="item">
-    <div>
-      <div class="item-label">Hming</div>
-      <div class="item-value" id="profileName2">Loading...</div>
-    </div>
-  </div>
-  <div class="item">
-    <div>
-      <div class="item-label">Email</div>
-      <div class="item-value" id="profileEmail">Loading...</div>
-    </div>
-  </div>
-  <div class="item" onclick="editAbout()">
-    <div>
-      <div class="item-label">About</div>
-      <div class="item-value" id="profileAbout">Hey there! I am using MizoChat</div>
-    </div>
-  </div>
+  <div class="item"><div><div class="item-label">Hming</div><div id="profileName2">Loading...</div></div></div>
+  <div class="item"><div><div class="item-label">Email</div><div id="profileEmail">Loading...</div></div></div>
+  <div class="item" onclick="editAbout()"><div><div class="item-label">About</div><div id="profileAbout">Hey there! I am using MizoChat</div></div></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -72,19 +64,8 @@ auth.onAuthStateChanged(u=>{
 
 function editAbout(){
   let newAbout = prompt("I About thlak rawh:", document.getElementById("profileAbout").innerText);
-  if(newAbout){
-    db.collection("users").doc(auth.currentUser.uid).update({about: newAbout});
-    document.getElementById("profileAbout").innerText = newAbout;
-  }
+  if(newAbout){ db.collection("users").doc(auth.currentUser.uid).update({about: newAbout}); document.getElementById("profileAbout").innerText = newAbout; }
 }
 </script>
 </body>
 </html>
-
-<script>
-// Page load apiang in font size saved kha a apply nghal
-window.onload = function(){
-  let savedSize = localStorage.getItem("appFontSize") || 45;
-  document.body.style.fontSize = savedSize + "px";
-}
-</script>
