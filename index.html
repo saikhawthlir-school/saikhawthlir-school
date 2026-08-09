@@ -5,11 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MizoChat</title>
 <style>
-body{background:#111b21;color:white;font-family:Arial;text-align:center;padding-top:50px;margin:0;}
-.form{background:#202c33;padding:20px;border-radius:10px;width:90%;max-width:400px;margin:auto;}
-input{width:90%;padding:12px;margin:8px 0;border:none;border-radius:8px;background:#2a3942;color:white;}
-button{padding:12px 20px;background:#00a884;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;width:95%;}
-.switch{color:#00a884;cursor:pointer;margin-top:10px;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111b21;color:white;font-family:'Segoe UI',Arial;display:flex;justify-content:center;align-items:center;height:100vh;}
+.form{background:#202c33;padding:30px 25px;border-radius:10px;width:90%;max-width:400px;}
+h2{text-align:center;margin-bottom:20px;font-size:24px;}
+input{width:100%;padding:14px;margin:8px 0;border:none;border-radius:8px;background:#2a3942;color:white;font-size:16px;}
+button{padding:14px;background:#00a884;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;width:100%;font-size:16px;margin-top:10px;}
+.switch{color:#00a884;cursor:pointer;margin-top:15px;text-align:center;font-size:14px;}
 </style>
 </head>
 <body>
@@ -34,20 +36,14 @@ button{padding:12px 20px;background:#00a884;color:white;border:none;border-radiu
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
-  authDomain: "school-project-dab29.firebaseapp.com",
-  projectId: "school-project-dab29"
-};
+const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const auth = firebase.auth(); const db = firebase.firestore();
 
 function toggle(){
   document.getElementById("loginBox").style.display = document.getElementById("loginBox").style.display=="none"?"block":"none";
   document.getElementById("signupBox").style.display = document.getElementById("signupBox").style.display=="none"?"block":"none";
 }
-
 function signup(){
   let name=document.getElementById("signupName").value;
   let email=document.getElementById("signupEmail").value;
@@ -58,7 +54,6 @@ function signup(){
     location.href="users.html";
   }).catch(e=>alert(e.message));
 }
-
 function login(){
   let email=document.getElementById("loginEmail").value;
   let pass=document.getElementById("loginPass").value;
