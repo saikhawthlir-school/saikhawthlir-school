@@ -8,12 +8,12 @@
     body.dark { --bg: #18191a; --card: #242526; --text: #e4e6eb; --sub: #b0b3b8; }
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial; }
     body { background: var(--bg); color: var(--text) }
-  .header { background: var(--card); padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center }
-  .header h2 { color:#1877f2 }
-  .header button { background:#1877f2; padding:8px 16px; border-radius:8px; border:none; color:white; font-weight:bold; cursor:pointer }
-  .container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
-  .notif-item { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor:pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1) }
-  .notif-item:hover { opacity:0.8 }
+ .header { background: var(--card); padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center }
+ .header h2 { color:#1877f2 }
+ .header button { background:#1877f2; padding:8px 16px; border-radius:8px; border:none; color:white; font-weight:bold; cursor:pointer }
+ .container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
+ .notif-item { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor:pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1) }
+ .notif-item:hover { opacity:0.8 }
   </style>
 </head>
 <body>
@@ -24,6 +24,9 @@
   <div class="container" id="notifList">Loading...</div>
 
 <script>
+  // Notification page a luh rual in a clear vek
+  localStorage.setItem('notifications', "[]");
+
   if(localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
   const notifs = JSON.parse(localStorage.getItem('notifications') || "[]");
   let html = "";
