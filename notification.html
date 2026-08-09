@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Notifications - SKT School</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root { --bg: #f0f2f5; --card: white; --text: #050505; --sub: #65676b; }
+    body.dark { --bg: #18191a; --card: #242526; --text: #e4e6eb; --sub: #b0b3b8; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial; }
+    body { background: var(--bg); color: var(--text) }
+  .header { background: var(--card); padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center }
+  .header h2 { color:#1877f2 }
+  .header button { background:#1877f2; padding:8px 16px; border-radius:8px; border:none; color:white; font-weight:bold; cursor:pointer }
+  .container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
+  .notif-item { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor:pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1) }
+  .notif-item:hover { opacity:0.8 }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Notifications</h2>
+    <button onclick="window.location='feed.html'">Home</button>
+  </div>
+  <div class="container" id="notifList">Loading...</div>
+
+<script>
+  if(localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
+  const notifs = JSON.parse(localStorage.getItem('notifications') || "[]");
+  let html = "";
+  if(notifs.length === 0) html = "<div style='text-align:center; padding:40px'>Notification a la awm lo</div>";
+  else {
+    notifs.reverse().forEach(n => {
+      html += `<div class="notif-item" onclick="window.location='feed.html#${n.postId}'">
+        <b>${n.user}</b> ${n.action}
+        <div style="font-size:12px; color:var(--sub)">${n.time}</div>
+      </div>`;
+    });
+  }
+  document.getElementById('notifList').innerHTML = html;
+</script>
+</body>
+</html>
