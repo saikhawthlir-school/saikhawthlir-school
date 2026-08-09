@@ -4,60 +4,64 @@
   <title>SKT School Feed</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    :root { --bg: #f0f2f5; --card: white; --text: #050505; --sub: #65676b; --border: #e4e6eb }
+    body.dark { --bg: #18191a; --card: #242526; --text: #e4e6eb; --sub: #b0b3b8; --border: #3a3b3c }
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial; }
-    body { background: #f0f2f5; }
+    body { background: var(--bg); color: var(--text) }
 
-    /* Header */
-  .header { background: white; padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  .header { background: var(--card); padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       position: sticky; top:0; display:flex; justify-content:space-between; align-items:center; z-index:100 }
   .header h2 { color:#1877f2; font-size:24px }
+  .header div { display:flex; gap:10px }
   .header button { background:#f44336; padding:8px 16px; border-radius:8px; font-size:14px; border:none; color:white; font-weight:bold; cursor:pointer }
+  .header button.dark-btn { background: var(--sub); }
 
   .container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
+  .create-box { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+  .create-box input,.create-box textarea { width:100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background:var(--bg); font-size:15px; outline:none; color: var(--text); margin-bottom:10px }
+  .create-box button { background: #1877f2; color:white; border:none; padding: 10px 20px; border-radius: 8px; font-weight:bold; cursor:pointer; width:100% }
 
-    /* Post Box */
-  .create-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; display:flex; gap:10px }
-  .create-box input { flex:1; padding: 12px; border-radius: 25px; border: 1px solid #ddd; background:#f0f2f5; font-size:15px; outline:none }
-  .create-box button { background: #1877f2; color:white; border:none; padding: 10px 20px; border-radius: 20px; font-weight:bold; cursor:pointer }
-
-    /* Post Card */
-  .post { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; }
+  .post { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; }
   .post-header { display:flex; align-items:center; gap:10px; margin-bottom:10px }
   .avatar { width:40px; height:40px; border-radius:50%; background: linear-gradient(45deg, #1877f2, #42a5f5); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:18px }
-  .post-name { font-weight:bold; color:#050505 }
+  .post-name { font-weight:bold }
+  .post-time { font-size:12px; color: var(--sub) }
   .post-text { margin: 10px 0; font-size:15px; line-height:1.4; word-wrap: break-word; }
+  .post-img { width:100%; border-radius:8px; margin-top:10px; max-height:500px; object-fit:cover }
 
-    /* Actions */
-  .actions { border-top:1px solid #e4e6eb; padding-top:10px; display:flex; justify-content:space-around }
-  .actions button { flex:1; background:transparent; color:#65676b; border:none; border-radius:8px; font-weight:600; padding:8px; cursor:pointer }
-  .actions button:hover { background:#f0f2f5 }
+  .actions { border-top:1px solid var(--border); padding-top:10px; display:flex; justify-content:space-around; margin-top:10px }
+  .actions button { flex:1; background:transparent; color:var(--sub); border:none; border-radius:8px; font-weight:600; padding:8px; cursor:pointer }
+  .actions button:hover { background:var(--bg) }
+  .actions button.liked { color:#1877f2 }
 
-    /* Comments */
-  .comment { background:#f0f2f5; padding:10px; border-radius:18px; margin-top:8px; font-size:14px }
-  .comment b { color:#050505 }
-  .error { color:red; text-align:center; padding:20px; background:white; border-radius:10px }
-
+  .comment { background:var(--bg); padding:10px; border-radius:18px; margin-top:8px; font-size:14px }
+  .comment b { color:var(--text) }
   </style>
 </head>
 <body>
   <div class="header">
     <h2>SKT School</h2>
-    <button id="logoutBtn">Logout</button>
+    <div>
+      <button class="dark-btn" onclick="toggleDark()">🌙</button>
+      <button id="profileBtn">Profile</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
   </div>
 
   <div class="container">
     <div class="create-box">
-      <input type="text" id="postText" placeholder="Enge nita,...">
+      <textarea id="postText" placeholder="Enge nita,..." rows="2"></textarea>
+      <input type="file" id="imageInput" accept="image/*">
       <button id="postBtn">Post</button>
     </div>
-
     <div id="posts">Loading...</div>
   </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
   import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-  import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
@@ -67,48 +71,55 @@
     messagingSenderId: "123456789",
     appId: "1:123456789:web:abcdef123456"
   };
-
+  
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
-  let currentUserName = "";
+  const storage = getStorage(app);
+  let currentUser = null;
+
+  // Dark mode save
+  if(localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
+  window.toggleDark = () => { document.body.classList.toggle('dark'); localStorage.setItem('dark', document.body.classList.contains('dark')) }
 
   onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = "login.html";
-    } else {
-      currentUserName = user.displayName || user.email.split('@')[0];
-      loadPosts();
-    }
+    if (!user) window.location.href = "login.html";
+    else { currentUser = user; loadPosts(); }
   });
 
   document.getElementById('postBtn').onclick = async () => {
     const text = document.getElementById('postText').value;
-    if(text.trim() === "") return alert("Engmah i ziak lo");
-    try {
-      await addDoc(collection(db, "posts"), {
-        text: text,
-        name: currentUserName,
-        email: auth.currentUser.email,
-        likes: [],
-        comments: [],
-        time: serverTimestamp()
-      });
-      document.getElementById('postText').value = "";
-      loadPosts();
-    } catch(e) {
-      alert("Post theih loh: " + e.message)
+    const file = document.getElementById('imageInput').files[0];
+    if(text.trim() === "" &&!file) return alert("Engmah i ziak lo");
+    
+    let imageUrl = "";
+    if(file) {
+      const storageRef = ref(storage, 'posts/' + Date.now() + file.name);
+      const snap = await uploadBytes(storageRef, file);
+      imageUrl = await getDownloadURL(snap.ref);
     }
+
+    await addDoc(collection(db, "posts"), {
+      text: text,
+      image: imageUrl,
+      name: currentUser.displayName || currentUser.email.split('@')[0],
+      email: currentUser.email,
+      likes: [],
+      comments: [],
+      time: serverTimestamp()
+    });
+    document.getElementById('postText').value = "";
+    document.getElementById('imageInput').value = "";
+    loadPosts();
   }
 
-  document.getElementById('logoutBtn').onclick = async () => {
-    await signOut(auth);
-    window.location.href = "login.html";
-  }
+  document.getElementById('logoutBtn').onclick = async () => { await signOut(auth); window.location.href = "login.html"; }
+  document.getElementById('profileBtn').onclick = () => { alert("Profile page chu hnu ah kan siam ang") }
 
-  window.likePost = async (id) => {
+  window.likePost = async (id, liked) => {
     const postRef = doc(db, "posts", id);
-    await updateDoc(postRef, { likes: arrayUnion(currentUserName) });
+    if(liked) await updateDoc(postRef, { likes: arrayRemove(currentUser.email) });
+    else await updateDoc(postRef, { likes: arrayUnion(currentUser.email) });
     loadPosts();
   }
 
@@ -116,45 +127,51 @@
     const comment = prompt("Comment ziak rawh:");
     if(!comment) return;
     const postRef = doc(db, "posts", id);
-    await updateDoc(postRef, { comments: arrayUnion(currentUserName + ": " + comment) });
+    await updateDoc(postRef, { comments: arrayUnion(currentUser.email.split('@')[0] + ": " + comment) });
     loadPosts();
   }
 
+  function timeAgo(timestamp) {
+    if(!timestamp) return "";
+    const seconds = Math.floor((new Date() - timestamp.toDate()) / 1000);
+    if(seconds < 60) return seconds + "s ago";
+    const minutes = Math.floor(seconds/60);
+    if(minutes < 60) return minutes + "m ago";
+    const hours = Math.floor(minutes/60);
+    if(hours < 24) return hours + "h ago";
+    return Math.floor(hours/24) + "d ago";
+  }
+
   async function loadPosts() {
-    try {
-      const q = query(collection(db, "posts"), orderBy("time", "desc"));
-      const snap = await getDocs(q);
-      let html = "";
-      snap.forEach(docSnap => {
-        const data = docSnap.data();
+    const q = query(collection(db, "posts"), orderBy("time", "desc"));
+    const snap = await getDocs(q);
+    let html = "";
+    snap.forEach(docSnap => {
+      const data = docSnap.data();
+      const likes = data.likes || [];
+      const comments = data.comments || [];
+      const liked = likes.includes(currentUser.email);
+      const firstLetter = data.name? data.name.charAt(0).toUpperCase() : "?";
 
-        // FIX: A awm loh chuan [] a hmang ang. Hei vang in error a awm tawh lo
-        const likes = data.likes || [];
-        const comments = data.comments || [];
-        const firstLetter = data.name? data.name.charAt(0).toUpperCase() : "?";
-
-        html += `
-          <div class="post">
-            <div class="post-header">
-              <div class="avatar">${firstLetter}</div>
+      html += `
+        <div class="post">
+          <div class="post-header">
+            <div class="avatar">${firstLetter}</div>
+            <div>
               <div class="post-name">${data.name || "User"}</div>
+              <div class="post-time">${timeAgo(data.time)}</div>
             </div>
-            <div class="post-text">${data.text}</div>
-            <div class="actions">
-              <button onclick="likePost('${docSnap.id}')">👍 Like (${likes.length})</button>
-              <button onclick="commentPost('${docSnap.id}')">💬 Comment (${comments.length})</button>
-            </div>
-            ${comments.map(c => {
-              const parts = c.split(': ');
-              return `<div class="comment"><b>${parts[0]}</b> ${parts[1] || ""}</div>`
-            }).join('')}
-          </div>`;
-      });
-      document.getElementById('posts').innerHTML = html || "<div style='text-align:center; padding:40px; background:white; border-radius:10px'>Post ala awm lo. I hmasa ber ni rawh!</div>";
-    } catch(error) {
-      document.getElementById('posts').innerHTML = `<div class="error">Error a awm: ${error.message}</div>`;
-      console.log(error);
-    }
+          </div>
+          <div class="post-text">${data.text}</div>
+          ${data.image? `<img class="post-img" src="${data.image}">` : ""}
+          <div class="actions">
+            <button class="${liked? 'liked' : ''}" onclick="likePost('${docSnap.id}', ${liked})">👍 Like (${likes.length})</button>
+            <button onclick="commentPost('${docSnap.id}')">💬 Comment (${comments.length})</button>
+          </div>
+          ${comments.map(c => { const parts = c.split(': '); return `<div class="comment"><b>${parts[0]}</b> ${parts[1] || ""}</div>` }).join('')}
+        </div>`;
+    });
+    document.getElementById('posts').innerHTML = html || "<div style='text-align:center; padding:40px'>Post ala awm lo</div>";
   }
 </script>
 </body>
