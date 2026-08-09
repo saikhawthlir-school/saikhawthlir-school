@@ -1,146 +1,152 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>SKT Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    :root { --bg: #f0f2f5; --card: white; --text: #050505; --sub: #65676b; --green: #25D366; --green-dark: #128C7E }
-    body.dark { --bg: #111b21; --card: #202c33; --text: #e9edef; --sub: #aebac1 }
-    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial; }
-    body { background: var(--bg); color: var(--text); height:100vh; display:flex; flex-direction:column }
-  .header { background: var(--green); color:white; padding: 15px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10 }
-  .header h2 { font-size:22px }
-  .header-right { display:flex; align-items:center; gap:15px; position:relative }
-  .header button { background:transparent; border:none; color:white; font-size:22px; cursor:pointer }
-  
-  /* MENU 3 DOT */
-  .dropdown { position:absolute; top:40px; right:0; background:var(--card); border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.2); display:none; min-width:180px; z-index:20 }
-  .dropdown.show { display:block }
-  .dropdown button { width:100%; text-align:left; padding:12px 20px; background:transparent; border:none; color:var(--text); font-size:15px; cursor:pointer }
-  .dropdown button:hover { background:var(--bg) }
-  .dropdown hr { border:none; border-top:1px solid var(--bg); margin:5px 0 }
-
-  .tabs { display:flex; background: var(--green) }
-  .tab { flex:1; text-align:center; padding:14px; color:white; font-weight:600; cursor:pointer; border-bottom:3px solid transparent; font-size:15px }
-  .tab.active { border-bottom:3px solid white }
-  .container { flex:1; overflow-y:auto }
-  .page { display:none; }
-  .page.active { display:block }
-  .user-item { display:flex; align-items:center; gap:15px; padding:12px 15px; background:var(--card); cursor:pointer; border-bottom:1px solid var(--bg) }
-  .avatar { width:50px; height:50px; border-radius:50%; background: linear-gradient(45deg, #25D366, #128C7E); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:20px; flex-shrink:0 }
-  .user-info { flex:1; overflow:hidden }
-  .user-name { font-weight:600; margin-bottom:3px; font-size:16px }
-  .user-last { font-size:14px; color:var(--sub); white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
-  .add-status { position:fixed; bottom:20px; right:20px; width:55px; height:55px; border-radius:50%; background:var(--green); color:white; border:none; font-size:30px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.3) }
-
-  /* PROFILE EDIT POPUP */
-  .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:100; align-items:center; justify-content:center }
-  .modal.show { display:flex }
-  .modal-box { background:var(--card); padding:20px; border-radius:12px; width:90%; max-width:400px }
-  .modal-box input { width:100%; padding:12px; margin:10px 0; border:1px solid var(--sub); border-radius:8px; background:var(--bg); color:var(--text) }
-  .modal-box button { width:100%; padding:12px; border:none; background:var(--green); color:white; font-weight:bold; border-radius:8px; cursor:pointer }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKT Chat</title>
+<style>
+  body { font-family: Arial; margin:0; background:#0f172a; color:white; }
+  .header { background:#22c55e; padding:12px; font-size:18px; font-weight:bold; }
+  .tabs { display:flex; background:#16a34a; }
+  .tab { flex:1; text-align:center; padding:12px; cursor:pointer; }
+  .tab.active { border-bottom:3px solid white; background:#15803d; }
+  .page { display:none; padding:10px; height:70vh; overflow-y:auto; }
+  .page.active { display:block; }
+  .msg { background:#1e293b; padding:10px; margin:6px 0; border-radius:10px; }
+  .bottom { position:fixed; bottom:0; width:100%; background:#1e293b; padding:10px; display:flex; }
+  input { flex:1; padding:10px; border-radius:8px; border:none; margin-right:5px; }
+  button { padding:10px 15px; background:#22c55e; color:white; border:none; border-radius:8px; cursor:pointer; }
+  #loginPage { text-align:center; margin-top:100px; }
+</style>
 </head>
 <body>
-  <div class="header">
-    <h2>SKT Chat</h2>
-    <div class="header-right">
-      <button onclick="toggleDark()">🌙</button>
-      <button onclick="toggleMenu()">⋮</button> <!-- DOT 3 -->
-      <div class="dropdown" id="menuDropdown">
-        <button onclick="openProfile()">👤 Profile</button>
-        <button onclick="openEdit()">✏️ Edit Profile</button>
-        <hr>
-        <button onclick="logout()" style="color:#f44336">🚪 Logout</button>
-      </div>
-    </div>
-  </div>
 
+<div id="loginPage">
+  <h2>SKT Chat</h2>
+  <p>Anonymous login</p>
+  <button onclick="login()">Lut rawh</button>
+</div>
+
+<div id="app" style="display:none;">
+  <div class="header">SKT Chat</div>
+  
   <div class="tabs">
-    <div class="tab active" onclick="showTab('chats')">CHATS</div>
-    <div class="tab" onclick="showTab('users')">USERS</div>
-    <div class="tab" onclick="showTab('status')">STATUS</div>
+    <div class="tab active" onclick="showTab('chats', this)">CHATS</div>
+    <div class="tab" onclick="showTab('users', this)">USERS</div>
+    <div class="tab" onclick="showTab('status', this)">STATUS</div>
   </div>
 
-  <div class="container">
-    <div id="chats" class="page active"><div id="chatList">Loading...</div></div>
-    <div id="users" class="page"><div id="userList">Loading...</div></div>
-    <div id="status" class="page"><div id="statusList">Loading...</div></div>
-  </div>
-
-  <button class="add-status" id="addStatusBtn" style="display:none">+</button>
-
-  <!-- EDIT PROFILE POPUP -->
-  <div class="modal" id="editModal">
-    <div class="modal-box">
-      <h3 style="margin-bottom:10px">Edit Profile</h3>
-      <input type="text" id="editName" placeholder="I hming thar">
-      <button onclick="saveProfile()">Save</button>
-      <button onclick="closeEdit()" style="background:var(--sub); margin-top:10px">Cancel</button>
+  <div id="chats" class="page active">
+    <div id="chatList">Loading...</div>
+    <div class="bottom">
+      <input id="msgInput" placeholder="Type message...">
+      <button onclick="sendMsg()">Send</button>
     </div>
   </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-  import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, query, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  <div id="users" class="page">
+    <div id="userList">Loading...</div>
+  </div>
 
-  const firebaseConfig = { apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk", authDomain: "school-project-dab29.firebaseapp.com", projectId: "school-project-dab29" };
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  let currentUser = null;
+  <div id="status" class="page">
+    <div class="bottom">
+      <input id="statusInput" placeholder="Update status...">
+      <button onclick="updateStatus()">Post</button>
+    </div>
+    <div id="statusList">Loading...</div>
+  </div>
+</div>
 
-  if(localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
-  window.toggleDark = () => { document.body.classList.toggle('dark'); localStorage.setItem('dark', document.body.classList.contains('dark')) }
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-  // MENU TOGGLE
-  window.toggleMenu = () => document.getElementById('menuDropdown').classList.toggle('show');
-  window.onclick = (e) => { if(!e.target.matches('.header button')) document.getElementById('menuDropdown').classList.remove('show') }
+<script>
+// I FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
+  authDomain: "school-project-dab29.firebaseapp.com",
+  databaseURL: "https://school-project-dab29-default-rtdb.firebaseio.com",
+  projectId: "school-project-dab29",
+  storageBucket: "school-project-dab29.firebasestorage.app",
+  messagingSenderId: "214125475324",
+  appId: "1:214125475324:web:83f908e4476ef8be3c2e79",
+  measurementId: "G-EGCH5X2Q91"
+};
 
-  window.showTab = (id) => {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    event.target.classList.add('active');
-    if(id === 'status') document.getElementById('addStatusBtn').style.display = 'block';
-    else document.getElementById('addStatusBtn').style.display = 'none';
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// LOGIN
+function login(){
+  firebase.auth().signInAnonymously().catch(e=>alert(e.message));
+}
+
+firebase.auth().onAuthStateChanged(user => {
+  if(user){
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("app").style.display="block";
+    saveUser(user.uid);
+    loadChats();
+    loadUsers();
+    loadStatus();
   }
+});
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) window.location.href = "login.html";
-    else {
-      currentUser = user;
-      loadUsers();
-      loadChats();
-      loadStatus();
-    }
+// TAB
+function showTab(id, el){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  el.classList.add("active");
+}
+
+// SAVE USER
+function saveUser(uid){
+  db.collection("users").doc(uid).set({lastSeen: Date.now()});
+}
+
+// CHAT
+function loadChats(){
+  db.collection("chats").orderBy("time").onSnapshot(snap=>{
+    let html="";
+    snap.forEach(d=>{ html+=`<div class="msg">${d.data().text}</div>` });
+    document.getElementById("chatList").innerHTML = html || "Message la awm lo";
   });
-
-  // MENU FUNCTIONS
-  window.logout = async () => { await signOut(auth); window.location.href = "login.html"; }
-  window.openProfile = () => alert("Hming: " + currentUser.displayName + "\nEmail: " + currentUser.email);
-  window.openEdit = () => { 
-    document.getElementById('editName').value = currentUser.displayName; 
-    document.getElementById('editModal').classList.add('show') 
+}
+function sendMsg(){
+  let txt = document.getElementById("msgInput").value;
+  if(txt){
+    db.collection("chats").add({text:txt, time:Date.now()});
+    document.getElementById("msgInput").value="";
   }
-  window.closeEdit = () => document.getElementById('editModal').classList.remove('show');
-  window.saveProfile = async () => {
-    const newName = document.getElementById('editName').value;
-    if(newName) {
-      await updateProfile(currentUser, { displayName: newName });
-      await updateDoc(doc(db, "users", currentUser.uid), { name: newName }); // Firestore ah pawh update
-      alert("Profile update a ni");
-      closeEdit();
-      location.reload();
-    }
-  }
+}
 
-  // CHATS, USERS, STATUS LOAD NA HI I HLUI ANG CHIAH
-  async function loadUsers() { /* i code hlui dah rawh */ }
-  async function loadChats() { /* i code hlui dah rawh */ }
-  async function loadStatus() { /* i code hlui dah rawh */ }
-  document.getElementById('addStatusBtn').onclick = async () => { /* i code hlui dah rawh */ }
+// USERS
+function loadUsers(){
+  db.collection("users").onSnapshot(snap=>{
+    let html="";
+    snap.forEach(d=>{ html+=`<div class="msg">User: ${d.id.substring(0,8)}</div>` });
+    document.getElementById("userList").innerHTML = html || "User la awm lo";
+  });
+}
+
+// STATUS
+function loadStatus(){
+  db.collection("status").orderBy("time","desc").onSnapshot(snap=>{
+    let html="";
+    snap.forEach(d=>{ html+=`<div class="msg">${d.data().text}</div>` });
+    document.getElementById("statusList").innerHTML = html || "Status la awm lo";
+  });
+}
+function updateStatus(){
+  let txt = document.getElementById("statusInput").value;
+  if(txt){
+    db.collection("status").add({text:txt, time:Date.now()});
+    document.getElementById("statusInput").value="";
+  }
+}
 </script>
 </body>
 </html>
