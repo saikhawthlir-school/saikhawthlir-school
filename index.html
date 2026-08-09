@@ -5,17 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SKT Chat</title>
 <style>
-  body { font-family: Arial; margin:0; background:#0f172a; color:white; }
-  .header { background:#22c55e; padding:12px; font-size:18px; font-weight:bold; }
-  .tabs { display:flex; background:#16a34a; }
-  .tab { flex:1; text-align:center; padding:12px; cursor:pointer; }
+    * { box-sizing: border-box; }
+  body { font-family: Arial; margin:0; background:#0f172a; color:white; padding-bottom:70px; }
+  .header { background:#22c55e; padding:12px; font-size:18px; font-weight:bold; position:sticky; top:0; }
+  .tabs { display:flex; background:#16a34a; position:sticky; top:48px; }
+  .tab { flex:1; text-align:center; padding:12px; cursor:pointer; font-weight:bold; }
   .tab.active { border-bottom:3px solid white; background:#15803d; }
-  .page { display:none; padding:10px; height:70vh; overflow-y:auto; }
+  .page { display:none; padding:10px; }
   .page.active { display:block; }
-  .msg { background:#1e293b; padding:10px; margin:6px 0; border-radius:10px; }
-  .bottom { position:fixed; bottom:0; width:100%; background:#1e293b; padding:10px; display:flex; }
-  input { flex:1; padding:10px; border-radius:8px; border:none; margin-right:5px; }
-  button { padding:10px 15px; background:#22c55e; color:white; border:none; border-radius:8px; cursor:pointer; }
+  .msg { background:#1e293b; padding:10px; margin:6px 0; border-radius:10px; word-wrap:break-word; }
+  .bottom { 
+    position:fixed; 
+    bottom:0; 
+    left:0;
+    width:100%; 
+    background:#1e293b; 
+    padding:10px; 
+    display:flex; 
+    gap:5px;
+    border-top:1px solid #334155;
+  }
+  input { flex:1; padding:12px; border-radius:8px; border:none; background:#334155; color:white; outline:none; }
+  button { padding:12px 18px; background:#22c55e; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
   #loginPage { text-align:center; margin-top:100px; }
 </style>
 </head>
@@ -23,7 +34,7 @@
 
 <div id="loginPage">
   <h2>SKT Chat</h2>
-  <p>Anonymous login</p>
+  <p>Anonymous a lut rawh</p>
   <button onclick="login()">Lut rawh</button>
 </div>
 
@@ -39,7 +50,7 @@
   <div id="chats" class="page active">
     <div id="chatList">Loading...</div>
     <div class="bottom">
-      <input id="msgInput" placeholder="Type message...">
+      <input id="msgInput" placeholder="Type message..." onkeypress="if(event.key==='Enter') sendMsg()">
       <button onclick="sendMsg()">Send</button>
     </div>
   </div>
@@ -49,11 +60,11 @@
   </div>
 
   <div id="status" class="page">
+    <div id="statusList">Loading...</div>
     <div class="bottom">
-      <input id="statusInput" placeholder="Update status...">
+      <input id="statusInput" placeholder="Update status..." onkeypress="if(event.key==='Enter') updateStatus()">
       <button onclick="updateStatus()">Post</button>
     </div>
-    <div id="statusList">Loading...</div>
   </div>
 </div>
 
@@ -74,13 +85,12 @@ const firebaseConfig = {
   measurementId: "G-EGCH5X2Q91"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // LOGIN
 function login(){
-  firebase.auth().signInAnonymously().catch(e=>alert(e.message));
+  firebase.auth().signInAnonymously().catch(e=>alert("Error: "+e.message));
 }
 
 firebase.auth().onAuthStateChanged(user => {
@@ -116,7 +126,7 @@ function loadChats(){
   });
 }
 function sendMsg(){
-  let txt = document.getElementById("msgInput").value;
+  let txt = document.getElementById("msgInput").value.trim();
   if(txt){
     db.collection("chats").add({text:txt, time:Date.now()});
     document.getElementById("msgInput").value="";
@@ -141,7 +151,7 @@ function loadStatus(){
   });
 }
 function updateStatus(){
-  let txt = document.getElementById("statusInput").value;
+  let txt = document.getElementById("statusInput").value.trim();
   if(txt){
     db.collection("status").add({text:txt, time:Date.now()});
     document.getElementById("statusInput").value="";
