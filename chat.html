@@ -38,3 +38,11 @@ auth.onAuthStateChanged(u=>{ if(!u) location.href="index.html"; me=u; loadMessag
 function loadMessages(){ let chatId = [me.uid, chatWith].sort().join("_"); db.collection("privateChats").doc(chatId).collection("messages").orderBy("time").onSnapshot(snap=>{ let html=""; snap.forEach(d=>{ let data=d.data(); let cls = data.uid==me.uid ? "msg me" : "msg"; html+=`<div class="${cls}">${data.text}</div>`; }); document.getElementById("chatBox").innerHTML = html; document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight; }); }
 function send(){ let txt=document.getElementById("msgInput").value.trim(); if(!txt) return; let chatId = [me.uid, chatWith].sort().join("_"); db.collection("privateChats").doc(chatId).collection("messages").add({text:txt,uid:me.uid,time:Date.now()}); document.getElementById("msgInput").value=""; }
 </script></body></html>
+
+<script>
+// Page load apiang in font size saved kha a apply nghal
+window.onload = function(){
+  let savedSize = localStorage.getItem("appFontSize") || 45;
+  document.body.style.fontSize = savedSize + "px";
+}
+</script>
