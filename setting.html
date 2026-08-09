@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setting</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;font-size:45px;}
+.header{background:#202c33;padding:28px 24px;display:flex;gap:20px;align-items:center;font-size:46px;font-weight:600;position:sticky;top:0;}
+.header button{background:none;border:none;color:white;font-size:50px;cursor:pointer;}
+.section{margin-top:20px;background:#111b21;}
+.item{display:flex;align-items:center;justify-content:space-between;padding:30px 25px;border-bottom:1px solid #202c33;cursor:pointer;}
+.item:hover{background:#202c33;}
+.item-title{font-size:38px;}
+.item-sub{font-size:30px;color:#8696a0;}
+</style>
+</head>
+<body>
+<div class="header">
+  <button onclick="location.href='users.html'">←</button>
+  <span>Settings</span>
+</div>
+
+<div class="section">
+  <div class="item" onclick="location.href='profile.html'">
+    <div>
+      <div class="item-title">Profile</div>
+      <div class="item-sub">I hming leh info thlakna</div>
+    </div>
+    <span>></span>
+  </div>
+  <div class="item" onclick="alert('Dark Mode ON tawh')">
+    <div>
+      <div class="item-title">Dark Mode</div>
+      <div class="item-sub">A awm reng</div>
+    </div>
+    <span>ON</span>
+  </div>
+  <div class="item" onclick="alert('Notification ON tawh')">
+    <div>
+      <div class="item-title">Notifications</div>
+      <div class="item-sub">Message thar</div>
+    </div>
+    <span>ON</span>
+  </div>
+  <div class="item" onclick="logout()">
+    <div>
+      <div class="item-title" style="color:#ef4444;">Logout</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script>
+const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
+firebase.initializeApp(firebaseConfig); const auth = firebase.auth();
+function logout(){ if(confirm("I logout duh takzet maw?")){ auth.signOut(); } }
+</script>
+</body>
+</html>
