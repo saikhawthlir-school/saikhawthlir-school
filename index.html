@@ -3,68 +3,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SKT Chat - Login</title>
+<title>SKT Chat</title>
 <style>
-body{background:#0f172a;color:white;font-family:Arial;text-align:center;padding-top:50px;}
-.form{background:#1e293b;padding:20px;border-radius:10px;width:90%;max-width:400px;margin:auto;}
-input{width:90%;padding:12px;margin:8px 0;border:none;border-radius:8px;background:#334155;color:white;}
-button{padding:12px 20px;background:#22c55e;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;}
-.switch{color:#22c55e;cursor:pointer;margin-top:10px;}
+body{background:#0f172a;color:white;font-family:Arial;margin:0;padding-bottom:70px;}
+.header{background:#22c55e;padding:12px;display:flex;justify-content:space-between;font-weight:bold;position:sticky;top:0;z-index:10;}
+.tabs{display:flex;background:#16a34a;position:sticky;top:48px;z-index:10;}
+.tab{flex:1;text-align:center;padding:12px;cursor:pointer;font-weight:bold;}
+.tab.active{border-bottom:3px solid white;background:#15803d;}
+.page{display:none;padding:10px;}
+.page.active{display:block;}
+.item{background:#1e293b;padding:15px;margin:6px 0;border-radius:10px;cursor:pointer;}
+.item:hover{background:#334155;}
+.bottom{position:fixed;bottom:0;left:0;width:100%;display:flex;background:#1e293b;padding:10px;gap:5px;}
+input{flex:1;padding:12px;border:none;border-radius:8px;background:#334155;color:white;}
+button{padding:12px;background:#22c55e;color:white;border:none;border-radius:8px;font-weight:bold;}
+
+/* DOT MENU */
+.menu-btn{background:none;border:none;color:white;font-size:22px;cursor:pointer;padding:0 10px;}
+.menu{position:absolute;top:50px;right:10px;background:#1e293b;border-radius:8px;display:none;flex-direction:column;box-shadow:0 4px 10px black;z-index:20;}
+.menu.show{display:flex;}
+.menu a{padding:12px 20px;color:white;text-decoration:none;cursor:pointer;}
+.menu a:hover{background:#334155;}
 </style>
 </head>
 <body>
-<div class="form" id="loginBox">
-  <h2>SKT Chat</h2>
-  <input id="loginEmail" type="email" placeholder="Email">
-  <input id="loginPass" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <div class="switch" onclick="toggle()">Account i la neilo? Signup</div>
+<div class="header">
+  <span id="title">CHATS</span>
+  <div style="position:relative;">
+    <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+    <div class="menu" id="menu">
+      <a onclick="openProfile()">Profile</a>
+      <a onclick="logout()">Logout</a>
+    </div>
+  </div>
 </div>
 
-<div class="form" id="signupBox" style="display:none;">
-  <h2>Signup</h2>
-  <input id="signupName" placeholder="I hming">
-  <input id="signupEmail" type="email" placeholder="Email">
-  <input id="signupPass" type="password" placeholder="Password">
-  <button onclick="signup()">Signup</button>
-  <div class="switch" onclick="toggle()">Login na lamah kir</div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('chats',this)">CHATS</div>
+  <div class="tab" onclick="showTab('users',this)">USERS</div>
+  <div class="tab" onclick="showTab('status',this)">STATUS</div>
+</div>
+
+<div id="chats" class="page active">
+  <div id="chatList">Loading...</div>
+</div>
+
+<div id="users" class="page">
+  <div id="userList">Loading...</div>
+</div>
+
+<div id="status" class="page">
+  <div id="statusList">Loading...</div>
+  <div class="bottom">
+    <input id="statusInput" placeholder="Update status...">
+    <button onclick="postStatus()">Post</button>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
-  authDomain: "school-project-dab29.firebaseapp.com",
-  projectId: "school-project-dab29"
-};
+const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const auth = firebase.auth(); const db = firebase.firestore();
+let me=null;
 
-function toggle(){
-  document.getElementById("loginBox").style.display = document.getElementById("loginBox").style.display=="none"?"block":"none";
-  document.getElementById("signupBox").style.display = document.getElementById("signupBox").style.display=="none"?"block":"none";
+auth.onAuthStateChanged(u=>{ 
+  if(!u) location.href="index.html"; 
+  me=u; 
+  loadUsers(); 
+  loadStatus(); 
+  loadChats(); 
+});
+
+function toggleMenu(){
+  document.getElementById("menu").classList.toggle("show");
 }
 
-function signup(){
-  let name=document.getElementById("signupName").value;
-  let email=document.getElementById("signupEmail").value;
-  let pass=document.getElementById("signupPass").value;
-  auth.createUserWithEmailAndPassword(email,pass).then(u=>{
-    db.collection("users").doc(u.user.uid).set({name,email});
-    location.href="users.html";
-  }).catch(e=>alert(e.message));
+function logout(){ 
+  auth.signOut(); 
 }
 
-function login(){
-  let email=document.getElementById("loginEmail").value;
-  let pass=document.getElementById("loginPass").value;
-  auth.signInWithEmailAndPassword(email,pass).then(()=>location.href="users.html").catch(e=>alert(e.message));
+function openProfile(){
+  alert("I hming: " + (me.displayName || "Loading...") + "\nI Email: " + me.email);
+  toggleMenu();
 }
 
-auth.onAuthStateChanged(u=>{ if(u) location.href="users.html" });
+function showTab(id,el){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  el.classList.add("active");
+  document.getElementById("title").innerText = id.toUpperCase();
+}
+
+// USERS TAB
+function loadUsers(){
+  db.collection("users").onSnapshot(snap=>{
+    let html="";
+    snap.forEach(d=>{
+      if(d.id != me.uid){
+        html+=`<div class="item" onclick="openChat('${d.id}','${d.data().name}')">${d.data().name}</div>`;
+      }
+    });
+    document.getElementById("userList").innerHTML = html || "User la awm lo";
+  });
+}
+
+// CHATS TAB
+function loadChats(){
+  db.collection("users").get().then(snap=>{
+    snap.forEach(d=>{
+      if(d.id != me.uid){
+        let id = [me.uid,d.id].sort().join("_");
+        db.collection("privateChats").doc(id).collection("messages").orderBy("time","desc").limit(1)
+        .onSnapshot(s=>{
+          if(!s.empty){
+            let last = s.docs[0].data();
+            let div = document.getElementById(`chat-${d.id}`);
+            if(!div){
+              div = document.createElement("div");
+              div.id = `chat-${d.id}`;
+              div.className = "item";
+              div.onclick = ()=>openChat(d.id,d.data().name);
+              document.getElementById("chatList").prepend(div);
+            }
+            div.innerHTML = `<b>${d.data().name}</b><br><small style="color:#94a3b8">${last.text}</small>`;
+          }
+        });
+      }
+    });
+    if(document.getElementById("chatList").innerHTML=="Loading...")
+      document.getElementById("chatList").innerHTML = "Message i la dawn lo";
+  });
+}
+
+function openChat(uid,name){
+  localStorage.setItem("chatWith",uid);
+  localStorage.setItem("chatName",name);
+  location.href="chat.html";
+}
+
+// STATUS TAB
+function loadStatus(){
+  db.collection("status").orderBy("time","desc").onSnapshot(snap=>{
+    let html="";
+    snap.forEach(d=>{ html+=`<div class="item"><b>${d.data().name}:</b> ${d.data().text}</div>` });
+    document.getElementById("statusList").innerHTML = html || "Status la awm lo";
+  });
+}
+function postStatus(){
+  let txt=document.getElementById("statusInput").value.trim();
+  if(!txt) return;
+  db.collection("users").doc(me.uid).get().then(doc=>{
+    db.collection("status").add({text:txt,name:doc.data().name,time:Date.now()});
+    document.getElementById("statusInput").value="";
+  });
+}
+
+// Menu pawn lam hmet chuan a close
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.header')) document.getElementById("menu").classList.remove("show");
+});
 </script>
 </body>
 </html>
