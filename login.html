@@ -1,149 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login - SKT School</title>
+  <title>Login - SKT Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    :root { 
-      --bg: #f0f2f5; 
-      --card: white; 
-      --text: #050505; 
-      --sub: #65676b;
-      --blue: #1877f2;
-    }
-    body.dark { 
-      --bg: #18191a; 
-      --card: #242526; 
-      --text: #e4e6eb;
-      --sub: #b0b3b8;
-    }
+    :root { --bg: #f0f2f5; --card: white; --text: #050505; --green: #25D366 }
+    body.dark { --bg: #111b21; --card: #202c33; --text: #e9edef }
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial; }
-    body { 
-      background: var(--bg); 
-      color: var(--text);
-      display:flex; 
-      justify-content:center; 
-      align-items:center; 
-      min-height:100vh;
-      padding: 20px;
-    }
-    .container {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      max-width: 980px;
-      width:100%;
-      gap: 40px;
-    }
-    .left { flex:1 }
-    .left h1 { color: var(--blue); font-size: 60px; font-weight: bold; margin-bottom: 10px }
-    .left p { font-size: 24px; line-height: 28px }
-
-    .login-box { 
-      background: var(--card); 
-      padding: 20px; 
-      border-radius: 12px; 
-      box-shadow: 0 2px 12px rgba(0,0,0,0.2); 
-      width: 100%; 
-      max-width: 400px;
-      text-align:center;
-    }
-    .login-box input { 
-      width:100%; 
-      padding: 16px; 
-      margin-bottom: 15px; 
-      border-radius: 8px; 
-      border: 1px solid #ddd; 
-      font-size:17px; 
-      background:var(--bg); 
-      color:var(--text);
-      outline:none;
-    }
-    .login-box input:focus { border-color: var(--blue) }
-    .login-btn { 
-      width:100%; 
-      padding: 14px; 
-      border-radius: 8px; 
-      border:none; 
-      background:var(--blue); 
-      color:white; 
-      font-size:20px; 
-      font-weight:bold; 
-      cursor:pointer;
-      margin-bottom:15px;
-    }
-    .login-btn:hover { background: #166fe5 }
-    .divider { border-bottom: 1px solid var(--sub); margin: 20px 0 }
-    .create-btn { 
-      background: #42b72a; 
-      padding: 14px 20px; 
-      border-radius: 8px; 
-      border:none; 
-      color:white; 
-      font-size:17px; 
-      font-weight:bold; 
-      cursor:pointer;
-      text-decoration:none;
-      display:inline-block;
-    }
-    .create-btn:hover { background: #36a420 }
-
-    /* Mobile ah chuan a sir a thu kha thup ang */
-    @media (max-width: 900px) {
-      .container { flex-direction: column; text-align:center }
-      .left h1 { font-size: 40px }
-      .left p { font-size: 18px }
-    }
+    body { background: var(--bg); color: var(--text); display:flex; align-items:center; justify-content:center; height:100vh }
+    .login-box { background: var(--card); padding: 40px 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align:center }
+    .login-box h1 { color: var(--green); margin-bottom: 10px; font-size:32px }
+    .login-box p { color: var(--text); margin-bottom: 30px }
+    .login-box input { width:100%; padding: 14px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ccc; background:var(--bg); color:var(--text); font-size:15px; outline:none }
+    .login-box button { width:100%; padding: 14px; background: var(--green); color:white; border:none; border-radius: 8px; font-weight:bold; font-size:16px; cursor:pointer }
+    .login-box button:hover { opacity:0.9 }
+    .login-box a { color: var(--green); text-decoration:none; font-weight:600 }
+    .error { color:red; font-size:14px; margin-bottom:10px; display:none }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- A KHAWI LAM A THU -->
-    <div class="left">
-      <h1>SKT School</h1>
-      <p>SKT School in a siam a, i thiante leh mi dangte nen in inzawm theih nan.</p>
-    </div>
-
-    <!-- A DING LAM A LOGIN BOX -->
-    <div class="login-box">
-      <input type="email" id="email" placeholder="Email address or Phone number">
-      <input type="password" id="password" placeholder="Password">
-      <button class="login-btn" id="loginBtn">Log In</button>
-      <a href="#" style="color:var(--blue); text-decoration:none; font-size:14px">Password i theihnghilh em?</a>
-      <div class="divider"></div>
-      <a href="signup.html" class="create-btn">Create New Account</a>
-    </div>
+  <div class="login-box">
+    <h1>SKT Chat</h1>
+    <p>Login to continue</p>
+    <div class="error" id="error"></div>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="loginBtn">LOGIN</button>
+    <p style="margin-top:20px">Account i la nei lo? <a href="signup.html">Signup</a></p>
   </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
-    authDomain: "school-project-dab29.firebaseapp.com",
-    projectId: "school-project-dab29"
-  };
-  
+  const firebaseConfig = { apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk", authDomain: "school-project-dab29.firebaseapp.com", projectId: "school-project-dab29" };
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Dark mode auto detect
-  if(localStorage.getItem('dark') === 'true' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    document.body.classList.add('dark');
-  }
+  if(localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
+
+  // A lo login sa tawh chuan index ah kal nghal
+  onAuthStateChanged(auth, (user) => {
+    if (user) window.location.href = "index.html";
+  });
 
   document.getElementById('loginBtn').onclick = async () => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    
-    if(!email || !password) return alert("Email leh Password fill kim rawh");
+    const errorDiv = document.getElementById('error');
+    errorDiv.style.display = 'none';
+
+    if(!email || !password) {
+      errorDiv.innerText = "Email leh Password dah kim rawh";
+      errorDiv.style.display = 'block';
+      return;
+    }
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = "feed.html";
-    } catch (error) {
-      alert("Login a dik lo: " + error.message);
+      window.location.href = "index.html";
+    } catch(e) {
+      errorDiv.innerText = "Login a hlawhtling lo: " + e.message;
+      errorDiv.style.display = 'block';
     }
   }
 </script>
