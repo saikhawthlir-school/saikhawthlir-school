@@ -7,7 +7,7 @@
 <style>
     * { box-sizing: border-box; }
   body { font-family: Arial; margin:0; background:#0f172a; color:white; padding-bottom:70px; }
-  .header { background:#22c55e; padding:12px; font-size:18px; font-weight:bold; position:sticky; top:0; display:flex; justify-content:space-between; }
+  .header { background:#22c55e; padding:12px; font-size:18px; font-weight:bold; position:sticky; top:0; display:flex; justify-content:space-between; align-items:center; }
   .tabs { display:flex; background:#16a34a; position:sticky; top:48px; }
   .tab { flex:1; text-align:center; padding:12px; cursor:pointer; font-weight:bold; }
   .tab.active { border-bottom:3px solid white; background:#15803d; }
@@ -16,38 +16,45 @@
   .msg { background:#1e293b; padding:10px; margin:6px 0; border-radius:10px; word-wrap:break-word; }
   .msg.me { background:#22c55e; text-align:right; }
   .user-item { background:#1e293b; padding:12px; margin:6px 0; border-radius:10px; cursor:pointer; }
-  .user-item:hover { background:#334155; }
-  .bottom { 
-    position:fixed; 
-    bottom:0; 
-    left:0;
-    width:100%; 
-    background:#1e293b; 
-    padding:10px; 
-    display:flex; 
-    gap:5px;
-    border-top:1px solid #334155;
-  }
-  input { flex:1; padding:12px; border-radius:8px; border:none; background:#334155; color:white; outline:none; }
+  .bottom { position:fixed; bottom:0; left:0; width:100%; background:#1e293b; padding:10px; display:flex; gap:5px; border-top:1px solid #334155; }
+  input { flex:1; padding:12px; border-radius:8px; border:none; background:#334155; color:white; outline:none; margin:5px 0; width:100%; }
   button { padding:12px 18px; background:#22c55e; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
-  #loginPage { text-align:center; margin-top:80px; padding:20px; }
-  #loginPage input { width:80%; margin-bottom:10px; }
-  .back-btn { background:#ef4444; padding:8px 12px; font-size:14px; }
+  .btn-red { background:#ef4444; }
+  #loginPage, #signupPage { text-align:center; margin-top:50px; padding:20px; }
+  .form-box { background:#1e293b; padding:20px; border-radius:10px; max-width:400px; margin:auto; }
+  .switch { color:#22c55e; cursor:pointer; text-decoration:underline; margin-top:10px; }
 </style>
 </head>
 <body>
 
+<!-- LOGIN PAGE -->
 <div id="loginPage">
-  <h2>SKT Chat</h2>
-  <input id="nameInput" placeholder="I hming dah rawh">
-  <br>
-  <button onclick="login()">Lut rawh</button>
+  <div class="form-box">
+    <h2>SKT Chat Login</h2>
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPass" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="switch" onclick="showSignup()">Account i la neilo mi? Signup rawh</div>
+  </div>
 </div>
 
+<!-- SIGNUP PAGE -->
+<div id="signupPage" style="display:none;">
+  <div class="form-box">
+    <h2>SKT Chat Signup</h2>
+    <input id="signupName" placeholder="I hming">
+    <input id="signupEmail" type="email" placeholder="Email">
+    <input id="signupPass" type="password" placeholder="Password">
+    <button onclick="signup()">Signup</button>
+    <div class="switch" onclick="showLogin()">Account i nei tawh? Login rawh</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
 <div id="app" style="display:none;">
   <div class="header">
     <span id="headerTitle">SKT Chat</span>
-    <button class="back-btn" id="backBtn" onclick="backToUsers()" style="display:none;">Back</button>
+    <button class="btn-red" onclick="logout()">Logout</button>
   </div>
   
   <div class="tabs" id="mainTabs">
@@ -103,44 +110,69 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
 let currentUser = null;
 let currentUserName = "";
 let chatWith = null;
 
-function login(){
-  let name = document.getElementById("nameInput").value.trim();
-  if(!name) return alert("Hming dah hmasa rawh");
-  currentUserName = name;
-  firebase.auth().signInAnonymously().catch(e=>alert("Error: "+e.message));
+// PAGE SWITCH
+function showSignup(){ document.getElementById("loginPage").style.display="none"; document.getElementById("signupPage").style.display="block"; }
+function showLogin(){ document.getElementById("signupPage").style.display="none"; document.getElementById("loginPage").style.display="block"; }
+
+// SIGNUP
+function signup(){
+  let name = document.getElementById("signupName").value.trim();
+  let email = document.getElementById("signupEmail").value.trim();
+  let pass = document.getElementById("signupPass").value.trim();
+  if(!name || !email || !pass) return alert("Kim lo");
+  
+  auth.createUserWithEmailAndPassword(email, pass)
+  .then(cred => {
+    db.collection("users").doc(cred.user.uid).set({name:name, email:email});
+  })
+  .catch(e=>alert(e.message));
 }
 
-firebase.auth().onAuthStateChanged(user => {
+// LOGIN
+function login(){
+  let email = document.getElementById("loginEmail").value.trim();
+  let pass = document.getElementById("loginPass").value.trim();
+  auth.signInWithEmailAndPassword(email, pass).catch(e=>alert(e.message));
+}
+
+// LOGOUT
+function logout(){
+  auth.signOut();
+}
+
+// AUTH STATE
+auth.onAuthStateChanged(user => {
   if(user){
     currentUser = user;
-    document.getElementById("loginPage").style.display="none";
-    document.getElementById("app").style.display="block";
-    saveUser(user.uid, currentUserName);
-    loadChats();
-    loadUsers();
-    loadStatus();
+    db.collection("users").doc(user.uid).get().then(doc=>{
+      currentUserName = doc.data().name;
+      document.getElementById("loginPage").style.display="none";
+      document.getElementById("signupPage").style.display="none";
+      document.getElementById("app").style.display="block";
+      document.getElementById("headerTitle").innerText = "SKT Chat - " + currentUserName;
+      loadChats(); loadUsers(); loadStatus();
+    });
+  } else {
+    document.getElementById("app").style.display="none";
+    document.getElementById("loginPage").style.display="block";
   }
 });
 
+// TAB
 function showTab(id, el){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   if(el) el.classList.add("active");
   document.getElementById(id).classList.add("active");
-  document.getElementById("mainTabs").style.display="flex";
-  document.getElementById("backBtn").style.display="none";
-  document.getElementById("headerTitle").innerText = "SKT Chat";
 }
 
-function saveUser(uid, name){
-  db.collection("users").doc(uid).set({name:name, lastSeen: Date.now()});
-}
-
+// GROUP CHAT
 function loadChats(){
   db.collection("groupChats").orderBy("time").onSnapshot(snap=>{
     let html="";
@@ -160,28 +192,23 @@ function sendMsg(){
   }
 }
 
+// USERS + PRIVATE
 function loadUsers(){
   db.collection("users").onSnapshot(snap=>{
     let html="";
     snap.forEach(d=>{
       if(d.id != currentUser.uid){
-        html+=`<div class="user-item" onclick="openPrivateChat('${d.id}','${d.data().name}')">
-          ${d.data().name}
-        </div>`;
+        html+=`<div class="user-item" onclick="openPrivateChat('${d.id}','${d.data().name}')">${d.data().name}</div>`;
       }
     });
     document.getElementById("userList").innerHTML = html || "User dang la awm lo";
   });
 }
-
 function openPrivateChat(uid, name){
   chatWith = uid;
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById("privateChat").classList.add("active");
-  document.getElementById("mainTabs").style.display="none";
-  document.getElementById("backBtn").style.display="block";
   document.getElementById("headerTitle").innerText = name;
-  
   let chatId = [currentUser.uid, chatWith].sort().join("_");
   db.collection("privateChats").doc(chatId).collection("messages").orderBy("time")
   .onSnapshot(snap=>{
@@ -191,25 +218,19 @@ function openPrivateChat(uid, name){
       let cls = data.uid == currentUser.uid ? "msg me" : "msg";
       html+=`<div class="${cls}">${data.text}</div>`;
     });
-    document.getElementById("privateChatList").innerHTML = html || "Be rawh le";
+    document.getElementById("privateChatList").innerHTML = html;
   });
 }
-
 function sendPrivateMsg(){
   let txt = document.getElementById("privateMsgInput").value.trim();
   if(txt && chatWith){
     let chatId = [currentUser.uid, chatWith].sort().join("_");
-    db.collection("privateChats").doc(chatId).collection("messages").add({
-      text:txt, uid:currentUser.uid, time:Date.now()
-    });
+    db.collection("privateChats").doc(chatId).collection("messages").add({text:txt, uid:currentUser.uid, time:Date.now()});
     document.getElementById("privateMsgInput").value="";
   }
 }
 
-function backToUsers(){
-  showTab('users');
-}
-
+// STATUS
 function loadStatus(){
   db.collection("status").orderBy("time","desc").onSnapshot(snap=>{
     let html="";
