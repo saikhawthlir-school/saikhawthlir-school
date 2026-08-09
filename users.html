@@ -6,25 +6,22 @@
 <title>MizoChat</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;padding-bottom:150px;font-size:45px;} /* 45px */
-.header{background:#202c33;padding:32px 24px;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100; /* z-index sang */font-size:46px;}
-.tabs{display:flex;background:#202c33;position:sticky;top:108px;z-index:50;} /* z-index hniam */
+body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;padding-bottom:150px;font-size:45px;}
+.header{background:#202c33;padding:32px 24px;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:46px;}
+.tabs{display:flex;background:#202c33;position:sticky;top:108px;z-index:50;}
 .tab{flex:1;text-align:center;padding:32px;cursor:pointer;font-weight:600;font-size:32px;color:#8696a0;letter-spacing:1px;}
 .tab.active{color:#00a884;border-bottom:5px solid #00a884;}
 .page{display:none;}
 .page.active{display:block;}
-.item{display:flex;gap:32px;align-items:center;background:#111b21;padding:32px 34px;cursor:pointer;border-bottom:1px solid #1f2c33;min-height:160px;} /* lian tawp */
+.item{display:flex;gap:32px;align-items:center;background:#111b21;padding:32px 34px;cursor:pointer;border-bottom:1px solid #1f2c33;min-height:160px;}
 .item:active{background:#2a3942;}
-.avatar{width:130px;height:130px;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:46px;flex-shrink:0;color:#e9edef;} /* 130px */
+.avatar{width:130px;height:130px;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:46px;flex-shrink:0;color:#e9edef;}
 .avatar.status{border:6px solid #00a884;}
 .chat-info{flex:1;overflow:hidden;}
 .chat-name{font-size:36px;font-weight:500;margin-bottom:10px;color:#e9edef;}
 .last-msg{font-size:30px;color:#8696a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bottom-btn{position:fixed;bottom:35px;right:28px;width:110px;height:110px;border-radius:50%;background:#00a884;color:#111b21;border:none;font-size:65px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;font-weight:300;}
-.bottom-status{display:flex;background:#202c33;padding:20px;gap:18px;position:fixed;bottom:0;left:0;width:100%;}
-.bottom-status input{flex:1;padding:28px 30px;border:none;border-radius:35px;background:#2a3942;color:white;font-size:34px;}
-.bottom-status button{padding:28px 32px;background:#00a884;color:#111b21;border:none;border-radius:35px;font-weight:600;font-size:32px;}
-.menu{position:absolute;top:115px;right:18px;background:#233138;border-radius:8px;display:none;flex-direction:column;z-index:200; /* z-index sang ber */box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:360px;}
+.menu{position:absolute;top:115px;right:18px;background:#233138;border-radius:8px;display:none;flex-direction:column;z-index:200;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:360px;}
 .menu.show{display:flex;}
 .menu a{padding:28px 34px;color:#d1d7db;text-decoration:none;cursor:pointer;font-size:32px;border-bottom:1px solid #2a3942;}
 .menu a:hover{background:#182229;}
@@ -37,9 +34,9 @@ body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;padding-bott
 <div class="header">
   <span>MizoChat</span>
   <div style="position:relative;">
-    <button onclick="toggleMenu()" style="background:none;border:none;color:#aebac1;font-size:46px;">⋮</button>
+    <button onclick="toggleMenu()" style="background:none;border:none;color:#aebac1;font-size:46px;cursor:pointer;">⋮</button>
     <div class="menu" id="menu">
-      <a onclick="openProfile()">Profile</a> <!-- HEI HI A AWM TAWH ANG -->
+      <a onclick="openProfile()">Profile</a>
       <a onclick="newGroup()">Create Group</a>
       <a onclick="openSetting()">Setting</a>
       <a onclick="logout()">Logout</a>
@@ -66,8 +63,8 @@ body{background:#0b141a;color:#e9edef;font-family:'Segoe UI', Arial;padding-bott
     <h3 id="modalTitle" style="margin-bottom:15px;font-size:36px;">Select contacts</h3>
     <div id="userList"></div>
     <div style="display:flex;gap:10px;margin-top:15px;">
-      <button onclick="closeMemberModal()" style="flex:1;padding:22px;background:#2a3942;border:none;border-radius:8px;color:#d1d7db;font-size:30px;">Cancel</button>
-      <button onclick="confirmAdd()" style="flex:1;padding:22px;background:#00a884;border:none;border-radius:8px;color:#111b21;font-weight:bold;font-size:30px;">OK</button>
+      <button onclick="closeMemberModal()" style="flex:1;padding:22px;background:#2a3942;border:none;border-radius:8px;color:#d1d7db;font-size:30px;cursor:pointer;">Cancel</button>
+      <button onclick="confirmAdd()" style="flex:1;padding:22px;background:#00a884;border:none;border-radius:8px;color:#111b21;font-weight:bold;font-size:30px;cursor:pointer;">OK</button>
     </div>
   </div>
 </div>
@@ -82,18 +79,17 @@ const auth = firebase.auth(); const db = firebase.firestore(); let me=null;
 let selectedMembers = []; let modalCallback = null;
 
 auth.onAuthStateChanged(u=>{ if(!u) location.href="index.html"; me=u; loadChats(); loadStatus(); });
+
 function toggleMenu(){ document.getElementById("menu").classList.toggle("show"); }
 function showTab(id,el){ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active")); document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active")); document.getElementById(id).classList.add("active"); el.classList.add("active"); }
 
+// THLAKNA PAWIMAWH: ALERT A BO TAWH
 function openProfile(){
-  db.collection("users").doc(me.uid).get().then(doc=>{
-    let data = doc.data();
-    alert("PROFILE\n\nHming: " + data.name + "\nEmail: " + data.email);
-  });
+  location.href = "profile.html"; // Profile page ah kal
   toggleMenu();
 }
 function openSetting(){
-  alert("SETTING\n1. Dark Mode: ON\n2. Notification: ON\n[La siam belh zel tur]");
+  location.href = "setting.html"; // Setting page ah kal
   toggleMenu();
 }
 function logout(){
