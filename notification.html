@@ -4,17 +4,21 @@
   <title>Notifications - SKT School</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    :root { --bg: #f0f2f5; --card: white; --text: #050505; --sub: #65676b; }
-    body.dark { --bg: #18191a; --card: #242526; --text: #e4e6eb; --sub: #b0b3b8; }
+    :root { --bg: #f0f2f5; --card: white; --text: #050505; --sub: #65676b; --border: #e4e6eb }
+    body.dark { --bg: #18191a; --card: #242526; --text: #e4e6eb; --sub: #b0b3b8; --border: #3a3b3c }
     * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial; }
     body { background: var(--bg); color: var(--text) }
-.header { background: var(--card); padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center }
-.header h2 { color:#1877f2 }
-.header button { background:#1877f2; padding:8px 16px; border-radius:8px; border:none; color:white; font-weight:bold; cursor:pointer }
-.container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
-.notif-item { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor:pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1) }
-.notif-item:hover { opacity:0.8 }
-.notif-item.read { opacity:0.5 }
+    .header { background: var(--card); padding: 10px 20px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 4px rgba(0,0,0,0.1) }
+    .header h2 { color:#1877f2 }
+    .header button { background:#1877f2; padding:8px 16px; border-radius:8px; border:none; color:white; font-weight:bold; cursor:pointer }
+    .container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
+    .notif-item { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display:flex; gap:10px; cursor:pointer; border-left: 4px solid #1877f2 }
+    .notif-item.read { border-left: 4px solid var(--border); opacity: 0.7 } /* en tawh chu a nhạt deuh */
+    .notif-item:hover { background: var(--bg) }
+    .notif-avatar { width:40px; height:40px; border-radius:50%; background: linear-gradient(45deg, #1877f2, #42a5f5); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; flex-shrink:0 }
+    .notif-text { flex:1 }
+    .notif-text b { color: var(--text) }
+    .notif-time { font-size:12px; color: var(--sub) }
   </style>
 </head>
 <body>
@@ -22,42 +26,60 @@
     <h2>Notifications</h2>
     <button onclick="window.location='feed.html'">Home</button>
   </div>
-  <div class="container" id="notifList">Loading...</div>
+  <div class="container" id="notifList">
+    Loading...
+  </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+<script>
+  let currentUserEmail = localStorage.getItem('currentUserEmail');
+  
+  // Dark mode
+  if(localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
 
-const firebaseConfig = { apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk", authDomain: "school-project-dab29.firebaseapp.com", projectId: "school-project-dab29" };
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+  // Kan lut rual hian current user email kan save
+  const authUser = JSON.parse(localStorage.getItem('firebase:authUser:AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk:[DEFAULT]') || '{}');
+  if(authUser.email) {
+    currentUserEmail = authUser.email;
+    localStorage.setItem('currentUserEmail', currentUserEmail);
+  }
 
-if(localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
-
-function markAsRead(id) {
-  const email = auth.currentUser.email;
-  let notifs = JSON.parse(localStorage.getItem('notifications_'+email) || "[]");
-  notifs = notifs.map(n => n.id === id? {...n, read: true} : n);
-  localStorage.setItem('notifications_'+email, JSON.stringify(notifs));
-}
-
-onAuthStateChanged(auth, (user) => {
-  if(!user) window.location.href = "login.html";
-  else {
-    const notifs = JSON.parse(localStorage.getItem('notifications_'+user.email) || "[]");
-    let html = "";
-    if(notifs.length === 0) html = "<div style='text-align:center; padding:40px'>Notification a la awm lo</div>";
-    else {
-      notifs.reverse().forEach(n => {
-        html += `<div class="notif-item ${n.read? 'read' : ''}" onclick="markAsRead(${n.id}); window.location='feed.html#${n.postId}'">
-          <b>${n.user}</b> ${n.action}
-          <div style="font-size:12px; color:var(--sub)">${n.time}</div>
-        </div>`;
-      });
+  function loadNotifs() {
+    const notifs = JSON.parse(localStorage.getItem('notifications_'+currentUserEmail) || "[]");
+    
+    if(notifs.length === 0) {
+      document.getElementById('notifList').innerHTML = "<div style='text-align:center; padding:40px'>Notification a la awm lo</div>";
+      return;
     }
+
+    let html = "";
+    notifs.reverse().forEach(n => { // thar ber a chung ah
+      const readClass = n.read ? 'read' : '';
+      // HEI HI A PAWIMAWH: onclick ah postId kan dah
+      html += `
+        <div class="notif-item ${readClass}" onclick="openPost('${n.postId}', ${n.id})">
+          <div class="notif-avatar">${n.user.charAt(0)}</div>
+          <div class="notif-text">
+            <b>${n.user}</b> ${n.action}
+            <div class="notif-time">${n.time}</div>
+          </div>
+        </div>
+      `;
+    });
     document.getElementById('notifList').innerHTML = html;
   }
-});
+
+  // FIX: NOTIF CLICK DAN
+  function openPost(postId, notifId) {
+    // 1. He notif hi read ah dah hmasa
+    let notifs = JSON.parse(localStorage.getItem('notifications_'+currentUserEmail) || "[]");
+    notifs = notifs.map(n => n.id === notifId ? {...n, read: true} : n);
+    localStorage.setItem('notifications_'+currentUserEmail, JSON.stringify(notifs));
+    
+    // 2. Feed page ah postId nen kal phei
+    window.location.href = `feed.html#${postId}`;
+  }
+
+  loadNotifs();
 </script>
 </body>
 </html>
