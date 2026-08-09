@@ -13,7 +13,7 @@
       position: sticky; top:0; display:flex; justify-content:space-between; align-items:center; z-index:100 }
 .header h2 { color:#1877f2; font-size:24px }
 .header div { display:flex; gap:10px }
-.header button { background:#1877f2; padding:8px 16px; border-radius:8px; font-size:14px; border:none; color:white; font-weight:bold; cursor:pointer }
+.header button { background:#1877f2; padding:8px 16px; border-radius:8px; font-size:14px; border:none; color:white; font-weight:bold; cursor:pointer; position:relative }
 .header button.logout { background:#f44336; }
 .header button.dark-btn { background: var(--sub); }
 
@@ -42,6 +42,9 @@
 .comment { background:var(--bg); padding:10px; border-radius:18px; margin-top:8px; font-size:14px }
 .comment b { color:var(--text) }
 .notification { position:fixed; top:70px; right:20px; background:#1877f2; color:white; padding:12px 20px; border-radius:8px; display:none; z-index:200 }
+
+/* NOTIF BADGE */
+#notifCount { position:absolute; top:-5px; right:-5px; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:10px; display:none }
   </style>
 </head>
 <body>
@@ -50,7 +53,7 @@
     <h2>SKT School</h2>
     <div>
       <button class="dark-btn" onclick="toggleDark()">🌙</button>
-      <button onclick="window.location='notification.html'">🔔</button>
+      <button onclick="window.location='notification.html'">🔔 <span id="notifCount">0</span></button>
       <button onclick="window.location='profile.html'">Profile</button>
       <button class="logout" id="logoutBtn">Logout</button>
     </div>
@@ -89,15 +92,30 @@
     setTimeout(()=> n.style.display='none', 3000);
   }
 
+  function updateNotifCount() {
+    const notifs = JSON.parse(localStorage.getItem('notifications') || "[]");
+    const countSpan = document.getElementById('notifCount');
+    if(notifs.length > 0) {
+      countSpan.innerText = notifs.length;
+      countSpan.style.display = 'inline-block';
+    } else {
+      countSpan.style.display = 'none';
+    }
+  }
+
   function saveNotification(action, postId) {
     let notifs = JSON.parse(localStorage.getItem('notifications') || "[]");
     notifs.push({user: currentUser.displayName || currentUser.email.split('@')[0], action: action, postId: postId, time: "tun lawk ah"});
     localStorage.setItem('notifications', JSON.stringify(notifs));
+    updateNotifCount();
   }
 
   onAuthStateChanged(auth, (user) => {
     if (!user) window.location.href = "login.html";
-    else { currentUser = user; loadPosts();
+    else { 
+      currentUser = user; 
+      loadPosts(); 
+      updateNotifCount();
       if(window.location.hash) {
         setTimeout(()=> document.getElementById(window.location.hash.substring(1))?.scrollIntoView(), 500)
       }
@@ -124,23 +142,28 @@
     }
   }
 
-  window.likePost = async (id, liked) => {
+  window.likePost = async (id, liked, postOwnerEmail) => {
     const postRef = doc(db, "posts", id);
-    if(liked) await updateDoc(postRef, { likes: arrayRemove(currentUser.email) });
-    else {
+    if(liked) {
+      await updateDoc(postRef, { likes: arrayRemove(currentUser.email) });
+    } else {
       await updateDoc(postRef, { likes: arrayUnion(currentUser.email) });
-      saveNotification("i post a like 👍", id);
+      if(postOwnerEmail!== currentUser.email) {
+        saveNotification("i post a like 👍", id);
+      }
       showNotif("I like e 👍");
     }
     loadPosts();
   }
 
-  window.commentPost = async (id) => {
+  window.commentPost = async (id, postOwnerEmail) => {
     const input = document.getElementById('comment-'+id);
     const comment = input.value;
     if(!comment) return;
     await updateDoc(doc(db, "posts", id), { comments: arrayUnion(currentUser.displayName || currentUser.email.split('@')[0] + ": " + comment) });
-    saveNotification("i post ah comment a dah 💬", id);
+    if(postOwnerEmail!== currentUser.email) {
+      saveNotification("i post ah comment a dah 💬", id);
+    }
     input.value = "";
     showNotif("Comment i dah e 💬");
     loadPosts();
@@ -183,13 +206,13 @@
           </div>
           <div class="post-text">${data.text}</div>
           <div class="actions">
-            <button class="${liked? 'liked' : ''}" onclick="likePost('${docSnap.id}', ${liked})">👍 Like (${likes.length})</button>
+            <button class="${liked? 'liked' : ''}" onclick="likePost('${docSnap.id}', ${liked}, '${data.email}')">👍 Like (${likes.length})</button>
             <button>💬 Comment (${comments.length})</button>
           </div>
           ${comments.map(c => { const parts = c.split(': '); return `<div class="comment"><b>${parts[0]}</b> ${parts[1] || ""}</div>` }).join('')}
           <div class="comment-box">
             <input id="comment-${docSnap.id}" placeholder="Comment ziak rawh...">
-            <button onclick="commentPost('${docSnap.id}')">Send</button>
+            <button onclick="commentPost('${docSnap.id}', '${data.email}')">Send</button>
           </div>
         </div>`;
     });
