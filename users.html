@@ -6,13 +6,16 @@
 <title>MizoChat</title>
 <style>
 body{background:#111b21;color:white;font-family:Arial;margin:0;padding-bottom:70px;}
-.header{background:#202c33;padding:12px;display:flex;justify-content:space-between;font-weight:bold;position:sticky;top:0;}
+.header{background:#202c33;padding:12px;display:flex;justify-content:space-between;font-weight:bold;position:sticky;top:0;z-index:10;}
 .item{display:flex;gap:10px;align-items:center;background:#202c33;padding:12px;margin:2px 0;cursor:pointer;}
 .item:hover{background:#2a3942;}
 .item img{width:50px;height:50px;border-radius:50%;background:#2a3942;}
-.bottom-btn{position:fixed;bottom:20px;right:20px;width:55px;height:55px;border-radius:50%;background:#00a884;color:white;border:none;font-size:30px;cursor:pointer;}
-.menu{position:absolute;top:50px;right:10px;background:#202c33;border-radius:8px;display:none;flex-direction:column;z-index:20;}
-.menu.show{display:flex;} .menu a{padding:12px 20px;color:white;text-decoration:none;} .menu a:hover{background:#2a3942;}
+.last-msg{font-size:13px;color:#8696a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:200px;}
+.bottom-btn{position:fixed;bottom:20px;right:20px;width:55px;height:55px;border-radius:50%;background:#00a884;color:white;border:none;font-size:30px;cursor:pointer;box-shadow:0 4px 10px black;}
+.menu{position:absolute;top:50px;right:10px;background:#202c33;border-radius:8px;display:none;flex-direction:column;z-index:20;box-shadow:0 4px 10px black;}
+.menu.show{display:flex;}
+.menu a{padding:12px 20px;color:white;text-decoration:none;cursor:pointer;}
+.menu a:hover{background:#2a3942;}
 </style>
 </head>
 <body>
@@ -34,44 +37,114 @@ body{background:#111b21;color:white;font-family:Arial;margin:0;padding-bottom:70
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
+const firebaseConfig = {
+  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
+  authDomain: "school-project-dab29.firebaseapp.com",
+  projectId: "school-project-dab29"
+};
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth(); const db = firebase.firestore();
+const auth = firebase.auth();
+const db = firebase.firestore();
 let me=null;
 
-auth.onAuthStateChanged(u=>{ if(!u) location.href="index.html"; me=u; loadChats(); });
+auth.onAuthStateChanged(u=>{
+  if(!u) location.href="index.html";
+  me=u;
+  loadChats();
+});
 
-function toggleMenu(){ document.getElementById("menu").classList.toggle("show"); }
-function logout(){ auth.signOut(); }
+function toggleMenu(){
+  document.getElementById("menu").classList.toggle("show");
+}
+function logout(){
+  auth.signOut();
+}
 
+// GROUP THAR SIAM + MEMBER ADD
 function newGroup(){
   let name = prompt("Group hming dah rawh:");
   if(!name) return;
-  db.collection("groups").add({name:name, members:[me.uid], createdBy:me.uid, time:Date.now()});
+  let members = [me.uid];
+
+  db.collection("users").get().then(snap=>{
+    let userList = "";
+    snap.forEach(d=>{
+      if(d.id!= me.uid) userList += `${d.data().name} - ${d.id}\n`
+    });
+    let add = prompt("Add duh te ID paste rawh:\n\n" + userList + "\n\nA ID copy la, hei ah paste rawh");
+    if(add) members.push(add.trim());
+
+    db.collection("groups").add({
+      name:name,
+      members:members,
+      admins:[me.uid],
+      createdBy:me.uid,
+      time:Date.now(),
+      icon:""
+    }).then(()=>alert("Group siam zawh"));
+  });
+  toggleMenu();
 }
 
+// CHATS LIST LOAD
 function loadChats(){
   let html="";
-  // Private chats
+  document.getElementById("chatList").innerHTML = "Loading...";
+
+  // 1. PRIVATE CHAT LOAD
   db.collection("users").onSnapshot(snap=>{
     snap.forEach(d=>{
-      if(d.id != me.uid){
-        html+=`<div class="item" onclick="openPrivate('${d.id}','${d.data().name}')">
-          <img src="https://ui-avatars.com/api/?name=${d.data().name}">
-          <div><b>${d.data().name}</b></div>
-        </div>`;
+      if(d.id!= me.uid){
+        let chatId = [me.uid,d.id].sort().join("_");
+        // last message ngaihthlak
+        db.collection("privateChats").doc(chatId).collection("messages").orderBy("time","desc").limit(1)
+       .onSnapshot(msnap=>{
+          let lastText = "Tap to chat";
+          if(!msnap.empty) lastText = msnap.docs[0].data().text;
+
+          let div = document.getElementById("p-"+d.id);
+          if(!div){
+            div = document.createElement("div");
+            div.id = "p-"+d.id;
+            div.className = "item";
+            div.onclick = ()=>openPrivate(d.id,d.data().name);
+            document.getElementById("chatList").prepend(div);
+          }
+          div.innerHTML = `
+            <img src="https://ui-avatars.com/api/?name=${d.data().name}&background=2a3942&color=fff">
+            <div>
+              <b>${d.data().name}</b><br>
+              <div class="last-msg">${lastText}</div>
+            </div>
+          `;
+        });
       }
     });
-    // Group chats
-    db.collection("groups").where("members","array-contains",me.uid).onSnapshot(gsnap=>{
-      gsnap.forEach(g=>{
-        html+=`<div class="item" onclick="openGroup('${g.id}','${g.data().name}')">
-          <img src="https://ui-avatars.com/api/?name=${g.data().name}&background=00a884">
-          <div><b>${g.data().name}</b><br><small>Group</small></div>
-        </div>`;
-      });
-      document.getElementById("chatList").innerHTML = html || "Chat i la nei lo";
+  });
+
+  // 2. GROUP CHAT LOAD
+  db.collection("groups").where("members","array-contains",me.uid).onSnapshot(gsnap=>{
+    gsnap.forEach(g=>{
+      let data = g.data();
+      let div = document.getElementById("g-"+g.id);
+      if(!div){
+        div = document.createElement("div");
+        div.id = "g-"+g.id;
+        div.className = "item";
+        div.onclick = ()=>openGroup(g.id,data.name);
+        document.getElementById("chatList").prepend(div);
+      }
+      div.innerHTML = `
+        <img src="https://ui-avatars.com/api/?name=${data.name}&background=00a884&color=fff">
+        <div>
+          <b>${data.name}</b><br>
+          <div class="last-msg">Group</div>
+        </div>
+      `;
     });
+
+    if(document.getElementById("chatList").innerHTML=="Loading...")
+      document.getElementById("chatList").innerHTML = "Chat i la nei lo";
   });
 }
 
@@ -87,6 +160,11 @@ function openGroup(gid,name){
   localStorage.setItem("chatName",name);
   location.href="group.html";
 }
+
+// menu pawn hmet chuan a close
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.header')) document.getElementById("menu").classList.remove("show");
+});
 </script>
 </body>
 </html>
