@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chats</title>
+<style>
+body{background:#0f172a;color:white;font-family:Arial;margin:0;}
+.header{background:#22c55e;padding:12px;display:flex;justify-content:space-between;font-weight:bold;}
+.chat-item{background:#1e293b;padding:15px;margin:5px;border-radius:10px;cursor:pointer;}
+.chat-item:hover{background:#334155;}
+</style>
+</head>
+<body>
+<div class="header">
+  <span>SKT Chat</span>
+  <button onclick="logout()" style="background:#ef4444;color:white;border:none;padding:6px 12px;border-radius:6px;">Logout</button>
+</div>
+<div id="chatList">Loading...</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(); const db = firebase.firestore();
+let me = null;
+
+auth.onAuthStateChanged(u=>{ 
+  if(!u) location.href="index.html"; 
+  me=u; 
+  loadChats(); 
+});
+
+function logout(){ auth.signOut(); }
+
+function loadChats(){
+  db.collection("users").onSnapshot(snap=>{
+    let html="";
+    snap.forEach(d=>{
+      if(d.id != me.uid){
+        html+=`<div class="chat-item" onclick="openChat('${d.id}','${d.data().name}')">
+          <b>${d.data().name}</b>
+        </div>`;
+      }
+    });
+    document.getElementById("chatList").innerHTML = html || "Mi an la awm lo";
+  });
+}
+
+function openChat(uid,name){
+  localStorage.setItem("chatWith",uid);
+  localStorage.setItem("chatName",name);
+  location.href="chat.html";
+}
+</script>
+</body>
+</html>
