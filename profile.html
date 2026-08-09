@@ -80,3 +80,11 @@ function editAbout(){
 </script>
 </body>
 </html>
+
+<script>
+// Page load apiang in font size saved kha a apply nghal
+window.onload = function(){
+  let savedSize = localStorage.getItem("appFontSize") || 45;
+  document.body.style.fontSize = savedSize + "px";
+}
+</script>
