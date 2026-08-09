@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Chat</title>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Chat</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b141a;color:white;font-family:'Segoe UI',Arial;height:100vh;display:flex;flex-direction:column;font-size:22px;}
-.header{background:#202c33;padding:16px 18px;font-weight:500;position:sticky;top:0;display:flex;gap:14px;align-items:center;font-size:22px;}
-.header button{background:none;border:none;color:white;font-size:28px;}
-#chatBox{flex:1;overflow-y:auto;padding:14px;background-image:url('https://user-images.githubusercontent.com/15082520/120515973-9b1ff200-c3b8-11eb-8b1e-5c1c7d5a3b3e.png');background-size:contain;}
-.msg{background:#202c33;padding:14px 18px;margin:10px 0;border-radius:10px;max-width:75%;font-size:19px;word-wrap:break-word;}
+body{background:#0b141a;color:white;font-family:'Segoe UI',Arial;height:100vh;display:flex;flex-direction:column;font-size:45px;}
+.header{background:#202c33;padding:28px 24px;font-weight:600;position:sticky;top:0;display:flex;gap:20px;align-items:center;font-size:46px;z-index:10;}
+.header button{background:none;border:none;color:white;font-size:50px;cursor:pointer;}
+#chatBox{flex:1;overflow-y:auto;padding:20px;background-image:url('https://user-images.githubusercontent.com/15082520/120515973-9b1ff200-c3b8-11eb-8b1e-5c1c7d5a3b3e.png');background-size:contain;}
+.msg{
+  background:#202c33;
+  padding:24px 28px;
+  margin:12px 0;
+  border-radius:12px;
+  max-width:80%;
+  font-size:38px;
+  word-wrap:break-word;
+  line-height:1.4;
+}
 .msg.me{background:#005c4b;margin-left:auto;}
-.bottom{position:sticky;bottom:0;display:flex;background:#202c33;padding:14px;gap:12px;}
-input{flex:1;padding:18px;border:none;border-radius:25px;background:#2a3942;color:white;font-size:20px;}
-button{padding:18px 20px;background:#00a884;color:#111b21;border:none;border-radius:50%;font-size:24px;cursor:pointer;}
+.bottom{position:sticky;bottom:0;display:flex;background:#202c33;padding:18px;gap:14px;}
+input{flex:1;padding:28px 30px;border:none;border-radius:35px;background:#2a3942;color:white;font-size:36px;}
+button{padding:28px 30px;background:#00a884;color:#111b21;border:none;border-radius:50%;font-size:40px;cursor:pointer;}
 </style></head>
 <body>
 <div class="header"><button onclick="location.href='users.html'">←</button><span id="headerName"></span></div>
