@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Profile - SKT School</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root { --bg: #f0f2f5; --card: white; --text: #050505; --sub: #65676b; --border: #e4e6eb }
+    body.dark { --bg: #18191a; --card: #242526; --text: #e4e6eb; --sub: #b0b3b8; --border: #3a3b3c }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial; }
+    body { background: var(--bg); color: var(--text) }
+  .header { background: var(--card); padding: 10px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center }
+  .header h2 { color:#1877f2 }
+  .header button { background:#1877f2; padding:8px 16px; border-radius:8px; border:none; color:white; font-weight:bold; cursor:pointer }
+  .container { max-width: 600px; margin: 20px auto; padding: 0 10px; }
+  .profile-card { background: var(--card); padding: 20px; border-radius: 12px; text-align:center; margin-bottom:20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1) }
+  .avatar-big { width:100px; height:100px; border-radius:50%; background: linear-gradient(45deg, #1877f2, #42a5f5); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:40px; margin:0 auto 10px }
+  .profile-card input { width:80%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); margin:5px 0 }
+  .profile-card button { background:#1877f2; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer }
+  .post { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1) }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>SKT School</h2>
+    <div>
+      <button onclick="window.location='feed.html'">Home</button>
+      <button onclick="toggleDark()">🌙</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="profile-card">
+      <div class="avatar-big" id="avatarBig">?</div>
+      <h2 id="nameDisplay">Loading...</h2>
+      <p id="emailDisplay" style="color:var(--sub)"></p>
+      <input id="nameInput" placeholder="I hming thar ziak rawh">
+      <button onclick="updateProfile()">Save</button>
+      <p style="margin-top:10px; color:var(--sub)">Post ka neih zawng: <b id="postCount">0</b></p>
+    </div>
+    <h3>Ka Post te</h3>
+    <div id="myPosts"></div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+  const firebaseConfig = { apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk", authDomain: "school-project-dab29.firebaseapp.com", projectId: "school-project-dab29" };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  let currentUser = null;
+
+  if(localStorage.getItem('dark') === 'true') document.body.classList.add('dark');
+  window.toggleDark = () => { document.body.classList.toggle('dark'); localStorage.setItem('dark', document.body.classList.contains('dark')) }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) window.location.href = "login.html";
+    else {
+      currentUser = user;
+      document.getElementById('nameDisplay').innerText = user.displayName || user.email.split('@')[0];
+      document.getElementById('emailDisplay').innerText = user.email;
+      document.getElementById('avatarBig').innerText = (user.displayName || user.email).charAt(0).toUpperCase();
+      loadMyPosts();
+    }
+  });
+
+  window.updateProfile = async () => {
+    const newName = document.getElementById('nameInput').value;
+    if(!newName) return alert("Hming dah rawh");
+    await updateProfile(currentUser, { displayName: newName });
+    alert("I hming a in thlak tawh");
+    location.reload();
+  }
+
+  async function loadMyPosts() {
+    const q = query(collection(db, "posts"), where("email", "==", currentUser.email), orderBy("time", "desc"));
+    const snap = await getDocs(q);
+    document.getElementById('postCount').innerText = snap.size;
+    let html = "";
+    snap.forEach(doc => {
+      html += `<div class="post"><b>${doc.data().text}</b><br><small style="color:var(--sub)">${doc.data().likes?.length || 0} likes</small></div>`;
+    });
+    document.getElementById('myPosts').innerHTML = html || "Post ala awm lo";
+  }
+</script>
+</body>
+</html>
