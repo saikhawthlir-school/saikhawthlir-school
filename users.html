@@ -5,16 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MizoChat</title>
 <style>
-body{background:#111b21;color:white;font-family:Arial;margin:0;padding-bottom:70px;}
-.header{background:#202c33;padding:12px;display:flex;justify-content:space-between;font-weight:bold;position:sticky;top:0;z-index:10;}
-.item{display:flex;gap:10px;align-items:center;background:#202c33;padding:12px;margin:2px 0;cursor:pointer;}
-.item:hover{background:#2a3942;}
-.item img{width:50px;height:50px;border-radius:50%;background:#2a3942;}
-.last-msg{font-size:13px;color:#8696a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:200px;}
-.bottom-btn{position:fixed;bottom:20px;right:20px;width:55px;height:55px;border-radius:50%;background:#00a884;color:white;border:none;font-size:30px;cursor:pointer;box-shadow:0 4px 10px black;}
-.menu{position:absolute;top:50px;right:10px;background:#202c33;border-radius:8px;display:none;flex-direction:column;z-index:20;box-shadow:0 4px 10px black;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111b21;color:white;font-family:'Segoe UI', Arial;padding-bottom:80px;}
+.header{background:#202c33;padding:16px 12px;display:flex;justify-content:space-between;align-items:center;font-weight:bold;position:sticky;top:0;z-index:10;font-size:20px;}
+.tabs{display:flex;background:#202c33;position:sticky;top:56px;z-index:10;}
+.tab{flex:1;text-align:center;padding:14px;cursor:pointer;font-weight:500;font-size:15px;color:#8696a0;}
+.tab.active{color:#00a884;border-bottom:3px solid #00a884;}
+.page{display:none;}
+.page.active{display:block;}
+.item{display:flex;gap:12px;align-items:center;background:#111b21;padding:12px 16px;cursor:pointer;border-bottom:1px solid #202c33;}
+.item:hover{background:#202c33;}
+.avatar{width:55px;height:55px;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;flex-shrink:0;}
+.avatar.status{border:3px solid #00a884;}
+.chat-info{flex:1;overflow:hidden;}
+.chat-name{font-size:16px;font-weight:500;margin-bottom:3px;}
+.last-msg{font-size:14px;color:#8696a0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bottom-btn{position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background:#00a884;color:white;border:none;font-size:30px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.4);z-index:10;}
+.bottom-status{display:flex;background:#202c33;padding:10px;gap:8px;position:fixed;bottom:0;left:0;width:100%;}
+.bottom-status input{flex:1;padding:14px;border:none;border-radius:8px;background:#2a3942;color:white;font-size:16px;}
+.bottom-status button{padding:14px 16px;background:#00a884;color:white;border:none;border-radius:8px;font-weight:bold;}
+.menu{position:absolute;top:55px;right:10px;background:#202c33;border-radius:8px;display:none;flex-direction:column;z-index:20;box-shadow:0 4px 10px black;min-width:160px;}
 .menu.show{display:flex;}
-.menu a{padding:12px 20px;color:white;text-decoration:none;cursor:pointer;}
+.menu a{padding:14px 20px;color:white;text-decoration:none;cursor:pointer;font-size:15px;}
 .menu a:hover{background:#2a3942;}
 </style>
 </head>
@@ -22,7 +34,7 @@ body{background:#111b21;color:white;font-family:Arial;margin:0;padding-bottom:70
 <div class="header">
   <span>MizoChat</span>
   <div style="position:relative;">
-    <button onclick="toggleMenu()" style="background:none;border:none;color:white;font-size:22px;">⋮</button>
+    <button onclick="toggleMenu()" style="background:none;border:none;color:white;font-size:24px;">⋮</button>
     <div class="menu" id="menu">
       <a onclick="newGroup()">Group thar siam</a>
       <a onclick="logout()">Logout</a>
@@ -30,8 +42,25 @@ body{background:#111b21;color:white;font-family:Arial;margin:0;padding-bottom:70
   </div>
 </div>
 
-<div id="chatList">Loading...</div>
-<button class="bottom-btn" onclick="newGroup()">+</button>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('chats',this)">CHATS</div>
+  <div class="tab" onclick="showTab('status',this)">STATUS</div>
+</div>
+
+<!-- CHATS TAB -->
+<div id="chats" class="page active">
+  <div id="chatList">Loading...</div>
+  <button class="bottom-btn" onclick="newGroup()">+</button>
+</div>
+
+<!-- STATUS TAB -->
+<div id="status" class="page">
+  <div id="statusList">Loading...</div>
+  <div class="bottom-status">
+    <input id="statusInput" placeholder="I status update rawh...">
+    <button onclick="postStatus()">Post</button>
+  </div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -51,57 +80,51 @@ auth.onAuthStateChanged(u=>{
   if(!u) location.href="index.html";
   me=u;
   loadChats();
+  loadStatus();
 });
 
-function toggleMenu(){
-  document.getElementById("menu").classList.toggle("show");
-}
-function logout(){
-  auth.signOut();
+function toggleMenu(){ document.getElementById("menu").classList.toggle("show"); }
+function logout(){ auth.signOut(); }
+
+function showTab(id,el){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  el.classList.add("active");
 }
 
-// GROUP THAR SIAM + MEMBER ADD
+// GROUP THAR SIAM
 function newGroup(){
   let name = prompt("Group hming dah rawh:");
   if(!name) return;
   let members = [me.uid];
-
   db.collection("users").get().then(snap=>{
-    let userList = "";
-    snap.forEach(d=>{
-      if(d.id!= me.uid) userList += `${d.data().name} - ${d.id}\n`
-    });
-    let add = prompt("Add duh te ID paste rawh:\n\n" + userList + "\n\nA ID copy la, hei ah paste rawh");
+    let userList = ""; snap.forEach(d=>{ if(d.id!= me.uid) userList += `${d.data().name}\nID: ${d.id}\n\n` });
+    let add = prompt("Add duh te ID paste rawh:\n\n" + userList);
     if(add) members.push(add.trim());
-
     db.collection("groups").add({
-      name:name,
-      members:members,
-      admins:[me.uid],
-      createdBy:me.uid,
-      time:Date.now(),
-      icon:""
+      name:name, members:members, admins:[me.uid], createdBy:me.uid, time:Date.now()
     }).then(()=>alert("Group siam zawh"));
   });
   toggleMenu();
 }
 
-// CHATS LIST LOAD
-function loadChats(){
-  let html="";
-  document.getElementById("chatList").innerHTML = "Loading...";
+// INITIAL LA CHHUAH
+function getInitials(name){
+  return name.split(" ").map(n=>n[0]).join("").toUpperCase().slice(0,2);
+}
 
-  // 1. PRIVATE CHAT LOAD
+// CHATS LOAD
+function loadChats(){
+  // Private
   db.collection("users").onSnapshot(snap=>{
     snap.forEach(d=>{
       if(d.id!= me.uid){
         let chatId = [me.uid,d.id].sort().join("_");
-        // last message ngaihthlak
         db.collection("privateChats").doc(chatId).collection("messages").orderBy("time","desc").limit(1)
-       .onSnapshot(msnap=>{
+     .onSnapshot(msnap=>{
           let lastText = "Tap to chat";
           if(!msnap.empty) lastText = msnap.docs[0].data().text;
-
           let div = document.getElementById("p-"+d.id);
           if(!div){
             div = document.createElement("div");
@@ -111,9 +134,9 @@ function loadChats(){
             document.getElementById("chatList").prepend(div);
           }
           div.innerHTML = `
-            <img src="https://ui-avatars.com/api/?name=${d.data().name}&background=2a3942&color=fff">
-            <div>
-              <b>${d.data().name}</b><br>
+            <div class="avatar">${getInitials(d.data().name)}</div>
+            <div class="chat-info">
+              <div class="chat-name">${d.data().name}</div>
               <div class="last-msg">${lastText}</div>
             </div>
           `;
@@ -121,8 +144,7 @@ function loadChats(){
       }
     });
   });
-
-  // 2. GROUP CHAT LOAD
+  // Group
   db.collection("groups").where("members","array-contains",me.uid).onSnapshot(gsnap=>{
     gsnap.forEach(g=>{
       let data = g.data();
@@ -135,33 +157,53 @@ function loadChats(){
         document.getElementById("chatList").prepend(div);
       }
       div.innerHTML = `
-        <img src="https://ui-avatars.com/api/?name=${data.name}&background=00a884&color=fff">
-        <div>
-          <b>${data.name}</b><br>
-          <div class="last-msg">Group</div>
+        <div class="avatar" style="background:#00a884">${getInitials(data.name)}</div>
+        <div class="chat-info">
+          <div class="chat-name">${data.name}</div>
+          <div class="last-msg">👥 Group</div>
         </div>
       `;
     });
+  });
+}
 
-    if(document.getElementById("chatList").innerHTML=="Loading...")
-      document.getElementById("chatList").innerHTML = "Chat i la nei lo";
+// STATUS LOAD + POST
+function loadStatus(){
+  db.collection("status").orderBy("time","desc").onSnapshot(snap=>{
+    let html="";
+    snap.forEach(d=>{
+      let data = d.data();
+      html+=`<div class="item">
+        <div class="avatar status">${getInitials(data.name)}</div>
+        <div class="chat-info">
+          <div class="chat-name">${data.name}</div>
+          <div class="last-msg">${data.text}</div>
+        </div>
+      </div>`;
+    });
+    document.getElementById("statusList").innerHTML = html || '<div style="padding:20px;text-align:center;color:#8696a0">Status la awm lo</div>';
+  });
+}
+function postStatus(){
+  let txt=document.getElementById("statusInput").value.trim();
+  if(!txt) return;
+  db.collection("users").doc(me.uid).get().then(doc=>{
+    db.collection("status").add({text:txt,name:doc.data().name,time:Date.now()});
+    document.getElementById("statusInput").value="";
   });
 }
 
 function openPrivate(uid,name){
-  localStorage.setItem("chatType","private");
   localStorage.setItem("chatWith",uid);
   localStorage.setItem("chatName",name);
   location.href="chat.html";
 }
 function openGroup(gid,name){
-  localStorage.setItem("chatType","group");
   localStorage.setItem("chatWith",gid);
   localStorage.setItem("chatName",name);
   location.href="group.html";
 }
 
-// menu pawn hmet chuan a close
 document.addEventListener('click', function(e){
   if(!e.target.closest('.header')) document.getElementById("menu").classList.remove("show");
 });
