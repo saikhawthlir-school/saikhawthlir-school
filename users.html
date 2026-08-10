@@ -10,19 +10,19 @@ body.light{--bg:#f0f2f5;--bg2:#ffffff;--header:#ffffff;--text:#111b21;--sub:#667
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:20px;} 
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;padding-bottom:150px;}
-.header{background:var(--header);padding:2em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:1.4em;} /* LIAN */
-.tabs{display:flex;background:var(--header);position:sticky;top:5.6em;z-index:50;}
-.tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:600;color:var(--sub);letter-spacing:1px;font-size:0.9em;} /* LIAN */
+.header{background:var(--header);padding:2em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:1.6em;} /* LIAN ZUAL */
+.tabs{display:flex;background:var(--header);position:sticky;top:6.4em;z-index:50;}
+.tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:700;color:var(--sub);letter-spacing:1px;font-size:1em;} /* LIAN ZUAL + BOLD */
 .tab.active{color:var(--green);border-bottom:5px solid var(--green);}
 .page{display:none;} .page.active{display:block;}
 .item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;}
 .item:active{background:var(--header);}
-.avatar{width:7em;height:7em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;} /* TI TET HRET */
+.avatar{width:7em;height:7em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;}
 .avatar.status{border:6px solid var(--green);}
 .chat-info{flex:1;overflow:hidden;}
-.chat-name{font-size:1.15em;font-weight:500;margin-bottom:0.6em;color:var(--text);} /* LIAN */
+.chat-name{font-size:1.3em;font-weight:600;margin-bottom:0.6em;color:var(--text);} /* LIAN ZUAL */
 .last-msg{font-size:0.85em;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.bottom-btn{position:fixed;bottom:2.2em;right:1.7em;width:5.5em;height:5.5em;border-radius:50%;background:var(--green);color:var(--bg);border:none;font-size:1.6em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;font-weight:300;} /* TI TET */
+.bottom-btn{position:fixed;bottom:2.2em;right:1.7em;width:4.8em;height:4.8em;border-radius:50%;background:var(--green);color:var(--bg);border:none;font-size:1.4em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;font-weight:300;} /* TI TET HRET */
 .menu{position:absolute;top:7.2em;right:1.1em;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:200;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:22.5em;}
 .menu.show{display:flex;}
 .menu a{padding:1.7em 2.1em;color:var(--text);text-decoration:none;cursor:pointer;border-bottom:1px solid var(--bg2);font-size:1em;}
@@ -48,7 +48,7 @@ window.onload = applyTheme;
 <div class="header">
   <span>MizoChat</span>
   <div style="position:relative;">
-    <button onclick="toggleMenu()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:1.5em;">⋮</button>
+    <button onclick="toggleMenu()" style="background:none;border:none;color:var(--sub);cursor:pointer;font-size:1.8em;font-weight:bold;">⋮</button> <!-- BOLD + LIAN -->
     <div class="menu" id="menu">
       <a onclick="openProfile()">Profile</a>
       <a onclick="newGroup()">Create Group</a>
