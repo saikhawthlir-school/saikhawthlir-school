@@ -15,11 +15,11 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;paddin
 .tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:700;color:var(--sub);letter-spacing:1px;font-size:1.2em;}
 .tab.active{color:var(--green);border-bottom:5px solid var(--green);}
 .page{display:none;} .page.active{display:block;}
-.item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;position:relative;z-index:1;} /* Z-INDEX DAH */
+.item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;position:relative;z-index:1;}
 .item:active{background:var(--header);}
 .avatar{width:7em;height:7em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;}
 .avatar.status{border:6px solid var(--green);}
-.chat-info{flex:1;overflow:hidden;pointer-events:none;} /* CLICK BLOCK LO TURIN */
+.chat-info{flex:1;overflow:hidden;pointer-events:none;}
 .chat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6em;}
 .chat-name{font-size:1.45em;font-weight:600;color:var(--text);}
 .chat-time{font-size:0.8em;color:var(--green);flex-shrink:0;}
@@ -94,7 +94,7 @@ window.onload = applyTheme;
 const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
 firebase.initializeApp(firebaseConfig); const auth = firebase.auth(); const db = firebase.firestore(); let me=null;
 let selectedMembers = []; let modalCallback = null; let tempGroupName = "";
-let deleteChatId = null; let deleteChatType = null;
+let deleteChatId = null; let deleteChatType = null; let deleteChatDivId = null; // THAR
 
 auth.onAuthStateChanged(u=>{ if(!u) location.href="index.html"; me=u; loadChats(); loadStatus(); });
 function toggleMenu(){ document.getElementById("menu").classList.toggle("show"); }
@@ -126,12 +126,12 @@ function formatTime12(timestamp){
   let m = d.getMinutes().toString().padStart(2,'0'); 
   let ampm = h >= 12 ? 'pm' : 'am';
   h = h % 12; h = h ? h : 12;
-  return h + ":" + m + " " + ampm; 
+  return h + ":" + m + " + ampm; 
 }
 
-function showContextMenu(e, id, type){
-  e.preventDefault(); e.stopPropagation(); // CLICK BLOCK TI BO
-  deleteChatId = id; deleteChatType = type;
+function showContextMenu(e, id, type, divId){
+  e.preventDefault(); e.stopPropagation();
+  deleteChatId = id; deleteChatType = type; deleteChatDivId = divId; // DIV ID DAH BELH
   let menu = document.getElementById("contextMenu");
   menu.style.display = "flex";
   menu.style.top = e.changedTouches ? e.changedTouches[0].pageY + "px" : e.pageY + "px";
@@ -140,12 +140,13 @@ function showContextMenu(e, id, type){
 function hideContextMenu(){ document.getElementById("contextMenu").style.display = "none"; }
 function deleteChatNow(){
   if(!deleteChatId) return;
-  // CONFIRM PAIH, DIRECT DELETE
+  // 1. UI ATANG HREHSA
+  document.getElementById(deleteChatDivId)?.remove();
+  // 2. FIREBASE ATANG DELETE
   if(deleteChatType == "private"){
     db.collection("privateChats").doc(deleteChatId).delete();
-    document.getElementById("p-"+deleteChatId.split("_")[1])?.remove();
   } else {
-    document.getElementById("g-"+deleteChatId)?.remove();
+    db.collection("groups").doc(deleteChatId).delete(); // GROUP PAWH DELETE
   }
   hideContextMenu();
 }
@@ -159,13 +160,13 @@ function loadChats(){
         let lastText = "Tap to chat"; let lastTime = ""; 
         if(!msnap.empty){ 
           let msg = msnap.docs[0].data(); 
-          lastText = msg.text; // SAYS PAIH
+          lastText = msg.text; 
           lastTime = formatTime12(msg.time); 
         } 
         let div = document.getElementById("p-"+d.id); 
         if(!div){ div = document.createElement("div"); div.id = "p-"+d.id; div.className = "item"; div.onclick = ()=>openPrivate(d.id,d.data().name);
-          div.addEventListener('contextmenu', (e)=>showContextMenu(e, chatId, "private"));
-          div.addEventListener('touchstart', (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, chatId, "private"), 600); });
+          div.addEventListener('contextmenu', (e)=>showContextMenu(e, chatId, "private", "p-"+d.id)); // DIV ID PASS
+          div.addEventListener('touchstart', (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, chatId, "private", "p-"+d.id), 600); });
           div.addEventListener('touchend', ()=>clearTimeout(window.longPressTimer));
           document.getElementById("chatList").appendChild(div); 
         } 
@@ -179,13 +180,13 @@ function loadChats(){
         let lastText = "👥 Group"; let lastTime = "";
         if(!msnap.empty){ 
           let msg = msnap.docs[0].data(); 
-          lastText = msg.text; // SAYS PAIH
+          lastText = msg.text; 
           lastTime = formatTime12(msg.time); 
         }
         let div = document.getElementById("g-"+g.id); 
         if(!div){ div = document.createElement("div"); div.id = "g-"+g.id; div.className = "item"; div.onclick = ()=>openGroup(g.id,data.name);
-          div.addEventListener('contextmenu', (e)=>showContextMenu(e, g.id, "group"));
-          div.addEventListener('touchstart', (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, g.id, "group"), 600); });
+          div.addEventListener('contextmenu', (e)=>showContextMenu(e, g.id, "group", "g-"+g.id)); // DIV ID PASS
+          div.addEventListener('touchstart', (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, g.id, "group", "g-"+g.id), 600); });
           div.addEventListener('touchend', ()=>clearTimeout(window.longPressTimer));
           document.getElementById("chatList").appendChild(div); 
         } 
