@@ -8,21 +8,21 @@
 :root{--bg:#0b141a;--bg2:#111b21;--header:#202c33;--text:#e9edef;--sub:#8696a0;--green:#00a884;}
 body.light{--bg:#f0f2f5;--bg2:#ffffff;--header:#ffffff;--text:#111b21;--sub:#667781;--green:#00a884;}
 *{margin:0;padding:0;box-sizing:border-box}
-html{font-size:20px;} /* Base font lian tawh */
+html{font-size:20px;} 
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;padding-bottom:150px;}
-.header{background:var(--header);padding:2em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:1.2em;}
-.tabs{display:flex;background:var(--header);position:sticky;top:5.5em;z-index:50;}
-.tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:600;color:var(--sub);letter-spacing:1px;font-size:0.8em;}
+.header{background:var(--header);padding:2em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:1.4em;} /* LIAN */
+.tabs{display:flex;background:var(--header);position:sticky;top:5.6em;z-index:50;}
+.tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:600;color:var(--sub);letter-spacing:1px;font-size:0.9em;} /* LIAN */
 .tab.active{color:var(--green);border-bottom:5px solid var(--green);}
 .page{display:none;} .page.active{display:block;}
 .item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;}
 .item:active{background:var(--header);}
-.avatar{width:8.1em;height:8.1em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;}
+.avatar{width:7em;height:7em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;} /* TI TET HRET */
 .avatar.status{border:6px solid var(--green);}
 .chat-info{flex:1;overflow:hidden;}
-.chat-name{font-size:1em;font-weight:500;margin-bottom:0.6em;color:var(--text);}
+.chat-name{font-size:1.15em;font-weight:500;margin-bottom:0.6em;color:var(--text);} /* LIAN */
 .last-msg{font-size:0.85em;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.bottom-btn{position:fixed;bottom:2.2em;right:1.7em;width:6.8em;height:6.8em;border-radius:50%;background:var(--green);color:var(--bg);border:none;font-size:2em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;font-weight:300;}
+.bottom-btn{position:fixed;bottom:2.2em;right:1.7em;width:5.5em;height:5.5em;border-radius:50%;background:var(--green);color:var(--bg);border:none;font-size:1.6em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;font-weight:300;} /* TI TET */
 .menu{position:absolute;top:7.2em;right:1.1em;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:200;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:22.5em;}
 .menu.show{display:flex;}
 .menu a{padding:1.7em 2.1em;color:var(--text);text-decoration:none;cursor:pointer;border-bottom:1px solid var(--bg2);font-size:1em;}
@@ -34,7 +34,7 @@ input,textarea{background:var(--bg2);color:var(--text);border:none;font-size:1em
 <script>
 function applyTheme(){
   let savedSize = localStorage.getItem("appFontSize") || "medium";
-  let px = savedSize == "small"? 18 : savedSize == "medium"? 20 : 22; // LIAN CHHO TAWH
+  let px = savedSize == "small"? 18 : savedSize == "medium"? 20 : 22; 
   document.documentElement.style.fontSize = px + "px";
   
   let dark = localStorage.getItem("darkMode") || "on";
