@@ -10,26 +10,26 @@ body.light{--bg:#f0f2f5;--bg2:#ffffff;--header:#ffffff;--text:#111b21;--sub:#667
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:20px;} 
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;padding-bottom:150px;}
-.header{background:var(--header);padding:1.2em 1.5em 2em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:2em;} /* INKAR TI TAWI + LIAN */
-.tabs{display:flex;background:var(--header);position:sticky;top:6.2em;z-index:50;} /* INKAR TI TAWI */
-.tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:700;color:var(--sub);letter-spacing:1px;font-size:1.2em;} /* LIAN */
+.header{background:var(--header);padding:1.2em 1.5em 0.8em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:2em;} /* INKAR TI TAWI */
+.tabs{display:flex;background:var(--header);position:sticky;top:5.8em;z-index:50;} /* INKAR TI TAWI */
+.tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:700;color:var(--sub);letter-spacing:1px;font-size:1.2em;}
 .tab.active{color:var(--green);border-bottom:5px solid var(--green);}
 .page{display:none;} .page.active{display:block;}
-.item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;position:relative;} /* POSITION RELATIVE THAR */
+.item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;position:relative;}
 .item:active{background:var(--header);}
 .avatar{width:7em;height:7em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;}
 .avatar.status{border:6px solid var(--green);}
 .chat-info{flex:1;overflow:hidden;}
 .chat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6em;}
 .chat-name{font-size:1.45em;font-weight:600;color:var(--text);}
-.chat-time{font-size:0.8em;color:var(--sub);flex-shrink:0;}
+.chat-time{font-size:0.8em;color:var(--green);flex-shrink:0;} /* GREEN IN */
 .last-msg{font-size:0.85em;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bottom-btn{position:fixed;bottom:2.2em;right:1.7em;width:4.8em;height:4.8em;border-radius:50%;background:var(--green);color:var(--bg);border:none;font-size:1.4em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;font-weight:300;}
-.menu{position:absolute;top:7.2em;right:1.1em;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:200;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:22.5em;}
+.menu{position:absolute;top:7.2em;right:1.1em;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:200;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:20em;} /* TI TET */
 .menu.show{display:flex;}
-.menu a{padding:1.7em 2.1em;color:var(--text);text-decoration:none;cursor:pointer;border-bottom:1px solid var(--bg2);font-size:1em;}
+.menu a{padding:1.3em 1.8em;color:var(--text);text-decoration:none;cursor:pointer;border-bottom:1px solid var(--bg2);font-size:0.9em;} /* TI TET */
 .menu a:hover{background:var(--bg2);} .menu a:last-child{border-bottom:none;color:#ef4444;}
-.context-menu{position:fixed;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:400;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:20em;} /* THAR */
+.context-menu{position:fixed;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:400;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:20em;}
 .context-menu a{padding:1.7em 2.1em;color:#ef4444;text-decoration:none;cursor:pointer;font-size:1em;}
 .context-menu a:hover{background:var(--bg2);}
 .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:300;}
@@ -71,7 +71,7 @@ window.onload = applyTheme;
 <div id="chats" class="page active"><div id="chatList">Loading...</div></div>
 <div id="status" class="page"><div id="statusList">Loading...</div><button class="bottom-btn" onclick="postStatus()">+</button></div>
 
-<div class="context-menu" id="contextMenu"> <!-- THAR -->
+<div class="context-menu" id="contextMenu">
   <a onclick="deleteChatNow()">Delete chat</a>
 </div>
 
@@ -94,7 +94,7 @@ window.onload = applyTheme;
 const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
 firebase.initializeApp(firebaseConfig); const auth = firebase.auth(); const db = firebase.firestore(); let me=null;
 let selectedMembers = []; let modalCallback = null; let tempGroupName = "";
-let deleteChatId = null; let deleteChatType = null; // THAR
+let deleteChatId = null; let deleteChatType = null;
 
 auth.onAuthStateChanged(u=>{ if(!u) location.href="index.html"; me=u; loadChats(); loadStatus(); });
 function toggleMenu(){ document.getElementById("menu").classList.toggle("show"); }
@@ -119,15 +119,16 @@ function closeGroupModal(){ document.getElementById("groupModal").style.display 
 function createGroupNow(){ let name = document.getElementById("groupNameInput").value.trim(); if(!name) return; let members = [me.uid, ...tempGroupName]; db.collection("groups").add({name:name,members:members,admins:[me.uid],createdBy:me.uid,time:Date.now()}); closeGroupModal(); }
 
 function getInitials(name){ return name.split(" ").map(n=>n[0]).join("").toUpperCase().slice(0,2); }
-function formatTime(timestamp){ 
+function formatTime12(timestamp){ // 12 HOUR FORMAT THAR
   if(!timestamp) return ""; 
   let d = new Date(timestamp); 
-  let h = d.getHours().toString().padStart(2,'0'); 
+  let h = d.getHours(); 
   let m = d.getMinutes().toString().padStart(2,'0'); 
-  return h + ":" + m; 
+  let ampm = h >= 12 ? 'pm' : 'am';
+  h = h % 12; h = h ? h : 12; // 0 = 12
+  return h + ":" + m + " + ampm; 
 }
 
-// LONG PRESS DELETE THAR
 function showContextMenu(e, id, type){
   e.preventDefault();
   deleteChatId = id; deleteChatType = type;
@@ -144,7 +145,6 @@ function deleteChatNow(){
       db.collection("privateChats").doc(deleteChatId).delete();
       document.getElementById("p-"+deleteChatId.split("_")[1])?.remove();
     } else {
-      // Group chu list atang chiah kan delete
       document.getElementById("g-"+deleteChatId)?.remove();
     }
   }
@@ -157,11 +157,14 @@ function loadChats(){
     snap.forEach(d=>{ if(d.id!= me.uid){ 
       let chatId = [me.uid,d.id].sort().join("_"); 
       db.collection("privateChats").doc(chatId).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{ 
-        let lastText = "Tap to chat"; let lastTime = ""; 
-        if(!msnap.empty){ lastText = msnap.docs[0].data().text; lastTime = formatTime(msnap.docs[0].data().time); } 
+        let lastText = "Tap to chat"; let lastTime = ""; let senderName = "";
+        if(!msnap.empty){ 
+          let msg = msnap.docs[0].data(); 
+          lastText = msg.text; 
+          lastTime = formatTime12(msg.time); // 12 FORMAT
+        } 
         let div = document.getElementById("p-"+d.id); 
         if(!div){ div = document.createElement("div"); div.id = "p-"+d.id; div.className = "item"; div.onclick = ()=>openPrivate(d.id,d.data().name);
-          // LONG PRESS EVENT THAR
           div.addEventListener('contextmenu', (e)=>showContextMenu(e, chatId, "private"));
           div.addEventListener('touchstart', (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, chatId, "private"), 600); });
           div.addEventListener('touchend', ()=>clearTimeout(window.longPressTimer));
@@ -173,15 +176,22 @@ function loadChats(){
   });
   db.collection("groups").where("members","array-contains",me.uid).onSnapshot(gsnap=>{ 
     gsnap.forEach(g=>{ let data = g.data(); 
-      let div = document.getElementById("g-"+g.id); 
-      if(!div){ div = document.createElement("div"); div.id = "g-"+g.id; div.className = "item"; div.onclick = ()=>openGroup(g.id,data.name);
-        // LONG PRESS EVENT THAR
-        div.addEventListener('contextmenu', (e)=>showContextMenu(e, g.id, "group"));
-        div.addEventListener('touchstart', (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, g.id, "group"), 600); });
-        div.addEventListener('touchend', ()=>clearTimeout(window.longPressTimer));
-        document.getElementById("chatList").appendChild(div); 
-      } 
-      div.innerHTML = `<div class="avatar" style="background:#008069">${getInitials(data.name)}</div><div class="chat-info"><div class="chat-top"><div class="chat-name">${data.name}</div><div class="chat-time"></div></div><div class="last-msg">👥 Group</div></div>`; 
+      db.collection("groupChats").doc(g.id).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{ // GROUP MSG LAST
+        let lastText = "👥 Group"; let lastTime = "";
+        if(!msnap.empty){ 
+          let msg = msnap.docs[0].data(); 
+          lastText = msg.name + ": " + msg.text; // NAME: TEXT
+          lastTime = formatTime12(msg.time); 
+        }
+        let div = document.getElementById("g-"+g.id); 
+        if(!div){ div = document.createElement("div"); div.id = "g-"+g.id; div.className = "item"; div.onclick = ()=>openGroup(g.id,data.name);
+          div.addEventListener('contextmenu', (e)=>showContextMenu(e, g.id, "group"));
+          div.addEventListener('touchstart', (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, g.id, "group"), 600); });
+          div.addEventListener('touchend', ()=>clearTimeout(window.longPressTimer));
+          document.getElementById("chatList").appendChild(div); 
+        } 
+        div.innerHTML = `<div class="avatar" style="background:#008069">${getInitials(data.name)}</div><div class="chat-info"><div class="chat-top"><div class="chat-name">${data.name}</div><div class="chat-time">${lastTime}</div></div><div class="last-msg">${lastText}</div></div>`; 
+      });
   }); });
 }
 function loadStatus(){ db.collection("status").orderBy("time","desc").onSnapshot(snap=>{ let html=""; snap.forEach(d=>{ let data = d.data(); html+=`<div class="item"><div class="avatar status">${getInitials(data.name)}</div><div class="chat-info"><div class="chat-name">${data.name}</div><div class="last-msg">${data.text}</div></div></div>`; }); document.getElementById("statusList").innerHTML = html || '<div style="padding:2.2em;text-align:center;color:var(--sub)">No recent updates</div>'; }); }
@@ -191,7 +201,7 @@ function openPrivate(uid,name){ localStorage.setItem("chatWith",uid); localStora
 function openGroup(gid,name){ localStorage.setItem("chatWith",gid); localStorage.setItem("chatName",name); location.href="group.html"; }
 document.addEventListener('click', function(e){ 
   if(!e.target.closest('.header')) document.getElementById("menu").classList.remove("show"); 
-  if(!e.target.closest('.context-menu')) hideContextMenu(); // THAR
+  if(!e.target.closest('.context-menu')) hideContextMenu();
 });
 </script>
 </body>
