@@ -10,9 +10,9 @@ body.light{--bg:#f0f2f5;--bg2:#ffffff;--header:#ffffff;--text:#111b21;--sub:#667
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:20px;} 
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;padding-bottom:150px;}
-.header{background:var(--header);padding:2em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:1.8em;} /* LIAN LEH */
+.header{background:var(--header);padding:2em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:1.8em;} /* LIAN */
 .tabs{display:flex;background:var(--header);position:sticky;top:6.8em;z-index:50;}
-.tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:700;color:var(--sub);letter-spacing:1px;font-size:1.1em;} /* LIAN LEH */
+.tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:700;color:var(--sub);letter-spacing:1px;font-size:1.1em;} /* LIAN */
 .tab.active{color:var(--green);border-bottom:5px solid var(--green);}
 .page{display:none;} .page.active{display:block;}
 .item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;}
@@ -20,9 +20,9 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;paddin
 .avatar{width:7em;height:7em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;}
 .avatar.status{border:6px solid var(--green);}
 .chat-info{flex:1;overflow:hidden;}
-.chat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6em;} /* THAR */
-.chat-name{font-size:1.45em;font-weight:600;color:var(--text);} /* LIAN LEH */
-.chat-time{font-size:0.8em;color:var(--sub);flex-shrink:0;} /* THAR */
+.chat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6em;}
+.chat-name{font-size:1.45em;font-weight:600;color:var(--text);} /* LIAN */
+.chat-time{font-size:0.8em;color:var(--sub);flex-shrink:0;}
 .last-msg{font-size:0.85em;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bottom-btn{position:fixed;bottom:2.2em;right:1.7em;width:4.8em;height:4.8em;border-radius:50%;background:var(--green);color:var(--bg);border:none;font-size:1.4em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;font-weight:300;}
 .menu{position:absolute;top:7.2em;right:1.1em;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:200;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:22.5em;}
@@ -119,19 +119,24 @@ function formatTime(timestamp){
   return h + ":" + m; 
 }
 function loadChats(){
-  db.collection("users").onSnapshot(snap=>{ snap.forEach(d=>{ if(d.id!= me.uid){ let chatId = [me.uid,d.id].sort().join("_"); db.collection("privateChats").doc(chatId).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{ 
-    let lastText = "Tap to chat"; let lastTime = ""; 
-    if(!msnap.empty){ lastText = msnap.docs[0].data().text; lastTime = formatTime(msnap.docs[0].data().time); } 
-    let div = document.getElementById("p-"+d.id); 
-    if(!div){ div = document.createElement("div"); div.id = "p-"+d.id; div.className = "item"; div.onclick = ()=>openPrivate(d.id,d.data().name); document.getElementById("chatList").prepend(div); } 
-    div.innerHTML = `<div class="avatar">${getInitials(d.data().name)}</div><div class="chat-info"><div class="chat-top"><div class="chat-name">${d.data().name}</div><div class="chat-time">${lastTime}</div></div><div class="last-msg">${lastText}</div></div>`; 
-  }); } }); });
-  db.collection("groups").where("members","array-contains",me.uid).onSnapshot(gsnap=>{ gsnap.forEach(g=>{ let data = g.data(); db.collection("groupChats").doc(g.id).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{ 
-    let lastText = "👥 Group"; let lastTime = ""; 
-    if(!msnap.empty){ lastText = msnap.docs[0].data().name + ": " + msnap.docs[0].data().text; lastTime = formatTime(msnap.docs[0].data().time); } 
-    let div = document.getElementById("g-"+g.id); 
-    if(!div){ div = document.createElement("div"); div.id = "g-"+g.id; div.className = "item"; div.onclick = ()=>openGroup(g.id,data.name); document.getElementById("chatList").prepend(div); } 
-    div.innerHTML = `<div class="avatar" style="background:#008069">${getInitials(data.name)}</div><div class="chat-info"><div class="chat-top"><div class="chat-name">${data.name}</div><div class="chat-time">${lastTime}</div></div><div class="last-msg">${lastText}</div></div>`; 
+  db.collection("users").onSnapshot(snap=>{ 
+    document.getElementById("chatList").innerHTML = ""; // clear hmasa
+    snap.forEach(d=>{ if(d.id!= me.uid){ 
+      let chatId = [me.uid,d.id].sort().join("_"); 
+      db.collection("privateChats").doc(chatId).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{ 
+        let lastText = "Tap to chat"; let lastTime = ""; 
+        if(!msnap.empty){ lastText = msnap.docs[0].data().text; lastTime = formatTime(msnap.docs[0].data().time); } 
+        let div = document.getElementById("p-"+d.id); 
+        if(!div){ div = document.createElement("div"); div.id = "p-"+d.id; div.className = "item"; div.onclick = ()=>openPrivate(d.id,d.data().name); document.getElementById("chatList").appendChild(div); } 
+        div.innerHTML = `<div class="avatar">${getInitials(d.data().name)}</div><div class="chat-info"><div class="chat-top"><div class="chat-name">${d.data().name}</div><div class="chat-time">${lastTime}</div></div><div class="last-msg">${lastText}</div></div>`; 
+      }); 
+    } }); 
+  });
+  db.collection("groups").where("members","array-contains",me.uid).onSnapshot(gsnap=>{ 
+    gsnap.forEach(g=>{ let data = g.data(); 
+      let div = document.getElementById("g-"+g.id); 
+      if(!div){ div = document.createElement("div"); div.id = "g-"+g.id; div.className = "item"; div.onclick = ()=>openGroup(g.id,data.name); document.getElementById("chatList").appendChild(div); } 
+      div.innerHTML = `<div class="avatar" style="background:#008069">${getInitials(data.name)}</div><div class="chat-info"><div class="chat-top"><div class="chat-name">${data.name}</div><div class="chat-time"></div></div><div class="last-msg">👥 Group</div></div>`; 
   }); });
 }
 function loadStatus(){ db.collection("status").orderBy("time","desc").onSnapshot(snap=>{ let html=""; snap.forEach(d=>{ let data = d.data(); html+=`<div class="item"><div class="avatar status">${getInitials(data.name)}</div><div class="chat-info"><div class="chat-name">${data.name}</div><div class="last-msg">${data.text}</div></div></div>`; }); document.getElementById("statusList").innerHTML = html || '<div style="padding:2.2em;text-align:center;color:var(--sub)">No recent updates</div>'; }); }
