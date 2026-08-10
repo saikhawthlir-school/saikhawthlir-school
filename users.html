@@ -10,24 +10,24 @@ body.light{--bg:#f0f2f5;--bg2:#ffffff;--header:#ffffff;--text:#111b21;--sub:#667
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:20px;} 
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;padding-bottom:150px;}
-.header{background:var(--header);padding:1.2em 1.5em 0.8em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:2em;} /* INKAR TI TAWI */
-.tabs{display:flex;background:var(--header);position:sticky;top:5.8em;z-index:50;} /* INKAR TI TAWI */
+.header{background:var(--header);padding:1.2em 1.5em 0.8em 1.5em;display:flex;justify-content:space-between;align-items:center;font-weight:600;position:sticky;top:0;z-index:100;font-size:2em;}
+.tabs{display:flex;background:var(--header);position:sticky;top:5.8em;z-index:50;}
 .tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:700;color:var(--sub);letter-spacing:1px;font-size:1.2em;}
 .tab.active{color:var(--green);border-bottom:5px solid var(--green);}
 .page{display:none;} .page.active{display:block;}
-.item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;position:relative;}
+.item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;position:relative;z-index:1;} /* Z-INDEX DAH */
 .item:active{background:var(--header);}
 .avatar{width:7em;height:7em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;}
 .avatar.status{border:6px solid var(--green);}
-.chat-info{flex:1;overflow:hidden;}
+.chat-info{flex:1;overflow:hidden;pointer-events:none;} /* CLICK BLOCK LO TURIN */
 .chat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6em;}
 .chat-name{font-size:1.45em;font-weight:600;color:var(--text);}
-.chat-time{font-size:0.8em;color:var(--green);flex-shrink:0;} /* GREEN IN */
+.chat-time{font-size:0.8em;color:var(--green);flex-shrink:0;}
 .last-msg{font-size:0.85em;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bottom-btn{position:fixed;bottom:2.2em;right:1.7em;width:4.8em;height:4.8em;border-radius:50%;background:var(--green);color:var(--bg);border:none;font-size:1.4em;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.5);z-index:10;font-weight:300;}
-.menu{position:absolute;top:7.2em;right:1.1em;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:200;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:20em;} /* TI TET */
+.menu{position:absolute;top:7.2em;right:1.1em;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:200;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:20em;}
 .menu.show{display:flex;}
-.menu a{padding:1.3em 1.8em;color:var(--text);text-decoration:none;cursor:pointer;border-bottom:1px solid var(--bg2);font-size:0.9em;} /* TI TET */
+.menu a{padding:1.3em 1.8em;color:var(--text);text-decoration:none;cursor:pointer;border-bottom:1px solid var(--bg2);font-size:0.9em;}
 .menu a:hover{background:var(--bg2);} .menu a:last-child{border-bottom:none;color:#ef4444;}
 .context-menu{position:fixed;background:var(--header);border-radius:8px;display:none;flex-direction:column;z-index:400;box-shadow:0 6px 15px rgba(0,0,0,0.6);min-width:20em;}
 .context-menu a{padding:1.7em 2.1em;color:#ef4444;text-decoration:none;cursor:pointer;font-size:1em;}
@@ -119,18 +119,18 @@ function closeGroupModal(){ document.getElementById("groupModal").style.display 
 function createGroupNow(){ let name = document.getElementById("groupNameInput").value.trim(); if(!name) return; let members = [me.uid, ...tempGroupName]; db.collection("groups").add({name:name,members:members,admins:[me.uid],createdBy:me.uid,time:Date.now()}); closeGroupModal(); }
 
 function getInitials(name){ return name.split(" ").map(n=>n[0]).join("").toUpperCase().slice(0,2); }
-function formatTime12(timestamp){ // 12 HOUR FORMAT THAR
+function formatTime12(timestamp){ 
   if(!timestamp) return ""; 
   let d = new Date(timestamp); 
   let h = d.getHours(); 
   let m = d.getMinutes().toString().padStart(2,'0'); 
   let ampm = h >= 12 ? 'pm' : 'am';
-  h = h % 12; h = h ? h : 12; // 0 = 12
-  return h + ":" + m + " + ampm; 
+  h = h % 12; h = h ? h : 12;
+  return h + ":" + m + " " + ampm; 
 }
 
 function showContextMenu(e, id, type){
-  e.preventDefault();
+  e.preventDefault(); e.stopPropagation(); // CLICK BLOCK TI BO
   deleteChatId = id; deleteChatType = type;
   let menu = document.getElementById("contextMenu");
   menu.style.display = "flex";
@@ -140,13 +140,12 @@ function showContextMenu(e, id, type){
 function hideContextMenu(){ document.getElementById("contextMenu").style.display = "none"; }
 function deleteChatNow(){
   if(!deleteChatId) return;
-  if(confirm("He chat hi i delete duh takzet maw?")){
-    if(deleteChatType == "private"){
-      db.collection("privateChats").doc(deleteChatId).delete();
-      document.getElementById("p-"+deleteChatId.split("_")[1])?.remove();
-    } else {
-      document.getElementById("g-"+deleteChatId)?.remove();
-    }
+  // CONFIRM PAIH, DIRECT DELETE
+  if(deleteChatType == "private"){
+    db.collection("privateChats").doc(deleteChatId).delete();
+    document.getElementById("p-"+deleteChatId.split("_")[1])?.remove();
+  } else {
+    document.getElementById("g-"+deleteChatId)?.remove();
   }
   hideContextMenu();
 }
@@ -157,11 +156,11 @@ function loadChats(){
     snap.forEach(d=>{ if(d.id!= me.uid){ 
       let chatId = [me.uid,d.id].sort().join("_"); 
       db.collection("privateChats").doc(chatId).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{ 
-        let lastText = "Tap to chat"; let lastTime = ""; let senderName = "";
+        let lastText = "Tap to chat"; let lastTime = ""; 
         if(!msnap.empty){ 
           let msg = msnap.docs[0].data(); 
-          lastText = msg.text; 
-          lastTime = formatTime12(msg.time); // 12 FORMAT
+          lastText = msg.text; // SAYS PAIH
+          lastTime = formatTime12(msg.time); 
         } 
         let div = document.getElementById("p-"+d.id); 
         if(!div){ div = document.createElement("div"); div.id = "p-"+d.id; div.className = "item"; div.onclick = ()=>openPrivate(d.id,d.data().name);
@@ -176,11 +175,11 @@ function loadChats(){
   });
   db.collection("groups").where("members","array-contains",me.uid).onSnapshot(gsnap=>{ 
     gsnap.forEach(g=>{ let data = g.data(); 
-      db.collection("groupChats").doc(g.id).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{ // GROUP MSG LAST
+      db.collection("groupChats").doc(g.id).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{
         let lastText = "👥 Group"; let lastTime = "";
         if(!msnap.empty){ 
           let msg = msnap.docs[0].data(); 
-          lastText = msg.name + ": " + msg.text; // NAME: TEXT
+          lastText = msg.text; // SAYS PAIH
           lastTime = formatTime12(msg.time); 
         }
         let div = document.getElementById("g-"+g.id); 
