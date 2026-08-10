@@ -15,9 +15,9 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI', Arial;paddin
 .tab{flex:1;text-align:center;padding:1.8em;cursor:pointer;font-weight:700;color:var(--sub);letter-spacing:1px;font-size:1.2em;}
 .tab.active{color:var(--green);border-bottom:5px solid var(--green);}
 .page{display:none;} .page.active{display:block;}
-.item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;position:relative;z-index:1;}
+.item{display:flex;gap:2em;align-items:center;background:var(--bg2);padding:2em 2.1em;cursor:pointer;border-bottom:1px solid var(--header);min-height:10em;position:relative;}
 .item:active{background:var(--header);}
-.avatar{width:7em;height:7em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;}
+.avatar{width:7em;height:7em;border-radius:50%;background:#2a3942;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0;color:var(--text);font-size:1em;pointer-events:none;}
 .avatar.status{border:6px solid var(--green);}
 .chat-info{flex:1;overflow:hidden;pointer-events:none;}
 .chat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6em;}
@@ -94,7 +94,7 @@ window.onload = applyTheme;
 const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
 firebase.initializeApp(firebaseConfig); const auth = firebase.auth(); const db = firebase.firestore(); let me=null;
 let selectedMembers = []; let modalCallback = null; let tempGroupName = "";
-let deleteChatId = null; let deleteChatType = null; let deleteChatDivId = null; // THAR
+let deleteChatId = null; let deleteChatType = null; let deleteChatDivId = null;
 
 auth.onAuthStateChanged(u=>{ if(!u) location.href="index.html"; me=u; loadChats(); loadStatus(); });
 function toggleMenu(){ document.getElementById("menu").classList.toggle("show"); }
@@ -130,8 +130,8 @@ function formatTime12(timestamp){
 }
 
 function showContextMenu(e, id, type, divId){
-  e.preventDefault(); e.stopPropagation();
-  deleteChatId = id; deleteChatType = type; deleteChatDivId = divId; // DIV ID DAH BELH
+  e.preventDefault(); 
+  deleteChatId = id; deleteChatType = type; deleteChatDivId = divId;
   let menu = document.getElementById("contextMenu");
   menu.style.display = "flex";
   menu.style.top = e.changedTouches ? e.changedTouches[0].pageY + "px" : e.pageY + "px";
@@ -140,22 +140,22 @@ function showContextMenu(e, id, type, divId){
 function hideContextMenu(){ document.getElementById("contextMenu").style.display = "none"; }
 function deleteChatNow(){
   if(!deleteChatId) return;
-  // 1. UI ATANG HREHSA
-  document.getElementById(deleteChatDivId)?.remove();
-  // 2. FIREBASE ATANG DELETE
+  document.getElementById(deleteChatDivId)?.remove(); // UI ATANG HREHSA
   if(deleteChatType == "private"){
-    db.collection("privateChats").doc(deleteChatId).delete();
+    db.collection("privateChats").doc(deleteChatId).delete(); // SIMPLE DELETE
   } else {
-    db.collection("groups").doc(deleteChatId).delete(); // GROUP PAWH DELETE
+    db.collection("groups").doc(deleteChatId).delete();
   }
   hideContextMenu();
 }
 
 function loadChats(){
   db.collection("users").onSnapshot(snap=>{ 
-    document.getElementById("chatList").innerHTML = ""; 
+    let chatList = document.getElementById("chatList");
+    if(chatList.innerHTML == "Loading...") chatList.innerHTML = ""; // LOADING 1 FO CHIAH
     snap.forEach(d=>{ if(d.id!= me.uid){ 
       let chatId = [me.uid,d.id].sort().join("_"); 
+      let divId = "p-"+d.id;
       db.collection("privateChats").doc(chatId).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{ 
         let lastText = "Tap to chat"; let lastTime = ""; 
         if(!msnap.empty){ 
@@ -163,19 +163,20 @@ function loadChats(){
           lastText = msg.text; 
           lastTime = formatTime12(msg.time); 
         } 
-        let div = document.getElementById("p-"+d.id); 
-        if(!div){ div = document.createElement("div"); div.id = "p-"+d.id; div.className = "item"; div.onclick = ()=>openPrivate(d.id,d.data().name);
-          div.addEventListener('contextmenu', (e)=>showContextMenu(e, chatId, "private", "p-"+d.id)); // DIV ID PASS
-          div.addEventListener('touchstart', (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, chatId, "private", "p-"+d.id), 600); });
-          div.addEventListener('touchend', ()=>clearTimeout(window.longPressTimer));
-          document.getElementById("chatList").appendChild(div); 
+        let div = document.getElementById(divId); 
+        if(!div){ div = document.createElement("div"); div.id = divId; div.className = "item"; 
+          div.onclick = ()=>openPrivate(d.id,d.data().name); // CLICK SIMPLE
+          div.oncontextmenu = (e)=>showContextMenu(e, chatId, "private", divId); // LONG PRESS PC
+          div.ontouchstart = (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, chatId, "private", divId), 600); }; // LONG PRESS PHONE
+          div.ontouchend = ()=>clearTimeout(window.longPressTimer);
+          chatList.appendChild(div); 
         } 
         div.innerHTML = `<div class="avatar">${getInitials(d.data().name)}</div><div class="chat-info"><div class="chat-top"><div class="chat-name">${d.data().name}</div><div class="chat-time">${lastTime}</div></div><div class="last-msg">${lastText}</div></div>`; 
       }); 
     } }); 
   });
   db.collection("groups").where("members","array-contains",me.uid).onSnapshot(gsnap=>{ 
-    gsnap.forEach(g=>{ let data = g.data(); 
+    gsnap.forEach(g=>{ let data = g.data(); let divId = "g-"+g.id;
       db.collection("groupChats").doc(g.id).collection("messages").orderBy("time","desc").limit(1).onSnapshot(msnap=>{
         let lastText = "👥 Group"; let lastTime = "";
         if(!msnap.empty){ 
@@ -183,11 +184,12 @@ function loadChats(){
           lastText = msg.text; 
           lastTime = formatTime12(msg.time); 
         }
-        let div = document.getElementById("g-"+g.id); 
-        if(!div){ div = document.createElement("div"); div.id = "g-"+g.id; div.className = "item"; div.onclick = ()=>openGroup(g.id,data.name);
-          div.addEventListener('contextmenu', (e)=>showContextMenu(e, g.id, "group", "g-"+g.id)); // DIV ID PASS
-          div.addEventListener('touchstart', (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, g.id, "group", "g-"+g.id), 600); });
-          div.addEventListener('touchend', ()=>clearTimeout(window.longPressTimer));
+        let div = document.getElementById(divId); 
+        if(!div){ div = document.createElement("div"); div.id = divId; div.className = "item"; 
+          div.onclick = ()=>openGroup(g.id,data.name);
+          div.oncontextmenu = (e)=>showContextMenu(e, g.id, "group", divId);
+          div.ontouchstart = (e)=>{ window.longPressTimer = setTimeout(()=>showContextMenu(e, g.id, "group", divId), 600); };
+          div.ontouchend = ()=>clearTimeout(window.longPressTimer);
           document.getElementById("chatList").appendChild(div); 
         } 
         div.innerHTML = `<div class="avatar" style="background:#008069">${getInitials(data.name)}</div><div class="chat-info"><div class="chat-top"><div class="chat-name">${data.name}</div><div class="chat-time">${lastTime}</div></div><div class="last-msg">${lastText}</div></div>`; 
