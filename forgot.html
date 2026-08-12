@@ -27,8 +27,8 @@
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = document.getElementById("email").value.trim();
-        msg.style.color = "#059669";
-        msg.innerText = "Thawn mek...";
+        
+        msg.innerText = ""; // A tir ah clear phawt
 
         try {
           await sendPasswordResetEmail(auth, email);
@@ -40,7 +40,9 @@
           if(error.code === 'auth/user-not-found'){
             msg.innerText = "He email hmang hian account a awm lo";
           } else if(error.code === 'auth/invalid-email'){
-            msg.innerText = "Email format a dik lo";
+            msg.innerText = "Email format a dik lo. example@gmail.com ti ang in ziak rawh";
+          } else if(error.code === 'auth/too-many-requests'){
+            msg.innerText = "I hmet tam lutuk. 1min hnu ah han ti nawn leh rawh";
           } else {
             msg.innerText = "Error: " + error.message;
           }
@@ -50,7 +52,7 @@
   </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    body { background: #fff; display: flex; justify-content: flex-start; align-items: flex-start; min-height: 100vh; padding: 60px 20px 20px 20px; }
+    body { background: #fff; display: flex; justify-content: flex-start; align-items: flex-start; min-height: 100vh; padding: 15px 20px 20px 20px; }
     
     .wrapper { width: 100%; max-width: 420px; margin: 0 auto; }
     
@@ -116,8 +118,6 @@
         <p>Reset link <b>MizoChat</b> ah kan lo thawn ang</p>
       </div>
     </div>
-    <br>
-    <br>
 
     <form id="resetForm">
       <div class="form-group">
