@@ -7,87 +7,83 @@
 <style>
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+    font-family: Roboto, "Segoe UI", sans-serif;
     background: #FFFFFF;
-    padding: 16px; /* sir leh chung ah 16px chiah */
+    padding: 12px 16px; /* chung ah 12px chiah */
   }
-  
-  .container{ width:100%; }
   
   .logo-wrap{ 
     display:flex; 
     align-items:center; 
     gap:10px; 
-    margin-bottom:12px; /* 20px atangin 12px ah */
+    margin-bottom:8px; /* 8px chiah */
   }
   .logo{ 
-    width:44px; height:44px; border-radius:12px;
-    background: linear-gradient(135deg,#25D366,#128C7E);
+    width:40px; height:40px; border-radius:10px;
+    background: #25D366;
     display:flex; align-items:center; justify-content:center;
-    color:white; font-weight:800; font-size:20px;
+    color:white; font-weight:800; font-size:18px;
   }
-  h1{ font-size:24px; margin:0; font-weight:700; }
-  .sub{ color:#555; margin:2px 0 0; font-size:14px; } /* margin kan ti tlem */
+  h1{ font-size:22px; margin:0; font-weight:700; }
+  .sub{ color:#555; font-size:13px; } /* margin awm lo */
 
-  .info{ font-size:14px; font-weight:600; color:#000; margin:16px 0 10px; } /* 24px atangin 16px */
+  .info{ font-size:14px; font-weight:600; color:#000; margin:12px 0 8px; } /* 12px/8px chiah */
 
-  .label{ font-size:13px; font-weight:600; color:#222; margin:10px 0 4px; display:block; } /* 14px/6px atangin 10px/4px */
+  .label{ font-size:12px; font-weight:500; color:#333; margin:8px 0 4px; display:block; } /* 8px/4px chiah */
   .input{
-    width:100%; padding:12px; border:1.5px solid #ccc; border-radius:10px; /* 14px atangin 12px */
+    width:100%; padding:10px 12px; border:1px solid #d0d0d0; border-radius:8px; /* 10px chiah */
     font-size:15px; background:white;
   }
 
   .pw-wrap{ position:relative; }
   .eye{ 
     position:absolute; right:10px; top:50%; transform:translateY(-50%);
-    cursor:pointer; font-size:18px; color:#888;
+    cursor:pointer; font-size:18px; color:#999;
   }
 
-  .forgot{ display:inline-block; margin:6px 0 12px; color:#FF6A00; text-decoration:none; font-weight:600; font-size:13px; } /* 8px/18px atangin 6px/12px */
+  .forgot{ display:block; margin:6px 0 10px; color:#FF6A00; text-decoration:none; font-weight:600; font-size:13px; text-align:left; } /* 6px/10px */
 
   .btn{
-    width:100%; padding:13px; border:none; border-radius:12px; /* 15px atangin 13px */
+    width:100%; padding:12px; border:none; border-radius:10px; /* 12px chiah */
     background:#FF6A00; color:white; font-size:16px; font-weight:700; cursor:pointer;
   }
 
-  .divider{ height:1px; background:#e0e0e0; margin:14px 0; } /* 20px atangin 14px */
+  .divider{ height:1px; background:#e5e5e5; margin:12px 0; } /* 12px chiah */
 
   .register{ text-align:center; font-size:14px; color:#222; }
+  .register a{ color:#FF6A00; font-weight:600; text-decoration:none; }
 
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="logo-wrap">
-    <div class="logo">MC</div>
-    <div>
-      <h1>Welcome!</h1>
-      <div class="sub">Login to your <b>MizoChat</b> Account</div>
-    </div>
+<div class="logo-wrap">
+  <div class="logo">MC</div>
+  <div>
+    <h1>Welcome!</h1>
+    <div class="sub">Login to your <b>MizoChat</b> Account</div>
   </div>
+</div>
 
-  <div class="info">Login using your <b>Mobile/Email ID and Password</b></div>
-  
-  <label class="label">Mobile/Email ID *</label>
-  <input id="email" class="input" type="text" placeholder="7005697815 or you@email.com">
+<div class="info">Login using your <b>Mobile/Email ID and Password</b></div>
 
-  <label class="label">Password *</label>
-  <div class="pw-wrap">
-    <input id="pass" class="input" type="password" placeholder="Password">
-    <span class="eye" onclick="togglePass()">👁️</span>
-  </div>
+<label class="label">Mobile/Email ID *</label>
+<input id="email" class="input" type="text" placeholder="7005697815 or you@email.com">
 
-  <a href="#" class="forgot">Forgot Password?</a>
+<label class="label">Password *</label>
+<div class="pw-wrap">
+  <input id="pass" class="input" type="password" placeholder="Password">
+  <span class="eye" onclick="togglePass()">👁️</span>
+</div>
 
-  <button class="btn" onclick="login()">Login</button>
+<a href="#" class="forgot">Forgot Password?</a>
 
-  <div class="divider"></div>
+<button class="btn" onclick="login()">Login</button>
 
-  <div class="register">
-    Don't have a MizoChat Account? <a href="#">Register Now</a>
-  </div>
+<div class="divider"></div>
 
+<div class="register">
+  Don't have a MizoChat Account? <a href="#">Register Now</a>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
