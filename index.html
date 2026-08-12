@@ -24,8 +24,8 @@
     display:flex; align-items:center; justify-content:center;
     color:white; font-weight:800; font-size:18px; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    align-self:flex-start; /* WELCOME TLANG AH A IN NGHAH TIR */
-    margin-top:4px; /* 4px IN KAN CHUANG DAH */
+    align-self:flex-start; 
+    margin-top:4px; 
     flex-shrink:0;
   }
   h1{ font-size:24px; margin:0; font-weight:700; color:#000; line-height:1.2; }
@@ -118,9 +118,9 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script>
-// FIREBASE CONFIG TAK - I PROJECT ATANGA LA
+// FIREBASE CONFIG TAK
 const firebaseConfig = { 
-  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk", // heihi Firebase > Project Settings > Config atangin copy rawh
+  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
   authDomain: "school-project-dab29.firebaseapp.com", 
   projectId: "school-project-dab29",
   storageBucket: "school-project-dab29.appspot.com",
@@ -129,6 +129,13 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+
+// EDIT 1: Login tawh sa chu chat.html ah auto dah
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    location.href = "chat.html";
+  }
+});
 
 function togglePass(){
   const p = document.getElementById('pass');
@@ -148,7 +155,8 @@ function login(){
   if(!email || !pass){ alert("Email leh Password dah rawh"); return; }
   
   auth.signInWithEmailAndPassword(email, pass)
-    .then(()=> location.href="users.html")
+    // EDIT 2: users.html ti lo in chat.html ah kan thlak
+    .then(()=> location.href="chat.html")
     .catch(e=> alert(e.message));
 }
 </script>
