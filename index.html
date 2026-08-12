@@ -9,53 +9,50 @@
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
     background: #FFFFFF;
-    padding: 30px 16px; /* sir ah 16px chiah awm */
+    padding: 16px; /* sir leh chung ah 16px chiah */
   }
   
-  .container{ 
-    width:100%; /* 100% full */
-    max-width:100%; /* max-width kan remove */
-  }
+  .container{ width:100%; }
   
   .logo-wrap{ 
     display:flex; 
     align-items:center; 
-    gap:12px; 
-    margin-bottom:20px; 
+    gap:10px; 
+    margin-bottom:12px; /* 20px atangin 12px ah */
   }
   .logo{ 
-    width:50px; height:50px; border-radius:14px;
+    width:44px; height:44px; border-radius:12px;
     background: linear-gradient(135deg,#25D366,#128C7E);
     display:flex; align-items:center; justify-content:center;
-    color:white; font-weight:800; font-size:22px;
+    color:white; font-weight:800; font-size:20px;
   }
-  h1{ font-size:28px; margin:0; font-weight:700; }
-  .sub{ color:#555; margin:6px 0 24px; font-size:15px; }
+  h1{ font-size:24px; margin:0; font-weight:700; }
+  .sub{ color:#555; margin:2px 0 0; font-size:14px; } /* margin kan ti tlem */
 
-  .label{ font-size:13px; font-weight:600; color:#222; margin:14px 0 6px; display:block; }
+  .info{ font-size:14px; font-weight:600; color:#000; margin:16px 0 10px; } /* 24px atangin 16px */
+
+  .label{ font-size:13px; font-weight:600; color:#222; margin:10px 0 4px; display:block; } /* 14px/6px atangin 10px/4px */
   .input{
-    width:100%; padding:14px; border:1.5px solid #e0e0e0; border-radius:12px;
-    font-size:16px; background:white;
+    width:100%; padding:12px; border:1.5px solid #ccc; border-radius:10px; /* 14px atangin 12px */
+    font-size:15px; background:white;
   }
-  .input:focus{ outline:none; border-color:#25D366; }
 
   .pw-wrap{ position:relative; }
   .eye{ 
-    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
     cursor:pointer; font-size:18px; color:#888;
   }
 
-  .forgot{ display:inline-block; margin:8px 0 0; color:#FF6A00; text-decoration:none; font-weight:600; font-size:14px; }
+  .forgot{ display:inline-block; margin:6px 0 12px; color:#FF6A00; text-decoration:none; font-weight:600; font-size:13px; } /* 8px/18px atangin 6px/12px */
 
   .btn{
-    width:100%; padding:15px; margin-top:18px; border:none; border-radius:14px;
-    background:#FF6A00; color:white; font-size:17px; font-weight:700; cursor:pointer;
+    width:100%; padding:13px; border:none; border-radius:12px; /* 15px atangin 13px */
+    background:#FF6A00; color:white; font-size:16px; font-weight:700; cursor:pointer;
   }
 
-  .divider{ text-align:center; margin:20px 0; color:#ccc; font-size:13px; }
+  .divider{ height:1px; background:#e0e0e0; margin:14px 0; } /* 20px atangin 14px */
 
-  .register{ text-align:center; font-size:14px; color:#333; }
-  .register a{ color:#FF6A00; font-weight:700; text-decoration:none; }
+  .register{ text-align:center; font-size:14px; color:#222; }
 
 </style>
 </head>
@@ -70,7 +67,7 @@
     </div>
   </div>
 
-  <label class="label">Login using your Mobile/Email ID and Password</label>
+  <div class="info">Login using your <b>Mobile/Email ID and Password</b></div>
   
   <label class="label">Mobile/Email ID *</label>
   <input id="email" class="input" type="text" placeholder="7005697815 or you@email.com">
@@ -85,10 +82,10 @@
 
   <button class="btn" onclick="login()">Login</button>
 
-  <div class="divider">────────</div>
+  <div class="divider"></div>
 
   <div class="register">
-    Don't have a MizoChat Account? <a href="#" onclick="showReg()">Register Now</a>
+    Don't have a MizoChat Account? <a href="#">Register Now</a>
   </div>
 
 </div>
@@ -111,10 +108,6 @@ function login(){
   auth.signInWithEmailAndPassword(email, pass)
     .then(()=> location.href="users.html")
     .catch(e=> alert(e.message));
-}
-
-function showReg(){
-  alert("Register page kan la siam ang boss")
 }
 </script>
 </body>
