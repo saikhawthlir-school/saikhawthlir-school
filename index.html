@@ -8,8 +8,8 @@
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
     font-family: Roboto, "Segoe UI", sans-serif;
-    background: #FFFFFF; /* AW KAWK */
-    padding: 12px 16px 0; /* HNUAI LAM PADDING 0 = AWL A TI ZIM */
+    background: #FFFFFF;
+    padding: 20px 16px 0; /* CHUNG LAM AW */
   }
   
   .logo-wrap{ 
@@ -20,13 +20,13 @@
   }
   .logo{ 
     width:48px; height:48px; border-radius:12px;
-    background: linear-gradient(135deg,#25D366,#128C7E); /* MC LOGO RAWNG */
+    background: linear-gradient(135deg,#25D366,#128C7E);
     display:flex; align-items:center; justify-content:center;
     color:white; font-weight:800; font-size:18px; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
   h1{ font-size:24px; margin:0; font-weight:700; color:#000; }
-  .sub{ color:#333; font-size:15px; line-height:1.4; }
+  .sub{ color:#333; font-size:15px; line-height:1.8; } /* ACCOUNT INKAR ZAU */
 
   .info{ font-size:15px; color:#000; margin:18px 0 14px; }
   .info b{ font-weight:700; }
@@ -49,10 +49,9 @@
     width:100%; padding:16px 14px 10px; border:none; 
     font-size:16px; background:transparent; outline:none;
   }
-  /* LABEL INSAWN CHHO DAN + RAWNG THAR */
   .input:focus + .field-label, 
   .input:not(:placeholder-shown) + .field-label{
-    top:-8px; font-size:12px; color:#128C7E; /* MC DARK GREEN */
+    top:-8px; font-size:12px; color:#128C7E;
   }
 
   .pw-wrap{ position:relative; }
@@ -62,11 +61,11 @@
     user-select: none;
   }
 
-  .forgot{ display:inline-block; margin:4px 0 18px; color:#128C7E; text-decoration:none; font-weight:600; font-size:14px; } /* GREEN */
+  .forgot{ display:block; margin:4px 0 18px; color:#128C7E; text-decoration:none; font-weight:600; font-size:14px; text-align:right; } /* DINGLAM */
 
   .btn{
     width:100%; padding:14px; border:none; border-radius:12px;
-    background: linear-gradient(135deg,#25D366,#128C7E); /* MC LOGO RAWNG */
+    background: linear-gradient(135deg,#25D366,#128C7E);
     color:white; font-size:17px; font-weight:700; cursor:pointer;
     box-shadow: 0 3px 8px rgba(18,140,126,0.3); 
   }
@@ -74,7 +73,7 @@
   .divider{ height:1px; background:#e5e5e5; margin:18px 0; }
 
   .register{ text-align:center; font-size:15px; color:#222; }
-  .register a{ color:#128C7E; font-weight:700; text-decoration:none; } /* GREEN */
+  .register a{ color:#128C7E; font-weight:700; text-decoration:none; }
 
 </style>
 </head>
@@ -84,7 +83,7 @@
   <div class="logo">MC</div>
   <div>
     <h1>Welcome!</h1>
-    <div class="sub">Login to your <b>MizoChat</b><br>Account</div>
+    <div class="sub">Login to your <b>MizoChat</b><br>Account</div> <!-- BR INKAR A ZAU TAWH -->
   </div>
 </div>
 
@@ -101,7 +100,7 @@
   <span class="eye" onclick="togglePass()">👁️</span>
 </div>
 
-<a href="#" class="forgot">Forgot Password?</a>
+<a href="#" class="forgot">Forgot Password?</a> <!-- A DING LAM AH A AWM TAWH -->
 
 <button class="btn" onclick="login()">Login</button>
 
