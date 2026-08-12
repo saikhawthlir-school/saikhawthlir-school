@@ -34,6 +34,19 @@
   .info{ font-size:15px; color:#000; margin:0 0 14px; }
   .info b{ font-weight:700; }
 
+  /* ERROR BOX SIGNUP ANG CHIAH */
+  .error-box{
+    display:none;
+    background: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #c62828;
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
   .field{ 
     position:relative; 
     margin-bottom:14px; 
@@ -72,6 +85,7 @@
     color:white; font-size:17px; font-weight:700; cursor:pointer;
     box-shadow: 0 3px 8px rgba(18,140,126,0.3); 
   }
+  .btn:active{ transform: scale(0.98); }
 
   .divider{ height:1px; background:#e5e5e5; margin:18px 0; }
 
@@ -93,6 +107,9 @@
  <br>
 
 <div class="info">Login using your <b>Email ID and Password</b></div>
+
+<!-- ERROR BOX -->
+<div id="errorBox" class="error-box"></div>
 
 <div class="field">
   <input id="email" class="input" type="email" placeholder=" ">
@@ -118,7 +135,6 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script>
-// FIREBASE CONFIG TAK
 const firebaseConfig = { 
   apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
   authDomain: "school-project-dab29.firebaseapp.com", 
@@ -130,7 +146,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
-// EDIT 1: Login tawh sa chu chat.html ah auto dah
 auth.onAuthStateChanged((user) => {
   if (user) {
     location.href = "chat.html";
@@ -149,15 +164,35 @@ function togglePass(){
   }
 }
 
+function showError(msg){
+  const box = document.getElementById('errorBox');
+  box.style.display = 'block';
+  box.innerText = msg;
+}
+
 function login(){
-  const email = document.getElementById('email').value;
+  const email = document.getElementById('email').value.trim();
   const pass = document.getElementById('pass').value;
-  if(!email || !pass){ alert("Email leh Password dah rawh"); return; }
+  document.getElementById('errorBox').style.display = 'none';
+  
+  if(!email || !pass){ 
+    showError("Email leh Password dah kim rawh"); 
+    return; 
+  }
   
   auth.signInWithEmailAndPassword(email, pass)
-    // EDIT 2: users.html ti lo in chat.html ah kan thlak
     .then(()=> location.href="chat.html")
-    .catch(e=> alert(e.message));
+    .catch(e=> {
+      if(e.code === 'auth/invalid-login-credentials' || e.code === 'auth/wrong-password'){
+        showError("Email emaw Password emaw a dik lo");
+      } else if(e.code === 'auth/user-not-found'){
+        showError("He email hmang hian account a awm lo");
+      } else if(e.code === 'auth/invalid-email'){
+        showError("Email address a dik lo");
+      } else {
+        showError("Login theih rih lo. Internet check la, han try leh rawh");
+      }
+    });
 }
 </script>
 </body>
