@@ -1,45 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MizoChat</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MizoChat - Login</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b141a;color:white;font-family:'Segoe UI',Arial;display:flex;justify-content:center;align-items:center;height:100vh;font-size:22px;}
-.form{background:#202c33;padding:35px 28px;border-radius:12px;width:90%;max-width:450px;}
-h2{text-align:center;margin-bottom:25px;font-size:28px;}
-input{width:100%;padding:16px;margin:10px 0;border:none;border-radius:10px;background:#2a3942;color:white;font-size:18px;}
-button{padding:16px;background:#00a884;color:#111b21;border:none;border-radius:10px;font-weight:bold;cursor:pointer;width:100%;font-size:18px;margin-top:12px;}
-.switch{color:#00a884;cursor:pointer;margin-top:18px;text-align:center;font-size:16px;}
+  body{
+    margin:0; 
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+    background: linear-gradient(180deg,#FFF7F0 0%, #FFFFFF 100%);
+    display:flex; flex-direction:column; min-height:100vh;
+  }
+  .top{ display:flex; justify-content:flex-end; padding:16px; }
+  .skip{ color:#FF6A00; font-weight:600; text-decoration:none; }
+  
+  .container{ flex:1; padding:0 24px; max-width:400px; margin:0 auto; width:100%; }
+  
+  .logo-wrap{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .logo{ 
+    width:48px; height:48px; border-radius:12px; 
+    background: linear-gradient(135deg,#25D366,#128C7E);
+    display:flex; align-items:center; justify-content:center;
+    color:white; font-weight:800; font-size:20px;
+  }
+  h1{ font-size:28px; margin:0; }
+  .sub{ color:#555; margin:6px 0 24px; font-size:15px; }
+
+  .label{ font-size:13px; font-weight:600; color:#333; margin:14px 4px 6px; display:block; }
+  .input{
+    width:100%; padding:14px; border:1.5px solid #ddd; border-radius:12px;
+    font-size:16px; box-sizing:border-box; background:white;
+  }
+  .input:focus{ outline:none; border-color:#25D366; }
+
+  .pw-wrap{ position:relative; }
+  .eye{ 
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    cursor:pointer; font-size:18px; color:#888;
+  }
+
+  .forgot{ display:inline-block; margin:10px 4px 0; color:#FF6A00; text-decoration:none; font-weight:600; font-size:14px; }
+
+  .btn{
+    width:100%; padding:15px; margin-top:20px; border:none; border-radius:14px;
+    background:#FF6A00; color:white; font-size:17px; font-weight:700; cursor:pointer;
+  }
+  .btn:active{ transform:scale(0.98); }
+
+  .divider{ text-align:center; margin:24px 0; color:#aaa; font-size:14px; }
+
+  .register{ text-align:center; font-size:15px; color:#333; }
+  .register a{ color:#FF6A00; font-weight:700; text-decoration:none; }
+
+  .footer{ display:flex; justify-content:space-between; padding:20px 24px; font-size:12px; color:#777; }
+  .footer a{ color:#777; text-decoration:none; }
 </style>
 </head>
 <body>
-<div class="form" id="loginBox">
-  <h2>MizoChat</h2>
-  <input id="loginEmail" type="email" placeholder="Email">
-  <input id="loginPass" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <div class="switch" onclick="toggle()">Account i la neilo? Signup</div>
+
+<div class="top"><a href="#" class="skip">SKIP</a></div>
+
+<div class="container">
+  <div class="logo-wrap">
+    <div class="logo">MC</div>
+    <div>
+      <h1>Welcome!</h1>
+      <div class="sub">Login to your <b>MizoChat</b> Account</div>
+    </div>
+  </div>
+
+  <label class="label">Login using your Mobile/Email ID and Password</label>
+  
+  <label class="label">Mobile/Email ID *</label>
+  <input id="email" class="input" type="text" placeholder="7005697815 or you@email.com">
+
+  <label class="label">Password *</label>
+  <div class="pw-wrap">
+    <input id="pass" class="input" type="password" placeholder="Password">
+    <span class="eye" onclick="togglePass()">👁️</span>
+  </div>
+
+  <a href="#" class="forgot">Forgot Password?</a>
+
+  <button class="btn" onclick="login()">Login</button>
+
+  <div class="divider">────────</div>
+
+  <div class="register">
+    Don't have a MizoChat Account? <a href="#" onclick="showReg()">Register Now</a>
+  </div>
 </div>
-<div class="form" id="signupBox" style="display:none;">
-  <h2>Signup</h2>
-  <input id="signupName" placeholder="I hming">
-  <input id="signupEmail" type="email" placeholder="Email">
-  <input id="signupPass" type="password" placeholder="Password">
-  <button onclick="signup()">Signup</button>
-  <div class="switch" onclick="toggle()">Login na lamah kir</div>
+
+<div class="footer">
+  <a href="#">License Agreement</a>
+  <a href="#">Privacy & Policy</a>
 </div>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script>
-const firebaseConfig = {apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain: "school-project-dab29.firebaseapp.com",projectId: "school-project-dab29"};
-firebase.initializeApp(firebaseConfig); const auth = firebase.auth(); const db = firebase.firestore();
-function toggle(){ document.getElementById("loginBox").style.display = document.getElementById("loginBox").style.display=="none"?"block":"none"; document.getElementById("signupBox").style.display = document.getElementById("signupBox").style.display=="none"?"block":"none"; }
-function signup(){ let name=document.getElementById("signupName").value; let email=document.getElementById("signupEmail").value; let pass=document.getElementById("signupPass").value; if(!name||!email||!pass) return alert("Kim lo"); auth.createUserWithEmailAndPassword(email,pass).then(u=>{ db.collection("users").doc(u.user.uid).set({name,email}); location.href="users.html"; }).catch(e=>alert(e.message)); }
-function login(){ let email=document.getElementById("loginEmail").value; let pass=document.getElementById("loginPass").value; auth.signInWithEmailAndPassword(email,pass).then(()=>location.href="users.html").catch(e=>alert(e.message)); }
-auth.onAuthStateChanged(u=>{ if(u) location.href="users.html" });
+// I Firebase config dah rawh
+const firebaseConfig = { apiKey:"", authDomain:"", projectId:"" };
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+function togglePass(){
+  const p = document.getElementById('pass');
+  p.type = p.type==='password' ? 'text' : 'password';
+}
+
+function login(){
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('pass').value;
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(()=> location.href="users.html")
+    .catch(e=> alert(e.message));
+}
+
+function showReg(){
+  alert("Register page kan la siam ang boss")
+}
 </script>
 </body>
 </html>
