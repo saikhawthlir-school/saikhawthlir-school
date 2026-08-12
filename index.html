@@ -34,7 +34,6 @@
   .info{ font-size:15px; color:#000; margin:0 0 14px; }
   .info b{ font-weight:700; }
 
-  /* ERROR BOX SIGNUP ANG CHIAH */
   .error-box{
     display:none;
     background: #ffebee;
@@ -108,7 +107,6 @@
 
 <div class="info">Login using your <b>Email ID and Password</b></div>
 
-<!-- ERROR BOX -->
 <div id="errorBox" class="error-box"></div>
 
 <div class="field">
@@ -183,14 +181,17 @@ function login(){
   auth.signInWithEmailAndPassword(email, pass)
     .then(()=> location.href="chat.html")
     .catch(e=> {
-      if(e.code === 'auth/invalid-login-credentials' || e.code === 'auth/wrong-password'){
-        showError("Email emaw Password emaw a dik lo");
+      // V8 ERROR CODE DIK TE
+      if(e.code === 'auth/wrong-password'){
+        showError("Password a dik lo");
       } else if(e.code === 'auth/user-not-found'){
         showError("He email hmang hian account a awm lo");
       } else if(e.code === 'auth/invalid-email'){
         showError("Email address a dik lo");
+      } else if(e.code === 'auth/too-many-requests'){
+        showError("I try nasa lutuk. Darkar 1 hnu ah han try leh rawh");
       } else {
-        showError("Login theih rih lo. Internet check la, han try leh rawh");
+        showError("Login theih rih lo. Error: " + e.code);
       }
     });
 }
