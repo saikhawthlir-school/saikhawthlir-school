@@ -6,38 +6,78 @@
 <title>Chat</title>
 <style>
   body { margin:0; font-family:Arial; background:#e5ddd5; display:flex; flex-direction:column; height:100vh; }
-  header { background:#128C7E; color:white; padding:12px; display:flex; align-items:center; }
-  header button { background:none; border:none; color:white; font-size:24px; margin-right:10px; cursor:pointer; }
-  header img { width:40px; height:40px; border-radius:50%; margin-right:10px; }
-  .chat-box { flex:1; padding:10px; overflow-y:auto; }
-  .msg { background:white; padding:8px 12px; border-radius:8px; margin:5px 0; max-width:70%; }
+  
+  /* HEADER - WhatsApp style */
+  header { 
+    background:#128C7E; color:white; padding:8px 12px; 
+    display:flex; align-items:center; gap:10px;
+    position:sticky; top:0; z-index:10;
+  }
+  .back-btn { 
+    font-size:28px; cursor:pointer; padding:4px;
+  }
+  .profile-pic { 
+    width:40px; height:40px; border-radius:50%; cursor:pointer;
+  }
+  .header-info { flex:1; cursor:pointer; }
+  .header-info .name { font-size:18px; font-weight:600; }
+  .header-info .status { font-size:13px; opacity:0.9; }
+
+  /* CHAT BOX */
+  .chat-box { 
+    flex:1; padding:10px; overflow-y:auto; 
+    background-image: url('https://user-images.githubusercontent.com/150825/48326858-5bb6fa00-e5f2-11e8-8e68-7d5a5c4d2b9f.png');
+    background-size: contain;
+  }
+  .msg { 
+    background:white; padding:8px 12px; border-radius:8px; 
+    margin:5px 0; max-width:75%; position:relative;
+    box-shadow:0 1px 0.5px rgba(0,0,0,0.13);
+  }
   .msg.me { background:#DCF8C6; margin-left:auto; }
-  .input { display:flex; padding:10px; background:white; }
-  .input input { flex:1; padding:12px; border-radius:20px; border:1px solid #ccc; outline:none; }
-  .input button { margin-left:10px; padding:10px 20px; background:#128C7E; color:white; border:none; border-radius:20px; cursor:pointer; }
+  .msg .time { font-size:11px; color:#667781; text-align:right; margin-top:4px; }
+
+  /* INPUT - WhatsApp style */
+  .input-wrap { 
+    display:flex; padding:8px; background:#f0f0f0; 
+    align-items:center; gap:8px;
+  }
+  .input { 
+    flex:1; background:white; border-radius:25px; 
+    padding:10px 16px; border:none; outline:none; font-size:15px;
+  }
+  .send-btn { 
+    width:50px; height:50px; border-radius:50%; 
+    background:#128C7E; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .send-btn svg { fill:white; width:24px; height:24px; }
 </style>
 </head>
 <body>
 
 <header>
-  <button onclick="history.back()">←</button>
-  <img src="https://i.pravatar.cc/40" id="friendPic">
-  <b id="friendName">Loading...</b>
+  <div class="back-btn" onclick="history.back()">←</div>
+  <img class="profile-pic" id="friendPic" onclick="goProfile()">
+  <div class="header-info" onclick="goProfile()">
+    <div class="name" id="friendName">Loading...</div>
+    <div class="status" id="friendStatus">Online</div>
+  </div>
 </header>
 
-<div class="chat-box" id="chatBox">
-  <p style="text-align:center; color:#666;">Message system kan la dah lo</p>
-</div>
+<div class="chat-box" id="chatBox"></div>
 
-<div class="input">
-  <input type="text" id="msgInput" placeholder="Type a message">
-  <button onclick="sendMsg()">Send</button>
+<div class="input-wrap">
+  <input type="text" id="msgInput" class="input" placeholder="Type a message" onkeydown="if(event.key==='Enter') sendMsg()">
+  <button class="send-btn" onclick="sendMsg()">
+    <svg viewBox="0 0 24 24"><path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path></svg>
+  </button>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const app = initializeApp({apiKey:"AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain:"school-project-dab29.firebaseapp.com",projectId:"school-project-dab29"});
   const auth = getAuth();
@@ -45,21 +85,65 @@
 
   const urlParams = new URLSearchParams(window.location.search);
   const friendUid = urlParams.get('uid');
+  let currentUser = null;
+  let chatId = null;
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) window.location.href = "login.html";
-    if(friendUid) {
-      const userDoc = await getDoc(doc(db, "users", friendUid));
-      if(userDoc.exists()){
-        const data = userDoc.data();
-        document.getElementById('friendName').innerText = data.name || data.email;
-        document.getElementById('friendPic').src = data.photoURL || 'https://i.pravatar.cc/40';
-      }
-    }
+    currentUser = user;
+    
+    // chatId unique siam: uid 2 te kha alphabet a rem
+    chatId = [currentUser.uid, friendUid].sort().join("_");
+    
+    loadFriendInfo();
+    loadMessages();
   });
 
-  window.sendMsg = () => {
-    alert("Message thawn na hi a hnu ah kan dah dawn nia boss. Tun ah chuan hming chiah a lang thei rih");
+  async function loadFriendInfo(){
+    const userDoc = await getDoc(doc(db, "users", friendUid));
+    if(userDoc.exists()){
+      const data = userDoc.data();
+      document.getElementById('friendName').innerText = data.name || data.email;
+      document.getElementById('friendPic').src = data.photoURL || 'https://i.pravatar.cc/40';
+      document.getElementById('friendStatus').innerText = data.status || 'Offline';
+    }
+  }
+
+  function loadMessages(){
+    const q = query(collection(db, "chats", chatId, "messages"), orderBy("timestamp"));
+    onSnapshot(q, (snapshot) => {
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML = "";
+      snapshot.forEach(doc => {
+        const msg = doc.data();
+        const isMe = msg.senderId === currentUser.uid;
+        chatBox.innerHTML += `
+          <div class="msg ${isMe ? 'me' : ''}">
+            ${msg.text}
+            <div class="time">${new Date(msg.timestamp?.toDate()).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}</div>
+          </div>
+        `;
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+  }
+
+  window.sendMsg = async () => {
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if(!text) return;
+    
+    await addDoc(collection(db, "chats", chatId, "messages"), {
+      text: text,
+      senderId: currentUser.uid,
+      receiverId: friendUid,
+      timestamp: serverTimestamp()
+    });
+    input.value = "";
+  }
+
+  window.goProfile = () => {
+    window.location.href = `profile.html?uid=${friendUid}`; // a hnu ah profile page kan siam ang
   }
 </script>
 </body>
