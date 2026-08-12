@@ -5,39 +5,43 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>MizoChat - Login</title>
 <style>
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box; margin:0; padding:0;}
   body{
-    margin:0; 
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-    background: #FFFFFF;
-    padding: 24px 16px; /* sir ah 16px chiah */
+    background: linear-gradient(180deg,#FFF7F0 0%, #FFFFFF 100%); /* background gradient */
+    padding: 20px 16px; /* chung ah 20px, sir ah 16px chiah */
     min-height:100vh;
   }
   
-  .container{ 
-    width:100%; 
-    max-width:380px; /* 420 atangin 380 ah kan ti te */
-    margin:0 auto; 
-  }
+  .top{ display:flex; justify-content:flex-end; margin-bottom:10px; }
+  .skip{ color:#FF6A00; font-weight:600; text-decoration:none; font-size:14px; }
+  
+  .container{ width:100%; }
   
   .logo-wrap{ 
     display:flex; 
-    align-items:center; 
+    align-items:flex-start; 
     gap:12px; 
-    margin:20px 0 16px; /* chung ah space kan ti tlem */
+    margin-bottom:16px; 
   }
   .logo{ 
-    width:50px; height:50px; border-radius:14px;
+    width:48px; height:48px; border-radius:12px;
     background: linear-gradient(135deg,#25D366,#128C7E);
     display:flex; align-items:center; justify-content:center;
-    color:white; font-weight:800; font-size:22px;
+    color:white; font-weight:800; font-size:20px; flex-shrink:0;
   }
-  h1{ font-size:28px; margin:0; font-weight:700; }
-  .sub{ color:#555; margin:6px 0 24px; font-size:15px; }
+  h1{ font-size:26px; margin:0; font-weight:700; }
+  .sub{ color:#444; margin:4px 0 0; font-size:15px; line-height:1.4; }
 
-  .label{ font-size:13px; font-weight:600; color:#222; margin:14px 2px 6px; display:block; }
+  .info{ font-size:15px; font-weight:600; color:#000; margin:20px 0 16px; }
+
+  .field{ position:relative; margin-bottom:14px; }
+  .field-label{
+    position:absolute; top:-8px; left:12px; background:white; padding:0 4px;
+    font-size:12px; color:#666; font-weight:500;
+  }
   .input{
-    width:100%; padding:14px; border:1.5px solid #e0e0e0; border-radius:12px;
+    width:100%; padding:14px 12px; border:1.5px solid #ccc; border-radius:10px;
     font-size:16px; background:white;
   }
   .input:focus{ outline:none; border-color:#25D366; }
@@ -45,56 +49,74 @@
   .pw-wrap{ position:relative; }
   .eye{ 
     position:absolute; right:12px; top:50%; transform:translateY(-50%);
-    cursor:pointer; font-size:18px; color:#888;
+    cursor:pointer; font-size:20px; color:#888;
   }
 
-  .forgot{ display:inline-block; margin:8px 2px 0; color:#FF6A00; text-decoration:none; font-weight:600; font-size:14px; }
+  .forgot{ display:inline-block; margin:6px 0 18px; color:#FF6A00; text-decoration:none; font-weight:600; font-size:14px; }
 
   .btn{
-    width:100%; padding:15px; margin-top:18px; border:none; border-radius:14px;
+    width:100%; padding:15px; border:none; border-radius:12px;
     background:#FF6A00; color:white; font-size:17px; font-weight:700; cursor:pointer;
   }
-  .btn:active{ transform:scale(0.98); }
 
-  .divider{ text-align:center; margin:20px 0; color:#ccc; font-size:13px; }
+  .divider{ height:1px; background:#e0e0e0; margin:20px 0; }
 
-  .register{ text-align:center; font-size:14px; color:#333; margin-bottom:20px; /* hnuai ah space kan ti tlem */}
+  .register{ text-align:center; font-size:15px; color:#222; }
   .register a{ color:#FF6A00; font-weight:700; text-decoration:none; }
+
+  .footer{ 
+    display:flex; 
+    justify-content:space-between; 
+    position:absolute; bottom:20px; left:16px; right:16px;
+    font-size:12px; color:#666; 
+  }
+  .footer a{ color:#666; text-decoration:none; }
 
 </style>
 </head>
 <body>
+
+<div class="top"><a href="#" class="skip">SKIP</a></div>
 
 <div class="container">
   <div class="logo-wrap">
     <div class="logo">MC</div>
     <div>
       <h1>Welcome!</h1>
-      <div class="sub">Login to your <b>MizoChat</b> Account</div>
+      <div class="sub">Login to your <b>MizoChat</b><br>Account</div>
     </div>
   </div>
 
-  <label class="label">Login using your Mobile/Email ID and Password</label>
+  <div class="info">Login using your <b>Mobile/Email ID and Password</b></div>
   
-  <label class="label">Mobile/Email ID *</label>
-  <input id="email" class="input" type="text" placeholder="7005697815 or you@email.com">
+  <div class="field">
+    <span class="field-label">Mobile/Email ID *</span>
+    <input id="email" class="input" type="text" placeholder="7005697815">
+  </div>
 
-  <label class="label">Password *</label>
-  <div class="pw-wrap">
-    <input id="pass" class="input" type="password" placeholder="Password">
-    <span class="eye" onclick="togglePass()">👁️</span>
+  <div class="field">
+    <span class="field-label">Password *</span>
+    <div class="pw-wrap">
+      <input id="pass" class="input" type="password" placeholder="">
+      <span class="eye" onclick="togglePass()">👁️</span>
+    </div>
   </div>
 
   <a href="#" class="forgot">Forgot Password?</a>
 
   <button class="btn" onclick="login()">Login</button>
 
-  <div class="divider">────────</div>
+  <div class="divider"></div>
 
   <div class="register">
     Don't have a MizoChat Account? <a href="#" onclick="showReg()">Register Now</a>
   </div>
 
+</div>
+
+<div class="footer">
+  <a href="#">License Agreement</a>
+  <a href="#">Privacy & Policy</a>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
