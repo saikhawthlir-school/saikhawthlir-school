@@ -1,200 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>MizoChat - Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mizo Chat</title>
 <style>
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    font-family: Roboto, "Segoe UI", sans-serif;
-    background: #FFFFFF;
-    padding: 50px 16px 0;
-  }
-  
-  .logo-wrap{ 
-    display:flex; 
-    align-items:center;
-    gap:14px; 
-    margin-bottom:6px;
-  }
-  .logo{ 
-    width:48px; height:48px; border-radius:12px;
-    background: linear-gradient(135deg,#25D366,#128C7E);
-    display:flex; align-items:center; justify-content:center;
-    color:white; font-weight:800; font-size:18px; 
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    align-self:flex-start; 
-    margin-top:4px; 
-    flex-shrink:0;
-  }
-  h1{ font-size:24px; margin:0; font-weight:700; color:#000; line-height:1.2; }
-  .sub{ color:#333; font-size:15px; line-height:1.4; margin-top:2px; margin-bottom:30px; }
-
-  .info{ font-size:15px; color:#000; margin:0 0 14px; }
-  .info b{ font-weight:700; }
-
-  .error-box{
-    display:none;
-    background: #ffebee;
-    color: #c62828;
-    border-left: 4px solid #c62828;
-    padding: 12px 14px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  .field{ 
-    position:relative; 
-    margin-bottom:14px; 
-    background:white;
-    border:1.5px solid #ddd;
-    border-radius:10px;
-  }
-  .field-label{
-    position:absolute; top:12px; left:14px;
-    font-size:14px; color:#666; font-weight:500;
-    transition: all 0.2s;
-    pointer-events:none;
-    background:white; padding:0 4px; 
-  }
-  .input{
-    width:100%; padding:16px 14px 10px; border:none; 
-    font-size:16px; background:transparent; outline:none;
-  }
-  .input:focus + .field-label, 
-  .input:not(:placeholder-shown) + .field-label{
-    top:-8px; font-size:12px; color:#128C7E;
-  }
-
-  .pw-wrap{ position:relative; }
-  .eye{ 
-    position:absolute; right:14px; top:50%; transform:translateY(-50%);
-    cursor:pointer; font-size:20px; color:#999;
-    user-select: none;
-  }
-
-  .forgot{ display:block; margin:4px 0 18px; color:#128C7E; text-decoration:none; font-weight:600; font-size:14px; text-align:right; }
-
-  .btn{
-    width:100%; padding:14px; border:none; border-radius:12px;
-    background: linear-gradient(135deg,#25D366,#128C7E);
-    color:white; font-size:17px; font-weight:700; cursor:pointer;
-    box-shadow: 0 3px 8px rgba(18,140,126,0.3); 
-  }
-  .btn:active{ transform: scale(0.98); }
-
-  .divider{ height:1px; background:#e5e5e5; margin:18px 0; }
-
-  .register{ text-align:center; font-size:15px; color:#222; }
-  .register a{ color:#128C7E; font-weight:700; text-decoration:none; }
-
+  :root { --bg: #ffffff; --text: #000; --header: #128C7E; --chat-bg: #e5ddd5; }
+  [data-theme="dark"] { --bg: #111b21; --text: #e9edef; --header: #202c33; --chat-bg: #0b141a; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+  body { background: var(--bg); color: var(--text); }
+  header { background: var(--header); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+  header h1 { font-size: 20px; }
+  .menu-btn { font-size: 24px; cursor: pointer; position: relative; }
+  .menu { display: none; position: absolute; right: 10px; top: 50px; background: var(--bg); color: var(--text); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); width: 200px; z-index: 200; }
+  .menu.show { display: block; }
+  .menu a { display: block; padding: 12px 16px; text-decoration: none; color: var(--text); cursor: pointer; }
+  .tabs { display: flex; background: var(--header); }
+  .tab { flex: 1; padding: 14px; text-align: center; color: white; cursor: pointer; font-weight: bold; }
+  .tab.active { border-bottom: 3px solid white; }
+  .content { display: none; padding: 10px; background: var(--chat-bg); min-height: 80vh; }
+  .content.active { display: block; }
+  .chat-item { display: flex; padding: 12px; border-bottom: 1px solid #ccc; cursor: pointer; background: var(--bg); margin-bottom: 5px; border-radius: 8px; }
+  .chat-item img { width: 50px; height: 50px; border-radius: 50%; margin-right: 12px; }
 </style>
 </head>
 <body>
 
-<div class="logo-wrap">
-  <div class="logo">MC</div>
-  <div>
-    <h1>Welcome!</h1>
-    <div class="sub">Login to your <b>MizoChat</b> Account</div>
+<header>
+  <h1>Mizo Chat</h1>
+  <div class="menu-btn" onclick="toggleMenu()">⋮
+    <div class="menu" id="menu">
+      <a onclick="goProfile()">Profile</a>
+      <a onclick="goSettings()">Settings</a>
+      <a onclick="toggleDark()">Dark Mode</a>
+      <a onclick="logout()">Logout</a>
+    </div>
   </div>
-</div>
- <br>
- <br>
+</header>
 
-<div class="info">Login using your <b>Email ID and Password</b></div>
-
-<div id="errorBox" class="error-box"></div>
-
-<div class="field">
-  <input id="email" class="input" type="email" placeholder=" ">
-  <span class="field-label">Email ID *</span>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('chats')">CHATS</div>
+  <div class="tab" onclick="showTab('status')">STATUS</div>
+  <div class="tab" onclick="showTab('users')">USERS</div>
 </div>
 
-<div class="field pw-wrap">
-  <input id="pass" class="input" type="password" placeholder=" ">
-  <span class="field-label">Password *</span>
-  <span class="eye" onclick="togglePass()">👁️</span>
-</div>
+<div id="chats" class="content active"></div>
+<div id="status" class="content"></div>
+<div id="users" class="content"></div>
 
-<a href="forgot.html" class="forgot">Forgot Password?</a>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-<button class="btn" onclick="login()">Login</button>
+  const app = initializeApp({apiKey:"AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain:"school-project-dab29.firebaseapp.com",projectId:"school-project-dab29",storageBucket:"school-project-dab29.appspot.com",messagingSenderId:"214125475324",appId:"1:214125475324:web:8f98e8a447ef8bec3a2f79"});
+  const auth = getAuth();
+  const db = getFirestore();
+  let currentUser = null;
 
-<div class="divider"></div>
+  onAuthStateChanged(auth, (user) => {
+    if (!user) window.location.href = "login.html";
+    else { currentUser = user; loadUsers(); }
+  });
 
-<div class="register">
-  Don't have a MizoChat Account? <a href="signup.html">Register Now</a>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script>
-const firebaseConfig = { 
-  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
-  authDomain: "school-project-dab29.firebaseapp.com", 
-  projectId: "school-project-dab29",
-  storageBucket: "school-project-dab29.appspot.com",
-  messagingSenderId: "214125475324",
-  appId: "1:214125475324:web:8f98e8a447ef8bec3a2f79"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    location.href = "chat.html";
-  }
-});
-
-function togglePass(){
-  const p = document.getElementById('pass');
-  const eye = document.querySelector('.eye');
-  if(p.type==='password'){ 
-    p.type='text'; 
-    eye.textContent = '🙈'; 
-  } else { 
-    p.type='password'; 
-    eye.textContent = '👁️'; 
-  }
-}
-
-function showError(msg){
-  const box = document.getElementById('errorBox');
-  box.style.display = 'block';
-  box.innerText = msg;
-}
-
-function login(){
-  const email = document.getElementById('email').value.trim();
-  const pass = document.getElementById('pass').value;
-  document.getElementById('errorBox').style.display = 'none';
-  
-  if(!email || !pass){ 
-    showError("Email leh Password dah kim rawh"); 
-    return; 
-  }
-  
-  auth.signInWithEmailAndPassword(email, pass)
-    .then(()=> location.href="chat.html")
-    .catch(e=> {
-      // V8 ERROR CODE DIK TE
-      if(e.code === 'auth/wrong-password'){
-        showError("Password a dik lo");
-      } else if(e.code === 'auth/user-not-found'){
-        showError("He email hmang hian account a awm lo");
-      } else if(e.code === 'auth/invalid-email'){
-        showError("Email address a dik lo");
-      } else if(e.code === 'auth/too-many-requests'){
-        showError("I try nasa lutuk. Darkar 1 hnu ah han try leh rawh");
-      } else {
-        showError("Login theih rih lo. Error: " + e.code);
-      }
+  function loadUsers(){
+    onSnapshot(collection(db, "users"), (snapshot) => {
+      const usersDiv = document.getElementById('users');
+      usersDiv.innerHTML = ""; 
+      snapshot.forEach((doc) => {
+        const user = doc.data();
+        if(user.uid !== currentUser.uid){
+          usersDiv.innerHTML += `<div class="chat-item" onclick="openChat('${user.uid}')"><img src="${user.photoURL || 'https://i.pravatar.cc/50'}"><div><b>${user.name || user.email}</b><br>${user.status || 'Offline'}</div></div>`;
+        }
+      });
     });
-}
+  }
+  window.openChat = (uid) => { window.location.href = `chat.html?uid=${uid}`; }
+  window.logout = () => { signOut(auth).then(() => window.location.href = "login.html"); }
+  function showTab(tab) { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.content').forEach(c => c.classList.remove('active')); document.querySelector(`[onclick="showTab('${tab}')"]`).classList.add('active'); document.getElementById(tab).classList.add('active'); }
+  function toggleMenu() { document.getElementById('menu').classList.toggle('show'); }
+  function goProfile() { alert("Profile"); }
+  function goSettings() { alert("Settings"); }
+  function toggleDark() { document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); localStorage.setItem('theme', document.documentElement.getAttribute('data-theme')); }
+  if(localStorage.getItem('theme') === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }
 </script>
 </body>
 </html>
