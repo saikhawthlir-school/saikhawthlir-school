@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Password Reset</title>
+  <title>Forgot Password</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    // I Firebase config dah rawh
     const firebaseConfig = {
       apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
       authDomain: "school-project-dab29.firebaseapp.com",
@@ -28,12 +27,13 @@
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = document.getElementById("email").value;
+        msg.style.color = "blue";
         msg.innerText = "Thawn mek...";
 
         try {
           await sendPasswordResetEmail(auth, email);
           msg.style.color = "green";
-          msg.innerText = "Password reset link i email ah kan thawn tawh. Inbox/Spam check rawh.";
+          msg.innerText = "Reset link i email ah kan thawn tawh. Spam pawh check rawh.";
           document.getElementById("email").value = "";
         } catch (error) {
           msg.style.color = "red";
@@ -49,23 +49,44 @@
     });
   </script>
   <style>
-    body { font-family: Arial; display:flex; justify-content:center; align-items:center; height:100vh; background:#f5f5f5; }
-    .box { background:white; padding:25px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); width:320px; }
-    input, button { width:100%; padding:10px; margin:8px 0; border-radius:5px; border:1px solid #ccc; }
-    button { background:#2563eb; color:white; border:none; cursor:pointer; }
-    button:hover { background:#1e40af; }
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    body { background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+    .container { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+    .logo { width: 50px; height: 50px; background: linear-gradient(135deg, #10b981, #059669); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
+    h1 { font-size: 22px; margin: 0; }
+    .subtitle { color: #666; font-size: 14px; margin-bottom: 20px; }
+    label { font-size: 14px; font-weight: 600; display: block; margin-top: 15px; }
+    input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
+    button { width: 100%; padding: 14px; margin-top: 20px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:hover { opacity: 0.9; }
+    .footer { text-align: center; margin-top: 20px; font-size: 14px; }
+    .footer a { color: #059669; text-decoration: none; font-weight: bold; }
+    #msg { margin-top: 15px; text-align: center; font-size: 14px; }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Password Theihnghilh</h2>
-    <p>I email dah la reset link kan lo thawn ang</p>
+  <div class="container">
+    <div class="header">
+      <div class="logo">MC</div>
+      <div>
+        <h1>Forgot Password</h1>
+        <div class="subtitle">Reset link kan lo thawn ang</div>
+      </div>
+    </div>
+
     <form id="resetForm">
-      <input type="email" id="email" placeholder="email@example.com" required>
-      <button type="submit">Reset Link Thawn</button>
+      <label>Fill in your email to Reset</label>
+      <input type="email" id="email" placeholder="Email ID *" required>
+      
+      <button type="submit">Send Reset Link</button>
     </form>
+
     <p id="msg"></p>
-    <a href="login.html">← Login ah kir leh</a>
+
+    <div class="footer">
+      Remember your password? <a href="login.html">Login Now</a>
+    </div>
   </div>
 </body>
 </html>
