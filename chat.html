@@ -126,16 +126,14 @@
 </div>
 
 <div id="users" class="content">
-  <div class="chat-item">
-    <img src="https://i.pravatar.cc/50?u=3">
-    <div><b>U Rina</b><br>Online</div>
-  </div>
+  <!-- HETA HI FIREBASE ATANGIN A LO LANG ANG -->
 </div>
 
 <!-- FIREBASE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; // 1. BELH
 
   const firebaseConfig = {
     apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
@@ -148,13 +146,47 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth();
+  const db = getFirestore(); // 2. BELH
+
+  let currentUser = null;
 
   onAuthStateChanged(auth, (user) => {
-    if (!user) window.location.href = "index.html";
+    if (!user) window.location.href = "login.html"; // login.html ah thlak
+    else {
+      currentUser = user;
+      loadUsers(); // 3. USER LOAD
+    }
   });
 
+  // 4. USERS LOAD FUNCTION BELH
+  function loadUsers(){
+    const usersRef = collection(db, "users");
+    onSnapshot(usersRef, (snapshot) => {
+      const usersDiv = document.getElementById('users');
+      usersDiv.innerHTML = ""; // a hlui delete
+      snapshot.forEach((doc) => {
+        const user = doc.data();
+        if(user.uid !== currentUser.uid){ // mahni lo
+          usersDiv.innerHTML += `
+            <div class="chat-item" onclick="openChat('${user.uid}')">
+              <img src="${user.photoURL || 'https://i.pravatar.cc/50'}">
+              <div>
+                <b>${user.name || user.email}</b><br>
+                ${user.status || 'Offline'}
+              </div>
+            </div>
+          `;
+        }
+      });
+    });
+  }
+
+  window.openChat = (uid) => {
+    window.location.href = `chat.html?uid=${uid}`; // chat page ah a kal
+  }
+
   window.logout = () => {
-    signOut(auth).then(() => window.location.href = "index.html");
+    signOut(auth).then(() => window.location.href = "login.html");
   }
 </script>
 
