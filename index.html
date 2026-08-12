@@ -10,68 +10,57 @@
     margin:0; 
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
     background: #FFFFFF;
+    padding: 24px 16px; /* sir ah 16px chiah */
     min-height:100vh;
-    padding: 40px 20px; /* chung hnuai ah space kan pe hnem */
-    display:flex; 
-    flex-direction:column;
   }
   
   .container{ 
     width:100%; 
-    max-width:500px; /* a zau deuh */
+    max-width:380px; /* 420 atangin 380 ah kan ti te */
     margin:0 auto; 
-    flex:1;
   }
   
   .logo-wrap{ 
     display:flex; 
     align-items:center; 
-    gap:14px; 
-    margin-bottom:20px; 
+    gap:12px; 
+    margin:20px 0 16px; /* chung ah space kan ti tlem */
   }
   .logo{ 
-    width:56px; height:56px; border-radius:16px; /* a lian deuh */
+    width:50px; height:50px; border-radius:14px;
     background: linear-gradient(135deg,#25D366,#128C7E);
     display:flex; align-items:center; justify-content:center;
-    color:white; font-weight:800; font-size:24px;
+    color:white; font-weight:800; font-size:22px;
   }
-  h1{ font-size:32px; margin:0; font-weight:700; } /* a lian deuh */
-  .sub{ color:#555; margin:8px 0 32px; font-size:16px; } /* a lian deuh */
+  h1{ font-size:28px; margin:0; font-weight:700; }
+  .sub{ color:#555; margin:6px 0 24px; font-size:15px; }
 
-  .label{ font-size:14px; font-weight:600; color:#222; margin:18px 4px 8px; display:block; }
+  .label{ font-size:13px; font-weight:600; color:#222; margin:14px 2px 6px; display:block; }
   .input{
-    width:100%; padding:16px; border:1.5px solid #ddd; border-radius:14px; /* padding kan ti hnem */
-    font-size:17px; background:white;
+    width:100%; padding:14px; border:1.5px solid #e0e0e0; border-radius:12px;
+    font-size:16px; background:white;
   }
   .input:focus{ outline:none; border-color:#25D366; }
 
   .pw-wrap{ position:relative; }
   .eye{ 
-    position:absolute; right:14px; top:50%; transform:translateY(-50%);
-    cursor:pointer; font-size:20px; color:#888;
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    cursor:pointer; font-size:18px; color:#888;
   }
 
-  .forgot{ display:inline-block; margin:12px 4px 0; color:#FF6A00; text-decoration:none; font-weight:600; font-size:15px; }
+  .forgot{ display:inline-block; margin:8px 2px 0; color:#FF6A00; text-decoration:none; font-weight:600; font-size:14px; }
 
   .btn{
-    width:100%; padding:17px; margin-top:24px; border:none; border-radius:16px; /* a chhah deuh */
-    background:#FF6A00; color:white; font-size:18px; font-weight:700; cursor:pointer;
+    width:100%; padding:15px; margin-top:18px; border:none; border-radius:14px;
+    background:#FF6A00; color:white; font-size:17px; font-weight:700; cursor:pointer;
   }
   .btn:active{ transform:scale(0.98); }
 
-  .divider{ text-align:center; margin:28px 0; color:#ccc; font-size:14px; }
+  .divider{ text-align:center; margin:20px 0; color:#ccc; font-size:13px; }
 
-  .register{ text-align:center; font-size:15px; color:#333; }
+  .register{ text-align:center; font-size:14px; color:#333; margin-bottom:20px; /* hnuai ah space kan ti tlem */}
   .register a{ color:#FF6A00; font-weight:700; text-decoration:none; }
 
-  .footer{ 
-    display:flex; 
-    justify-content:space-between; 
-    padding-top:30px; 
-    font-size:13px; 
-    color:#777; 
-  }
-  .footer a{ color:#777; text-decoration:none; }
 </style>
 </head>
 <body>
@@ -106,10 +95,6 @@
     Don't have a MizoChat Account? <a href="#" onclick="showReg()">Register Now</a>
   </div>
 
-  <div class="footer">
-    <a href="#">License Agreement</a>
-    <a href="#">Privacy & Policy</a>
-  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
