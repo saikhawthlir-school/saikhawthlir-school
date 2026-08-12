@@ -134,10 +134,11 @@
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script> <!-- 1. HEI HI BELH -->
 <script>
-// FIREBASE CONFIG TAK - I PROJECT ATANGA LA
+// FIREBASE CONFIG TAK
 const firebaseConfig = { 
-  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk", // Firebase > Project Settings > Config atangin copy rawh
+  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
   authDomain: "school-project-dab29.firebaseapp.com", 
   projectId: "school-project-dab29",
   storageBucket: "school-project-dab29.appspot.com",
@@ -146,6 +147,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore(); // 2. HEI HI BELH
 
 function togglePass(id, el){
   const p = document.getElementById(id);
@@ -189,7 +191,18 @@ function register(){
 
   auth.createUserWithEmailAndPassword(email, pass)
     .then((userCredential)=> {
-      return userCredential.user.updateProfile({displayName: name})
+      const user = userCredential.user;
+      return user.updateProfile({displayName: name}).then(()=>{ // 3. HETA tang hian
+        // Firestore ah user data save
+        return db.collection("users").doc(user.uid).set({
+          uid: user.uid,
+          name: name,
+          email: email,
+          photoURL: "",
+          status: "Online",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }) // HETA thleng hian
     })
     .then(()=> {
       showPopup("Success", "Account siam a hlawhtling e!");
