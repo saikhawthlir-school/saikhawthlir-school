@@ -14,9 +14,9 @@
   
   .logo-wrap{ 
     display:flex; 
-    align-items:center;
-    gap:14px; 
-    margin-bottom:6px;
+    align-items:flex-start; /* MC HI CHUNG LAM AH */
+    gap:12px; 
+    margin-bottom:20px;
   }
   .logo{ 
     width:48px; height:48px; border-radius:12px;
@@ -24,37 +24,24 @@
     display:flex; align-items:center; justify-content:center;
     color:white; font-weight:800; font-size:18px; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    align-self:flex-start;
-    margin-top:4px;
     flex-shrink:0;
   }
   h1{ font-size:24px; margin:0; font-weight:700; color:#000; line-height:1.2; }
-  .sub{ color:#333; font-size:15px; line-height:1.4; margin-top:2px; margin-bottom:30px; }
+  .sub{ color:#333; font-size:15px; line-height:1.4; margin-top:2px; }
 
-  .info{ font-size:15px; color:#000; margin:0 0 14px; }
+  .info{ font-size:15px; color:#000; margin:0 0 18px; }
   .info b{ font-weight:700; }
 
   .field{ 
-    position:relative; 
     margin-bottom:14px; 
-    background:white;
-    border:1.5px solid #ddd;
-    border-radius:10px;
-  }
-  .field-label{
-    position:absolute; top:12px; left:14px;
-    font-size:14px; color:#666; font-weight:500;
-    transition: all 0.2s;
-    pointer-events:none;
-    background:white; padding:0 4px; 
   }
   .input{
-    width:100%; padding:16px 14px 10px; border:none; 
-    font-size:16px; background:transparent; outline:none;
+    width:100%; padding:14px; border:1.5px solid #ddd; 
+    font-size:16px; background:white; outline:none;
+    border-radius:10px;
   }
-  .input:focus + .field-label, 
-  .input:not(:placeholder-shown) + .field-label{
-    top:-8px; font-size:12px; color:#128C7E;
+  .input:focus{
+    border-color: #128C7E;
   }
 
   .pw-wrap{ position:relative; }
@@ -77,9 +64,6 @@
   .login-link{ text-align:center; font-size:15px; color:#222; }
   .login-link a{ color:#128C7E; font-weight:700; text-decoration:none; }
 
-  .terms{ font-size:13px; color:#666; text-align:center; margin:12px 0 0; line-height:1.4; }
-  .terms a{ color:#128C7E; text-decoration:none; }
-
 </style>
 </head>
 <body>
@@ -95,24 +79,20 @@
 <div class="info">Fill in your details to <b>Register</b></div>
 
 <div class="field">
-  <input id="name" class="input" type="text" placeholder=" ">
-  <span class="field-label">Full Name *</span>
+  <input id="name" class="input" type="text" placeholder="Full Name *">
 </div>
 
 <div class="field">
-  <input id="email" class="input" type="email" placeholder=" ">
-  <span class="field-label">Email ID *</span>
+  <input id="email" class="input" type="email" placeholder="Email ID *">
 </div>
 
 <div class="field pw-wrap">
-  <input id="pass" class="input" type="password" placeholder=" ">
-  <span class="field-label">Password *</span>
+  <input id="pass" class="input" type="password" placeholder="Password *">
   <span class="eye" onclick="togglePass('pass', this)">👁️</span>
 </div>
 
 <div class="field pw-wrap">
-  <input id="cpass" class="input" type="password" placeholder=" ">
-  <span class="field-label">Confirm Password *</span>
+  <input id="cpass" class="input" type="password" placeholder="Confirm Password *">
   <span class="eye" onclick="togglePass('cpass', this)">👁️</span>
 </div>
 
@@ -127,7 +107,11 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script>
-const firebaseConfig = { apiKey:"", authDomain:"", projectId:"" };
+const firebaseConfig = { 
+  apiKey:"YOUR_API_KEY", 
+  authDomain:"YOUR_AUTH_DOMAIN", 
+  projectId:"YOUR_PROJECT_ID" 
+};
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
@@ -148,8 +132,16 @@ function register(){
   const pass = document.getElementById('pass').value;
   const cpass = document.getElementById('cpass').value;
 
+  if(!name || !email || !pass || !cpass){
+    alert("Field zawng zawng fill rawh");
+    return;
+  }
   if(pass !== cpass){
     alert("Password a inang lo");
+    return;
+  }
+  if(pass.length < 6){
+    alert("Password chu 6 character aia tam tur");
     return;
   }
 
