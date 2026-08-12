@@ -96,9 +96,11 @@
   onAuthStateChanged(auth, async (user) => {
     if (!user) return window.location.href = "login.html";
     currentUser = user;
-    chatId = [currentUser.uid, friendUid].sort().join("_");
-    loadFriendInfo();
-    loadMessages();
+    if(friendUid) {
+      chatId = [currentUser.uid, friendUid].sort().join("_");
+      loadFriendInfo();
+      loadMessages();
+    }
   });
 
   async function loadFriendInfo(){
@@ -125,13 +127,16 @@
         chatBox.innerHTML += `<div class="msg ${isMe ? 'me' : ''}">${msg.text}<div class="time">${time}</div></div>`;
       });
       chatBox.scrollTop = chatBox.scrollHeight;
+    }, (error) => {
+      console.error("Load Messages Error:", error);
+      alert("Message load Error: " + error.message);
     });
   }
 
   window.sendMsg = async () => {
     const input = document.getElementById('msgInput');
     const text = input.value.trim();
-    if(!text || !currentUser) return;
+    if(!text || !currentUser || !chatId || !friendUid) return; // Heihi ka belh
     
     try {
       await addDoc(collection(db, "chats", chatId, "messages"), {
@@ -142,7 +147,8 @@
       });
       input.value = "";
     } catch(e) {
-      alert("Error: " + e.message)
+      console.error("Send Error:", e);
+      alert("Error: " + e.message) // Error a awm chuan a rawn lang ang
     }
   }
 
