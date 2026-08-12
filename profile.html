@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile</title>
+<style>
+  body { margin:0; font-family:Arial; background:#f0f2f5; }
+  header { background:#128C7E; color:white; padding:12px; display:flex; align-items:center; gap:10px; }
+  header .back { font-size:28px; cursor:pointer; }
+  header b { font-size:18px; }
+  
+  .profile-card {
+    background:white; margin:20px; padding:20px; border-radius:12px;
+    text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.1);
+  }
+  .profile-card img { 
+    width:120px; height:120px; border-radius:50%; 
+    margin-bottom:15px; object-fit:cover;
+  }
+  .profile-card .name { font-size:22px; font-weight:bold; margin-bottom:5px; }
+  .profile-card .status { color:#667781; margin-bottom:15px; }
+  .profile-card .email { color:#128C7E; }
+  
+  .btn-chat {
+    background:#25D366; color:white; border:none; padding:12px 30px;
+    border-radius:25px; font-size:16px; font-weight:bold; cursor:pointer;
+    margin-top:10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="back" onclick="history.back()">←</div>
+  <b>Profile</b>
+</header>
+
+<div class="profile-card" id="profileCard">
+  <img src="https://i.pravatar.cc/120" id="pPic">
+  <div class="name" id="pName">Loading...</div>
+  <div class="status" id="pStatus">Offline</div>
+  <div class="email" id="pEmail"></div>
+  <button class="btn-chat" onclick="goChat()">Message</button>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const app = initializeApp({apiKey:"AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain:"school-project-dab29.firebaseapp.com",projectId:"school-project-dab29"});
+  const auth = getAuth();
+  const db = getFirestore();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const uid = urlParams.get('uid');
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return window.location.href = "login.html";
+    if(uid) loadProfile();
+  });
+
+  async function loadProfile(){
+    const userDoc = await getDoc(doc(db, "users", uid));
+    if(userDoc.exists()){
+      const data = userDoc.data();
+      document.getElementById('pName').innerText = data.name || 'No Name';
+      document.getElementById('pPic').src = data.photoURL || 'https://i.pravatar.cc/120';
+      document.getElementById('pStatus').innerText = data.status || 'Offline';
+      document.getElementById('pEmail').innerText = data.email || '';
+    }
+  }
+
+  window.goChat = () => {
+    window.location.href = `chat.html?uid=${uid}`;
+  }
+</script>
+</body>
+</html>
