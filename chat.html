@@ -1,33 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chat</title>
 <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:Arial; background:#e5ddd5; height:100vh; display:flex; flex-direction:column; }
-  header { background:#128C7E; color:white; height:60px; padding:0 12px; display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:100; }
-.back-btn { font-size:32px; cursor:pointer; line-height:60px; }
-.profile-pic { width:42px; height:42px; border-radius:50%; cursor:pointer; }
-.header-info { flex:1; cursor:pointer; }
-.header-info.name { font-size:18px; font-weight:600; }
-.header-info.status { font-size:13px; opacity:0.9; }
-.chat-box { flex:1; padding:10px; overflow-y:auto; padding-bottom:70px; background:#e5ddd5; }
-.msg { background:white; padding:8px 12px; border-radius:8px; margin:5px 0; max-width:75%; position:relative; box-shadow:0 1px 0.5px rgba(0,0,0,0.13); word-wrap:break-word; }
-.msg.me { background:#DCF8C6; margin-left:auto; }
-.msg.time { font-size:11px; color:#667781; text-align:right; margin-top:4px; display:flex; gap:3px; justify-content:flex-end; align-items:center; }
-.tick { font-size:14px; }
-.tick.read { color:#53bdeb; }
-.input-wrap { display:flex; padding:8px; background:#f0f0f0; align-items:center; gap:8px; position:fixed; bottom:0; left:0; right:0; z-index:99; }
-.input { flex:1; background:white; border-radius:25px; padding:12px 16px; border:none; outline:none; font-size:15px; }
-.send-btn { width:48px; height:48px; border-radius:50%; background:#128C7E; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.send-btn svg { fill:white; width:24px; height:24px; }
-.error { color:red; text-align:center; padding:10px; font-size:14px; background:white; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Arial;background:#e5ddd5;height:100vh;display:flex;flex-direction:column}
+  header{background:#128C7E;color:white;height:60px;padding:0 12px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100}
+  .back-btn{font-size:32px;cursor:pointer;line-height:60px}
+  .profile-pic{width:42px;height:42px;border-radius:50%;cursor:pointer}
+  .header-info{flex:1;cursor:pointer}
+  .header-info.name{font-size:18px;font-weight:600}
+  .header-info.status{font-size:13px;opacity:0.9}
+  .chat-box{flex:1;padding:10px;overflow-y:auto;padding-bottom:70px;background:#e5ddd5}
+  .msg{background:white;padding:8px 12px;border-radius:8px;margin:5px 0;max-width:75%;position:relative;box-shadow:0 1px 0.5px rgba(0,0,0,0.13);word-wrap:break-word}
+  .msg.me{background:#DCF8C6;margin-left:auto}
+  .msg.time{font-size:11px;color:#667781;text-align:right;margin-top:4px;display:flex;gap:3px;justify-content:flex-end;align-items:center}
+  .tick{font-size:14px}.tick.read{color:#53bdeb}
+  .input-wrap{display:flex;padding:8px;background:#f0f0f0;align-items:center;gap:8px;position:fixed;bottom:0;left:0;right:0;z-index:99}
+  .input{flex:1;background:white;border-radius:25px;padding:12px 16px;border:none;outline:none;font-size:15px}
+  .send-btn{width:48px;height:48px;border-radius:50%;background:#128C7E;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .send-btn svg{fill:white;width:24px;height:24px}
 </style>
 </head>
 <body>
-
 <header>
   <div class="back-btn" onclick="window.location.href='index.html'">←</div>
   <img class="profile-pic" id="friendPic" src="https://i.pravatar.cc/42" onclick="goToProfile()">
@@ -36,10 +32,7 @@
     <div class="status" id="friendStatus">Offline</div>
   </div>
 </header>
-
 <div class="chat-box" id="chatBox"></div>
-<div class="error" id="errorMsg"></div>
-
 <div class="input-wrap">
   <input type="text" id="msgInput" class="input" placeholder="Type a message" onkeydown="if(event.key==='Enter') sendMsg()">
   <button class="send-btn" id="sendBtn" onclick="sendMsg()">
@@ -50,52 +43,40 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, updateDoc, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, updateDoc, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
   const app = initializeApp({apiKey:"AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain:"school-project-dab29.firebaseapp.com",projectId:"school-project-dab29"});
   const auth = getAuth(); const db = getFirestore();
 
   const urlParams = new URLSearchParams(window.location.search);
   const friendUid = urlParams.get('uid');
-  alert("Friend UID: " + friendUid); // TEST NAN
   if(!friendUid) window.location.href = "index.html";
 
   let currentUser = null;
   let chatId = null;
 
-  function showError(msg){
-    document.getElementById('errorMsg').innerText = msg;
-    alert("ERROR: " + msg); // alert in a rawn lang nghal
-    setTimeout(()=> document.getElementById('errorMsg').innerText = '', 5000);
-  }
-
   onAuthStateChanged(auth, (user) => {
     if (!user) return window.location.href = "login.html";
     currentUser = user;
-    alert("Logged in as: " + currentUser.uid); // TEST NAN
     chatId = [currentUser.uid, friendUid].sort().join("_");
-    alert("ChatID: " + chatId); // TEST NAN
     loadFriendInfo();
     loadMessages();
     markAsRead();
   });
 
   function goToProfile(){
-    alert("Going to profile: " + friendUid); // TEST NAN
     window.location.href = `profile.html?uid=${friendUid}`
   }
 
   async function loadFriendInfo(){
-    try{
-      const docSnap = await getDoc(doc(db, "users", friendUid));
-      if(docSnap.exists()){
-        const data = docSnap.data();
-        let nameToShow = data.name || (data.email? data.email.split('@')[0] : "User");
-        document.getElementById('friendName').innerText = nameToShow;
-        document.getElementById('friendPic').src = data.photoURL || 'https://i.pravatar.cc/42';
-        document.getElementById('friendStatus').innerText = data.status || 'Offline';
-      }
-    } catch(e){ showError("User load error: " + e.message) }
+    const docSnap = await getDoc(doc(db, "users", friendUid));
+    if(docSnap.exists()){
+      const data = docSnap.data();
+      let nameToShow = data.name || data.email.split('@')[0];
+      document.getElementById('friendName').innerText = nameToShow;
+      document.getElementById('friendPic').src = data.photoURL || 'https://i.pravatar.cc/42';
+      document.getElementById('friendStatus').innerText = data.status || 'Offline';
+    }
   }
 
   function getTicks(status){
@@ -120,50 +101,31 @@
       });
       chatBox.scrollTop = chatBox.scrollHeight;
       if(lastMsg) updateChatList(lastMsg);
-    }, (err)=> showError("Message load error: " + err.message));
+    });
   }
 
   async function updateChatList(lastMsg){
-    try{
-      const dataForMe = {
-        lastMessage: lastMsg.text,
-        timestamp: lastMsg.timestamp,
-        friendUid: friendUid,
-        status: lastMsg.status,
-        senderId: lastMsg.senderId
-      };
-      const dataForFriend = {
-        lastMessage: lastMsg.text,
-        timestamp: lastMsg.timestamp,
-        friendUid: currentUser.uid,
-        status: lastMsg.senderId === currentUser.uid? 'sent' : lastMsg.status,
-        senderId: lastMsg.senderId
-      };
-      await setDoc(doc(db, "userChats", currentUser.uid, "chats", friendUid), dataForMe, {merge: true});
-      await setDoc(doc(db, "userChats", friendUid, "chats", currentUser.uid), dataForFriend, {merge: true});
-    } catch(e){ showError("Chat list update error: " + e.message) }
+    const dataForMe = {lastMessage: lastMsg.text, timestamp: lastMsg.timestamp, friendUid: friendUid, status: lastMsg.status, senderId: lastMsg.senderId};
+    const dataForFriend = {lastMessage: lastMsg.text, timestamp: lastMsg.timestamp, friendUid: currentUser.uid, status: lastMsg.senderId === currentUser.uid? 'sent' : lastMsg.status, senderId: lastMsg.senderId};
+    
+    setDoc(doc(db, "userChats", currentUser.uid, "chats", friendUid), dataForMe, {merge: true}).catch(e => console.log("ChatList me error:", e));
+    setDoc(doc(db, "userChats", friendUid, "chats", currentUser.uid), dataForFriend, {merge: true}).catch(e => console.log("ChatList friend error:", e));
   }
 
   async function sendMsg(){
     const input = document.getElementById('msgInput');
     const text = input.value.trim();
-    alert("Send button clicked. Text: " + text); // TEST NAN
-    if(!text) return;
-    if(!currentUser) return showError("Login nghak lawk");
-    if(!chatId) return showError("Chat ID error");
+    if(!text || !currentUser || !chatId) return;
+    await addDoc(collection(db, "chats", chatId, "messages"), {
+      text: text, senderId: currentUser.uid, receiverId: friendUid, status: 'sent', timestamp: serverTimestamp()
+    });
+    input.value = "";
+  }
 
-    try{
-      alert("Sending to Firebase...");
-      await addDoc(collection(db, "chats", chatId, "messages"), {
-        text: text,
-        senderId: currentUser.uid,
-        receiverId: friendUid,
-        status: 'sent',
-        timestamp: serverTimestamp()
-      });
-      alert("Sent successfully!");
-      input.value = "";
-    } catch(e){ showError("Send error: " + e.message) }
+  async function markAsRead(){
+    const q = query(collection(db, "chats", chatId, "messages"), where("receiverId","==",currentUser.uid), where("status","in",["sent","delivered"]));
+    const snap = await getDocs(q);
+    snap.forEach(d => updateDoc(d.ref, {status: 'read'}));
   }
 </script>
 </body>
