@@ -43,7 +43,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, updateDoc, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, updateDoc, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"; // HEI HI A DIK TAWH
 
   const app = initializeApp({apiKey:"AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain:"school-project-dab29.firebaseapp.com",projectId:"school-project-dab29"});
   const auth = getAuth(); const db = getFirestore();
@@ -108,8 +108,8 @@
     const dataForMe = {lastMessage: lastMsg.text, timestamp: lastMsg.timestamp, friendUid: friendUid, status: lastMsg.status, senderId: lastMsg.senderId};
     const dataForFriend = {lastMessage: lastMsg.text, timestamp: lastMsg.timestamp, friendUid: currentUser.uid, status: lastMsg.senderId === currentUser.uid? 'sent' : lastMsg.status, senderId: lastMsg.senderId};
     
-    setDoc(doc(db, "userChats", currentUser.uid, "chats", friendUid), dataForMe, {merge: true}).catch(e => console.log("ChatList me error:", e));
-    setDoc(doc(db, "userChats", friendUid, "chats", currentUser.uid), dataForFriend, {merge: true}).catch(e => console.log("ChatList friend error:", e));
+    setDoc(doc(db, "userChats", currentUser.uid, "chats", friendUid), dataForMe, {merge: true}).catch(e => console.log(e));
+    setDoc(doc(db, "userChats", friendUid, "chats", currentUser.uid), dataForFriend, {merge: true}).catch(e => console.log(e));
   }
 
   async function sendMsg(){
