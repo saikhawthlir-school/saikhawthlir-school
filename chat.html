@@ -45,130 +45,113 @@
   </button>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",
-  authDomain: "school-project-dab29.firebaseapp.com",
-  projectId: "school-project-dab29"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, getDoc, setDoc, updateDoc, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const urlParams = new URLSearchParams(window.location.search);
-const friendUid = urlParams.get('uid');
-if(!friendUid) window.location.href = "index.html";
+  const app = initializeApp({apiKey:"AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain:"school-project-dab29.firebaseapp.com",projectId:"school-project-dab29"});
+  const auth = getAuth(); const db = getFirestore();
 
-let currentUser = null;
-let chatId = null;
+  const urlParams = new URLSearchParams(window.location.search);
+  const friendUid = urlParams.get('uid');
+  if(!friendUid) window.location.href = "index.html";
 
-auth.onAuthStateChanged((user) => {
-  if (!user) return window.location.href = "login.html";
-  currentUser = user;
-  chatId = [currentUser.uid, friendUid].sort().join("_");
-  loadFriendInfo();
-  loadMessages();
-  markAsRead();
-});
+  let currentUser = null;
+  let chatId = null;
 
-function loadFriendInfo(){
-  db.collection("users").doc(friendUid).get().then((doc) => {
-    if(doc.exists){
-      const data = doc.data();
+  onAuthStateChanged(auth, (user) => {
+    if (!user) return window.location.href = "login.html";
+    currentUser = user;
+    chatId = [currentUser.uid, friendUid].sort().join("_");
+    loadFriendInfo();
+    loadMessages();
+    markAsRead();
+  });
+
+  async function loadFriendInfo(){
+    const docSnap = await getDoc(doc(db, "users", friendUid));
+    if(docSnap.exists()){
+      const data = docSnap.data();
       let nameToShow = data.name || (data.email? data.email.split('@')[0] : "User");
       document.getElementById('friendName').innerText = nameToShow;
       document.getElementById('friendPic').src = data.photoURL || 'https://i.pravatar.cc/42';
       document.getElementById('friendStatus').innerText = data.status || 'Offline';
     }
-  });
-}
+  }
 
-function getTicks(status){
-  if(status === 'read') return `<span class="tick read">✓✓</span>`;
-  if(status === 'delivered') return `<span class="tick">✓✓</span>`;
-  return `<span class="tick">✓</span>`;
-}
+  function getTicks(status){
+    if(status === 'read') return `<span class="tick read">✓</span>`;
+    if(status === 'delivered') return `<span class="tick">✓</span>`;
+    return `<span class="tick">✓</span>`;
+  }
 
-function loadMessages(){
-  db.collection("chats").doc(chatId).collection("messages").orderBy("timestamp")
-.onSnapshot((snapshot) => {
-    const chatBox = document.getElementById('chatBox');
-    chatBox.innerHTML = "";
-    let lastMsg = null;
-    snapshot.forEach(doc => {
-      const msg = doc.data();
-      lastMsg = msg;
-      const isMe = msg.senderId === currentUser.uid;
-      const time = msg.timestamp? new Date(msg.timestamp.toDate()).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) : '';
-      const ticks = isMe? getTicks(msg.status) : '';
-      chatBox.innerHTML += `<div class="msg ${isMe? 'me' : ''}">${msg.text}<div class="time">${time} ${ticks}</div></div>`;
+  function loadMessages(){
+    const q = query(collection(db, "chats", chatId, "messages"), orderBy("timestamp"));
+    onSnapshot(q, (snapshot) => {
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML = "";
+      let lastMsg = null;
+      snapshot.forEach(doc => {
+        const msg = doc.data();
+        lastMsg = msg;
+        const isMe = msg.senderId === currentUser.uid;
+        const time = msg.timestamp? new Date(msg.timestamp.toDate()).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) : '';
+        const ticks = isMe? getTicks(msg.status) : '';
+        chatBox.innerHTML += `<div class="msg ${isMe? 'me' : ''}">${msg.text}<div class="time">${time} ${ticks}</div></div>`;
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+      if(lastMsg) updateChatList(lastMsg); // HEIHI A PAWIMAWH
     });
-    chatBox.scrollTop = chatBox.scrollHeight;
+  }
 
-    if(lastMsg){
-      updateChatList(lastMsg);
-    }
-  });
-}
+  async function updateChatList(lastMsg){
+    const dataForMe = {
+      lastMessage: lastMsg.text,
+      timestamp: lastMsg.timestamp,
+      friendUid: friendUid,
+      status: lastMsg.status,
+      senderId: lastMsg.senderId
+    };
+    const dataForFriend = {
+      lastMessage: lastMsg.text,
+      timestamp: lastMsg.timestamp,
+      friendUid: currentUser.uid,
+      status: lastMsg.senderId === currentUser.uid? 'sent' : lastMsg.status,
+      senderId: lastMsg.senderId
+    };
 
-// PAWIMAWH: CHAT LIST UPDATE + senderId DAH TEL
-function updateChatList(lastMsg){
-  const dataForMe = {
-    lastMessage: lastMsg.text,
-    timestamp: lastMsg.timestamp,
-    friendUid: friendUid,
-    status: lastMsg.status,
-    senderId: lastMsg.senderId // tunge thawn hriat nan
-  };
-  const dataForFriend = {
-    lastMessage: lastMsg.text,
-    timestamp: lastMsg.timestamp,
-    friendUid: currentUser.uid,
-    status: lastMsg.senderId === currentUser.uid? 'sent' : lastMsg.status, // keima thawn loh chuan a status ang
-    senderId: lastMsg.senderId
-  };
+    await setDoc(doc(db, "userChats", currentUser.uid, "chats", friendUid), dataForMe, {merge: true});
+    await setDoc(doc(db, "userChats", friendUid, "chats", currentUser.uid), dataForFriend, {merge: true});
+  }
 
-  db.collection("userChats").doc(currentUser.uid).collection("chats").doc(friendUid).set(dataForMe, {merge: true});
-  db.collection("userChats").doc(friendUid).collection("chats").doc(currentUser.uid).set(dataForFriend, {merge: true});
-}
+  async function sendMsg(){
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if(!text ||!currentUser ||!chatId ||!friendUid) return;
 
-function sendMsg(){
-  const input = document.getElementById('msgInput');
-  const text = input.value.trim();
-  if(!text ||!currentUser ||!chatId ||!friendUid) return;
+    await addDoc(collection(db, "chats", chatId, "messages"), {
+      text: text,
+      senderId: currentUser.uid,
+      receiverId: friendUid,
+      status: 'sent',
+      timestamp: serverTimestamp()
+    });
+    input.value = "";
+  }
 
-  db.collection("chats").doc(chatId).collection("messages").add({
-    text: text,
-    senderId: currentUser.uid,
-    receiverId: friendUid,
-    status: 'sent', // 1 tick
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  input.value = "";
-}
+  async function markAsRead(){
+    const q = query(collection(db, "chats", chatId, "messages"), where("receiverId","==",currentUser.uid), where("status","in",["sent","delivered"]));
+    const snap = await getDocs(q);
+    snap.forEach(d => updateDoc(d.ref, {status: 'read'}));
 
-function markAsRead(){
-  // Kei hnena lo thleng chu hawng apiangin 'read' ah
-  db.collection("chats").doc(chatId).collection("messages")
-.where("receiverId", "==", currentUser.uid)
-.where("status", "in", ["sent","delivered"])
-.get().then(snap => {
-    snap.forEach(doc => doc.ref.update({status: 'read'}))
-  })
-
-  // 'sent' chu 'delivered' ah
-  db.collection("chats").doc(chatId).collection("messages")
-.where("receiverId", "==", currentUser.uid)
-.where("status", "==", "sent")
-.onSnapshot(snap => {
-    snap.docChanges().forEach(change => {
-      if(change.type === 'added') change.doc.ref.update({status: 'delivered'})
+    const q2 = query(collection(db, "chats", chatId, "messages"), where("receiverId","==",currentUser.uid), where("status","==","sent"));
+    onSnapshot(q2, snap => {
+      snap.docChanges().forEach(change => {
+        if(change.type === 'added') updateDoc(change.doc.ref, {status: 'delivered'})
+      })
     })
-  })
-}
+  }
 </script>
 </body>
 </html>
