@@ -22,8 +22,8 @@
 .input-wrap { display:flex; padding:8px; background:#f0f0f0; align-items:center; gap:8px; position:fixed; bottom:0; left:0; right:0; z-index:99; }
 .input { flex:1; background:white; border-radius:25px; padding:12px 16px; border:none; outline:none; font-size:15px; }
 .send-btn { width:48px; height:48px; border-radius:50%; background:#128C7E; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.send-btn:disabled { background:#ccc; }
 .send-btn svg { fill:white; width:24px; height:24px; }
+.error { color:red; text-align:center; padding:10px; font-size:12px; }
 </style>
 </head>
 <body>
@@ -38,6 +38,7 @@
 </header>
 
 <div class="chat-box" id="chatBox"></div>
+<div class="error" id="errorMsg"></div>
 
 <div class="input-wrap">
   <input type="text" id="msgInput" class="input" placeholder="Type a message" onkeydown="if(event.key==='Enter') sendMsg()">
@@ -61,33 +62,39 @@
   let currentUser = null;
   let chatId = null;
 
+  function showError(msg){
+    document.getElementById('errorMsg').innerText = msg;
+    setTimeout(()=> document.getElementById('errorMsg').innerText = '', 3000);
+  }
+
   onAuthStateChanged(auth, (user) => {
     if (!user) return window.location.href = "login.html";
     currentUser = user;
     chatId = [currentUser.uid, friendUid].sort().join("_");
-    document.getElementById('sendBtn').disabled = false; // login zawh ah send theih
     loadFriendInfo();
     loadMessages();
     markAsRead();
   });
 
   function goToProfile(){
-    window.location.href = `profile.html?uid=${friendUid}` // profile page i neih chuan
+    window.location.href = `profile.html?uid=${friendUid}` // HEI HI A NI TAWH
   }
 
   async function loadFriendInfo(){
-    const docSnap = await getDoc(doc(db, "users", friendUid));
-    if(docSnap.exists()){
-      const data = docSnap.data();
-      let nameToShow = data.name || (data.email? data.email.split('@')[0] : "User");
-      document.getElementById('friendName').innerText = nameToShow;
-      document.getElementById('friendPic').src = data.photoURL || 'https://i.pravatar.cc/42';
-      document.getElementById('friendStatus').innerText = data.status || 'Offline';
-    }
+    try{
+      const docSnap = await getDoc(doc(db, "users", friendUid));
+      if(docSnap.exists()){
+        const data = docSnap.data();
+        let nameToShow = data.name || (data.email? data.email.split('@')[0] : "User");
+        document.getElementById('friendName').innerText = nameToShow;
+        document.getElementById('friendPic').src = data.photoURL || 'https://i.pravatar.cc/42';
+        document.getElementById('friendStatus').innerText = data.status || 'Offline';
+      }
+    } catch(e){ showError("User load error: " + e.message) }
   }
 
   function getTicks(status){
-    if(status === 'read') return `<span class="tick read">✓✓</span>`;
+    if(status === 'read') return `<span class="tick read">✓</span>`;
     if(status === 'delivered') return `<span class="tick">✓✓</span>`;
     return `<span class="tick">✓</span>`;
   }
@@ -108,43 +115,47 @@
       });
       chatBox.scrollTop = chatBox.scrollHeight;
       if(lastMsg) updateChatList(lastMsg);
-    });
+    }, (err)=> showError("Message load error: " + err.message));
   }
 
   async function updateChatList(lastMsg){
-    const dataForMe = {
-      lastMessage: lastMsg.text,
-      timestamp: lastMsg.timestamp,
-      friendUid: friendUid,
-      status: lastMsg.status,
-      senderId: lastMsg.senderId
-    };
-    const dataForFriend = {
-      lastMessage: lastMsg.text,
-      timestamp: lastMsg.timestamp,
-      friendUid: currentUser.uid,
-      status: lastMsg.senderId === currentUser.uid? 'sent' : lastMsg.status,
-      senderId: lastMsg.senderId
-    };
-    await setDoc(doc(db, "userChats", currentUser.uid, "chats", friendUid), dataForMe, {merge: true});
-    await setDoc(doc(db, "userChats", friendUid, "chats", currentUser.uid), dataForFriend, {merge: true});
+    try{
+      const dataForMe = {
+        lastMessage: lastMsg.text,
+        timestamp: lastMsg.timestamp,
+        friendUid: friendUid,
+        status: lastMsg.status,
+        senderId: lastMsg.senderId
+      };
+      const dataForFriend = {
+        lastMessage: lastMsg.text,
+        timestamp: lastMsg.timestamp,
+        friendUid: currentUser.uid,
+        status: lastMsg.senderId === currentUser.uid? 'sent' : lastMsg.status,
+        senderId: lastMsg.senderId
+      };
+      await setDoc(doc(db, "userChats", currentUser.uid, "chats", friendUid), dataForMe, {merge: true});
+      await setDoc(doc(db, "userChats", friendUid, "chats", currentUser.uid), dataForFriend, {merge: true});
+    } catch(e){ showError("Chat list update error: " + e.message) }
   }
 
   async function sendMsg(){
     const input = document.getElementById('msgInput');
     const text = input.value.trim();
-    if(!text ||!currentUser ||!chatId ||!friendUid) return;
+    if(!text) return;
+    if(!currentUser) return showError("Login nghak lawk");
+    if(!chatId) return showError("Chat ID error");
 
-    document.getElementById('sendBtn').disabled = true; // spam tur ven nan
-    await addDoc(collection(db, "chats", chatId, "messages"), {
-      text: text,
-      senderId: currentUser.uid,
-      receiverId: friendUid,
-      status: 'sent',
-      timestamp: serverTimestamp()
-    });
-    input.value = "";
-    document.getElementById('sendBtn').disabled = false;
+    try{
+      await addDoc(collection(db, "chats", chatId, "messages"), {
+        text: text,
+        senderId: currentUser.uid,
+        receiverId: friendUid,
+        status: 'sent',
+        timestamp: serverTimestamp()
+      });
+      input.value = "";
+    } catch(e){ showError("Send error: " + e.message) }
   }
 
   async function markAsRead(){
