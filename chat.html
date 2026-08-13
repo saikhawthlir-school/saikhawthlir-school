@@ -22,6 +22,7 @@
 .input-wrap { display:flex; padding:8px; background:#f0f0f0; align-items:center; gap:8px; position:fixed; bottom:0; left:0; right:0; z-index:99; }
 .input { flex:1; background:white; border-radius:25px; padding:12px 16px; border:none; outline:none; font-size:15px; }
 .send-btn { width:48px; height:48px; border-radius:50%; background:#128C7E; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.send-btn:disabled { background:#ccc; }
 .send-btn svg { fill:white; width:24px; height:24px; }
 </style>
 </head>
@@ -29,8 +30,8 @@
 
 <header>
   <div class="back-btn" onclick="window.location.href='index.html'">←</div>
-  <img class="profile-pic" id="friendPic" src="https://i.pravatar.cc/42">
-  <div class="header-info">
+  <img class="profile-pic" id="friendPic" src="https://i.pravatar.cc/42" onclick="goToProfile()">
+  <div class="header-info" onclick="goToProfile()">
     <div class="name" id="friendName">Loading...</div>
     <div class="status" id="friendStatus">Offline</div>
   </div>
@@ -40,7 +41,7 @@
 
 <div class="input-wrap">
   <input type="text" id="msgInput" class="input" placeholder="Type a message" onkeydown="if(event.key==='Enter') sendMsg()">
-  <button class="send-btn" onclick="sendMsg()">
+  <button class="send-btn" id="sendBtn" onclick="sendMsg()">
     <svg viewBox="0 0 24 24"><path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path></svg>
   </button>
 </div>
@@ -64,10 +65,15 @@
     if (!user) return window.location.href = "login.html";
     currentUser = user;
     chatId = [currentUser.uid, friendUid].sort().join("_");
+    document.getElementById('sendBtn').disabled = false; // login zawh ah send theih
     loadFriendInfo();
     loadMessages();
     markAsRead();
   });
+
+  function goToProfile(){
+    window.location.href = `profile.html?uid=${friendUid}` // profile page i neih chuan
+  }
 
   async function loadFriendInfo(){
     const docSnap = await getDoc(doc(db, "users", friendUid));
@@ -120,7 +126,6 @@
       status: lastMsg.senderId === currentUser.uid? 'sent' : lastMsg.status,
       senderId: lastMsg.senderId
     };
-
     await setDoc(doc(db, "userChats", currentUser.uid, "chats", friendUid), dataForMe, {merge: true});
     await setDoc(doc(db, "userChats", friendUid, "chats", currentUser.uid), dataForFriend, {merge: true});
   }
@@ -130,6 +135,7 @@
     const text = input.value.trim();
     if(!text ||!currentUser ||!chatId ||!friendUid) return;
 
+    document.getElementById('sendBtn').disabled = true; // spam tur ven nan
     await addDoc(collection(db, "chats", chatId, "messages"), {
       text: text,
       senderId: currentUser.uid,
@@ -138,6 +144,7 @@
       timestamp: serverTimestamp()
     });
     input.value = "";
+    document.getElementById('sendBtn').disabled = false;
   }
 
   async function markAsRead(){
