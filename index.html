@@ -25,7 +25,7 @@
  .chat-top { display: flex; justify-content: space-between; align-items: center; }
  .chat-name { font-weight: bold; font-size: 16px; }
  .chat-time { font-size: 12px; opacity: 0.7; }
- .chat-last { font-size: 14px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; }
+ .chat-last { font-size: 14px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; display:flex; gap:4px; align-items:center; }
 </style>
 </head>
 <body>
@@ -56,7 +56,7 @@
 
   onAuthStateChanged(auth, (user) => {
     if (!user) window.location.href = "login.html";
-    else { currentUser = user; loadUsers(); loadChats(); } // CHATS LOAD KAN BELH
+    else { currentUser = user; loadUsers(); loadChats(); } // CHATS LOAD BELH
   });
 
   function loadUsers(){
@@ -73,7 +73,14 @@
     });
   }
 
-  // HEIHI CHAT LIST LOAD TUR FUNCTION THAR
+  // TICK FUNCTION
+  function getTicks(status){
+    if(status === 'read') return `<span style="color:#53bdeb; font-size:16px;">✓✓</span>`;
+    if(status === 'delivered') return `<span style="color:#667781; font-size:16px;">✓</span>`;
+    return `<span style="color:#667781; font-size:16px;">✓</span>`;
+  }
+
+  // CHAT LIST LOAD FUNCTION THAR
   function loadChats(){
     const chatsDiv = document.getElementById('chats');
     const q = query(collection(db, "userChats", currentUser.uid, "chats"), orderBy("timestamp", "desc"));
@@ -88,12 +95,12 @@
         const chatData = docSnap.data();
         const friendUid = chatData.friendUid;
 
-        // Friend info kan la
         const friendDoc = await getDoc(doc(db, "users", friendUid));
         if(friendDoc.exists()){
           const friend = friendDoc.data();
           let name = friend.name || (friend.email? friend.email.split('@')[0] : "User");
           let time = chatData.timestamp? new Date(chatData.timestamp.toDate()).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) : '';
+          let ticks = getTicks(chatData.status);
 
           chatsDiv.innerHTML += `
           <div class="chat-item" onclick="openChat('${friendUid}')">
@@ -103,7 +110,7 @@
                 <div class="chat-name">${name}</div>
                 <div class="chat-time">${time}</div>
               </div>
-              <div class="chat-last">${chatData.lastMessage || ''}</div>
+              <div class="chat-last">${ticks} ${chatData.lastMessage || ''}</div>
             </div>
           </div>`;
         }
