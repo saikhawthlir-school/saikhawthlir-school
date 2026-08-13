@@ -73,17 +73,11 @@
     });
   }
 
-  // TICK SIAM DAN WHATSAPP ANG
-  function getChatPreview(chatData){
-    const isMe = chatData.senderId === currentUser.uid; // tunge thawn
-    let ticks = '';
-
-    if(isMe){ // Keima thawn anih chuan tick dah
-      if(chatData.status === 'read') ticks = `<span style="color:#53bdeb; font-size:16px;">✓✓</span>`;
-      else if(chatData.status === 'delivered') ticks = `<span style="color:#667781; font-size:16px;">✓</span>`;
-      else ticks = `<span style="color:#667781; font-size:16px;">✓</span>`;
-    }
-    return `${ticks} ${chatData.lastMessage || ''}`;
+  function getTicks(status, isMe){
+    if(!isMe) return ''; // an thawn chuan tick dah lo
+    if(status === 'read') return `<span style="color:#53bdeb; font-size:16px;">✓</span>`;
+    if(status === 'delivered') return `<span style="color:#667781; font-size:16px;">✓✓</span>`;
+    return `<span style="color:#667781; font-size:16px;">✓</span>`;
   }
 
   function loadChats(){
@@ -99,13 +93,14 @@
       for(const docSnap of snapshot.docs){
         const chatData = docSnap.data();
         const friendUid = chatData.friendUid;
+        const isMe = chatData.senderId === currentUser.uid;
 
         const friendDoc = await getDoc(doc(db, "users", friendUid));
         if(friendDoc.exists()){
           const friend = friendDoc.data();
           let name = friend.name || (friend.email? friend.email.split('@')[0] : "User");
           let time = chatData.timestamp? new Date(chatData.timestamp.toDate()).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) : '';
-          let preview = getChatPreview(chatData);
+          let ticks = getTicks(chatData.status, isMe);
 
           chatsDiv.innerHTML += `
           <div class="chat-item" onclick="openChat('${friendUid}')">
@@ -115,7 +110,7 @@
                 <div class="chat-name">${name}</div>
                 <div class="chat-time">${time}</div>
               </div>
-              <div class="chat-last">${preview}</div>
+              <div class="chat-last">${ticks} ${chatData.lastMessage || ''}</div>
             </div>
           </div>`;
         }
