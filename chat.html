@@ -81,8 +81,8 @@
   }
 
   function getTicks(status){
-    if(status === 'read') return `<span class="tick read">✓</span>`;
-    if(status === 'delivered') return `<span class="tick">✓</span>`;
+    if(status === 'read') return `<span class="tick read">✓✓</span>`;
+    if(status === 'delivered') return `<span class="tick">✓✓</span>`;
     return `<span class="tick">✓</span>`;
   }
 
@@ -101,7 +101,7 @@
         chatBox.innerHTML += `<div class="msg ${isMe? 'me' : ''}">${msg.text}<div class="time">${time} ${ticks}</div></div>`;
       });
       chatBox.scrollTop = chatBox.scrollHeight;
-      if(lastMsg) updateChatList(lastMsg); // HEIHI A PAWIMAWH
+      if(lastMsg) updateChatList(lastMsg);
     });
   }
 
