@@ -10,22 +10,22 @@
   body { background: var(--bg); color: var(--text); }
   header { background: var(--header); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
   header h1 { font-size: 20px; }
- .menu-btn { font-size: 24px; cursor: pointer; position: relative; }
- .menu { display: none; position: absolute; right: 10px; top: 50px; background: var(--bg); color: var(--text); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); width: 200px; z-index: 200; }
- .menu.show { display: block; }.menu a { display: block; padding: 12px 16px; text-decoration: none; color: var(--text); cursor: pointer; }
- .menu a:hover { background: rgba(0,0,0,0.1); }
- .tabs { display: flex; background: var(--header); }
- .tab { flex: 1; padding: 14px; text-align: center; color: white; cursor: pointer; font-weight: bold; font-size: 14px; }
- .tab.active { border-bottom: 3px solid white; }
- .content { display: none; padding: 10px; background: var(--chat-bg); min-height: 80vh; }
- .content.active { display: block; }
- .chat-item { display: flex; padding: 12px; border-bottom: 1px solid #ccc; cursor: pointer; background: var(--bg); margin-bottom: 5px; border-radius: 8px; align-items: center; }
- .chat-item img { width: 50px; height: 50px; border-radius: 50%; margin-right: 12px; }
- .chat-info { flex: 1; overflow: hidden; }
- .chat-top { display: flex; justify-content: space-between; align-items: center; }
- .chat-name { font-weight: bold; font-size: 16px; }
- .chat-time { font-size: 12px; opacity: 0.7; }
- .chat-last { font-size: 14px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; display:flex; gap:4px; align-items:center; }
+.menu-btn { font-size: 24px; cursor: pointer; position: relative; }
+.menu { display: none; position: absolute; right: 10px; top: 50px; background: var(--bg); color: var(--text); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); width: 200px; z-index: 200; }
+.menu.show { display: block; }.menu a { display: block; padding: 12px 16px; text-decoration: none; color: var(--text); cursor: pointer; }
+.menu a:hover { background: rgba(0,0,0,0.1); }
+.tabs { display: flex; background: var(--header); }
+.tab { flex: 1; padding: 14px; text-align: center; color: white; cursor: pointer; font-weight: bold; font-size: 14px; }
+.tab.active { border-bottom: 3px solid white; }
+.content { display: none; padding: 10px; background: var(--chat-bg); min-height: 80vh; }
+.content.active { display: block; }
+.chat-item { display: flex; padding: 12px; border-bottom: 1px solid #ccc; cursor: pointer; background: var(--bg); margin-bottom: 5px; border-radius: 8px; align-items: center; }
+.chat-item img { width: 50px; height: 50px; border-radius: 50%; margin-right: 12px; }
+.chat-info { flex: 1; overflow: hidden; }
+.chat-top { display: flex; justify-content: space-between; align-items: center; }
+.chat-name { font-weight: bold; font-size: 16px; }
+.chat-time { font-size: 12px; opacity: 0.7; }
+.chat-last { font-size: 14px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; display:flex; gap:4px; align-items:center; }
 </style>
 </head>
 <body>
@@ -56,7 +56,7 @@
 
   onAuthStateChanged(auth, (user) => {
     if (!user) window.location.href = "login.html";
-    else { currentUser = user; loadUsers(); loadChats(); } // CHATS LOAD BELH
+    else { currentUser = user; loadUsers(); loadChats(); }
   });
 
   function loadUsers(){
@@ -73,14 +73,19 @@
     });
   }
 
-  // TICK FUNCTION
-  function getTicks(status){
-    if(status === 'read') return `<span style="color:#53bdeb; font-size:16px;">✓✓</span>`;
-    if(status === 'delivered') return `<span style="color:#667781; font-size:16px;">✓</span>`;
-    return `<span style="color:#667781; font-size:16px;">✓</span>`;
+  // TICK SIAM DAN WHATSAPP ANG
+  function getChatPreview(chatData){
+    const isMe = chatData.senderId === currentUser.uid; // tunge thawn
+    let ticks = '';
+
+    if(isMe){ // Keima thawn anih chuan tick dah
+      if(chatData.status === 'read') ticks = `<span style="color:#53bdeb; font-size:16px;">✓✓</span>`;
+      else if(chatData.status === 'delivered') ticks = `<span style="color:#667781; font-size:16px;">✓</span>`;
+      else ticks = `<span style="color:#667781; font-size:16px;">✓</span>`;
+    }
+    return `${ticks} ${chatData.lastMessage || ''}`;
   }
 
-  // CHAT LIST LOAD FUNCTION THAR
   function loadChats(){
     const chatsDiv = document.getElementById('chats');
     const q = query(collection(db, "userChats", currentUser.uid, "chats"), orderBy("timestamp", "desc"));
@@ -100,7 +105,7 @@
           const friend = friendDoc.data();
           let name = friend.name || (friend.email? friend.email.split('@')[0] : "User");
           let time = chatData.timestamp? new Date(chatData.timestamp.toDate()).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) : '';
-          let ticks = getTicks(chatData.status);
+          let preview = getChatPreview(chatData);
 
           chatsDiv.innerHTML += `
           <div class="chat-item" onclick="openChat('${friendUid}')">
@@ -110,7 +115,7 @@
                 <div class="chat-name">${name}</div>
                 <div class="chat-time">${time}</div>
               </div>
-              <div class="chat-last">${ticks} ${chatData.lastMessage || ''}</div>
+              <div class="chat-last">${preview}</div>
             </div>
           </div>`;
         }
