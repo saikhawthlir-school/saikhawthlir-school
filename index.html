@@ -10,17 +10,22 @@
   body { background: var(--bg); color: var(--text); }
   header { background: var(--header); color: white; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
   header h1 { font-size: 20px; }
-  .menu-btn { font-size: 24px; cursor: pointer; position: relative; }
-  .menu { display: none; position: absolute; right: 10px; top: 50px; background: var(--bg); color: var(--text); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); width: 200px; z-index: 200; }
-  .menu.show { display: block; } .menu a { display: block; padding: 12px 16px; text-decoration: none; color: var(--text); cursor: pointer; }
-  .menu a:hover { background: rgba(0,0,0,0.1); }
-  .tabs { display: flex; background: var(--header); }
-  .tab { flex: 1; padding: 14px; text-align: center; color: white; cursor: pointer; font-weight: bold; font-size: 14px; }
-  .tab.active { border-bottom: 3px solid white; }
-  .content { display: none; padding: 10px; background: var(--chat-bg); min-height: 80vh; }
-  .content.active { display: block; }
-  .chat-item { display: flex; padding: 12px; border-bottom: 1px solid #ccc; cursor: pointer; background: var(--bg); margin-bottom: 5px; border-radius: 8px; align-items: center; }
-  .chat-item img { width: 50px; height: 50px; border-radius: 50%; margin-right: 12px; }
+ .menu-btn { font-size: 24px; cursor: pointer; position: relative; }
+ .menu { display: none; position: absolute; right: 10px; top: 50px; background: var(--bg); color: var(--text); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); width: 200px; z-index: 200; }
+ .menu.show { display: block; }.menu a { display: block; padding: 12px 16px; text-decoration: none; color: var(--text); cursor: pointer; }
+ .menu a:hover { background: rgba(0,0,0,0.1); }
+ .tabs { display: flex; background: var(--header); }
+ .tab { flex: 1; padding: 14px; text-align: center; color: white; cursor: pointer; font-weight: bold; font-size: 14px; }
+ .tab.active { border-bottom: 3px solid white; }
+ .content { display: none; padding: 10px; background: var(--chat-bg); min-height: 80vh; }
+ .content.active { display: block; }
+ .chat-item { display: flex; padding: 12px; border-bottom: 1px solid #ccc; cursor: pointer; background: var(--bg); margin-bottom: 5px; border-radius: 8px; align-items: center; }
+ .chat-item img { width: 50px; height: 50px; border-radius: 50%; margin-right: 12px; }
+ .chat-info { flex: 1; overflow: hidden; }
+ .chat-top { display: flex; justify-content: space-between; align-items: center; }
+ .chat-name { font-weight: bold; font-size: 16px; }
+ .chat-time { font-size: 12px; opacity: 0.7; }
+ .chat-last { font-size: 14px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; }
 </style>
 </head>
 <body>
@@ -44,37 +49,75 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  
+  import { getFirestore, collection, onSnapshot, doc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
   const app = initializeApp({apiKey:"AIzaSyDR_nEYUlimYLcU9dc3diXrt7_IV2xzqRk",authDomain:"school-project-dab29.firebaseapp.com",projectId:"school-project-dab29"});
   const auth = getAuth(); const db = getFirestore(); let currentUser = null;
 
   onAuthStateChanged(auth, (user) => {
     if (!user) window.location.href = "login.html";
-    else { currentUser = user; loadUsers(); }
+    else { currentUser = user; loadUsers(); loadChats(); } // CHATS LOAD KAN BELH
   });
 
   function loadUsers(){
     onSnapshot(collection(db, "users"), (snapshot) => {
       const usersDiv = document.getElementById('users');
       if(snapshot.empty){ usersDiv.innerHTML = `<p style="text-align:center; padding:20px;">User ala awm lo</p>`; return; }
-      usersDiv.innerHTML = ""; 
+      usersDiv.innerHTML = "";
       snapshot.forEach((doc) => {
         const user = doc.data();
-        if(user.uid !== currentUser.uid){
+        if(user.uid!== currentUser.uid){
           usersDiv.innerHTML += `<div class="chat-item" onclick="openChat('${user.uid}')"><img src="${user.photoURL || 'https://i.pravatar.cc/50'}"><div><b>${user.name || user.email}</b><br><span style="font-size:12px; opacity:0.7;">${user.status || 'Offline'}</span></div></div>`;
         }
       });
     });
   }
-  
+
+  // HEIHI CHAT LIST LOAD TUR FUNCTION THAR
+  function loadChats(){
+    const chatsDiv = document.getElementById('chats');
+    const q = query(collection(db, "userChats", currentUser.uid, "chats"), orderBy("timestamp", "desc"));
+
+    onSnapshot(q, async (snapshot) => {
+      if(snapshot.empty){
+        chatsDiv.innerHTML = `<p style="text-align:center; padding:20px; opacity:0.6;">Chat ala awm lo</p>`;
+        return;
+      }
+      chatsDiv.innerHTML = "";
+      for(const docSnap of snapshot.docs){
+        const chatData = docSnap.data();
+        const friendUid = chatData.friendUid;
+
+        // Friend info kan la
+        const friendDoc = await getDoc(doc(db, "users", friendUid));
+        if(friendDoc.exists()){
+          const friend = friendDoc.data();
+          let name = friend.name || (friend.email? friend.email.split('@')[0] : "User");
+          let time = chatData.timestamp? new Date(chatData.timestamp.toDate()).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) : '';
+
+          chatsDiv.innerHTML += `
+          <div class="chat-item" onclick="openChat('${friendUid}')">
+            <img src="${friend.photoURL || 'https://i.pravatar.cc/50'}">
+            <div class="chat-info">
+              <div class="chat-top">
+                <div class="chat-name">${name}</div>
+                <div class="chat-time">${time}</div>
+              </div>
+              <div class="chat-last">${chatData.lastMessage || ''}</div>
+            </div>
+          </div>`;
+        }
+      }
+    });
+  }
+
   window.openChat = (uid) => { window.location.href = `chat.html?uid=${uid}`; }
   window.logout = () => { signOut(auth).then(() => window.location.href = "login.html"); }
-  window.showTab = function(tab) { 
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); 
-    document.querySelectorAll('.content').forEach(c => c.classList.remove('active')); 
-    document.querySelector(`[onclick="showTab('${tab}')"]`).classList.add('active'); 
-    document.getElementById(tab).classList.add('active'); 
+  window.showTab = function(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+    document.querySelector(`[onclick="showTab('${tab}')"]`).classList.add('active');
+    document.getElementById(tab).classList.add('active');
   }
   window.toggleMenu = function() { document.getElementById('menu').classList.toggle('show'); }
 </script>
